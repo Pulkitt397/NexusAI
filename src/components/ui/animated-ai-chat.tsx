@@ -24,10 +24,12 @@ interface MessageItem {
     content: string;
     id: string;
     webResult?: WebSearchResult;
+    pdfUrl?: string; // Added field
 }
 
 interface ChatContext {
     isStreaming: boolean;
+    isSearching: boolean;
     streamingContent: string;
     searchMode?: SearchMode;
 }
@@ -108,9 +110,9 @@ const StreamingFooter = ({ context }: { context?: ChatContext }) => {
                         <MessageContent content={streamingContent} isStreaming={true} />
                     ) : (
                         <div className="flex items-center gap-2 text-white/40 h-full py-1">
-                            <LoaderIcon className={cn("w-4 h-4 animate-spin", context?.searchMode === 'web' ? "text-cyan-400" : "text-violet-400")} />
+                            <LoaderIcon className={cn("w-4 h-4 animate-spin", context?.isSearching ? "text-cyan-400" : "text-violet-400")} />
                             <span className="text-xs font-medium tracking-wide">
-                                {context?.searchMode === 'web' ? 'Searching web...' : 'Thinking...'}
+                                {context?.isSearching ? 'Searching web...' : 'Thinking...'}
                             </span>
                         </div>
                     )}
@@ -128,6 +130,7 @@ const ChatHeader = () => <div className="h-8" />;
 interface AnimatedAIChatProps {
     onSendMessage: (message: string) => void;
     isStreaming: boolean;
+    isSearching: boolean;
     streamingContent: string;
     messages: Array<MessageItem>;
     onOpenMemory: () => void;
@@ -152,7 +155,8 @@ export function AnimatedAIChat({
     placeholder = "Describe what you want to build...",
     onEnhance,
     searchMode,
-    onSetSearchMode
+    onSetSearchMode,
+    isSearching
 }: AnimatedAIChatProps) {
     const [value, setValue] = useState("");
     const [isFocused, setIsFocused] = useState(false);
@@ -270,7 +274,7 @@ export function AnimatedAIChat({
                     <Virtuoso<MessageItem, ChatContext>
                         ref={virtuosoRef}
                         data={messages}
-                        context={{ isStreaming, streamingContent, searchMode }}
+                        context={{ isStreaming, isSearching, streamingContent, searchMode }}
                         style={{ height: '100%' }}
                         className="scrollbar-hide"
                         followOutput={isAtBottom ? 'smooth' : false}
@@ -285,6 +289,7 @@ export function AnimatedAIChat({
                                     content={msg.content}
                                     id={msg.id}
                                     webResult={msg.webResult}
+                                    pdfUrl={msg.pdfUrl}
                                 />
                             </div>
                         )}
@@ -303,42 +308,42 @@ export function AnimatedAIChat({
                         isFocused ? "scale-[1.01]" : "scale-100"
                     )}
                 >
-                    {/* Search Mode Toggle */}
+                    {/* Grounded Search Toggle */}
                     <div className="flex justify-center mb-4">
-                        <div className="flex items-center p-1 rounded-full bg-[#0a0a0c]/80 border border-white/10 backdrop-blur-xl shadow-xl">
-                            <button
-                                onClick={() => onSetSearchMode('ai')}
-                                className={cn(
-                                    "px-4 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 transition-all duration-300",
-                                    searchMode === 'ai'
-                                        ? "bg-violet-600 text-white shadow-lg shadow-violet-600/20"
-                                        : "text-white/40 hover:text-white/70 hover:bg-white/5"
-                                )}
-                            >
-                                <Sparkles className="w-3 h-3" />
-                                AI
-                            </button>
-                            <button
-                                onClick={() => onSetSearchMode('web')}
-                                className={cn(
-                                    "px-4 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 transition-all duration-300",
-                                    searchMode === 'web'
-                                        ? "bg-cyan-600 text-white shadow-lg shadow-cyan-600/20"
-                                        : "text-white/40 hover:text-white/70 hover:bg-white/5"
-                                )}
-                            >
+                        <button
+                            onClick={() => onSetSearchMode(searchMode === 'web' ? 'ai' : 'web')}
+                            className={cn(
+                                "group flex items-center gap-3 px-4 py-2 rounded-full border transition-all duration-300 backdrop-blur-xl shadow-xl",
+                                searchMode === 'web'
+                                    ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400"
+                                    : "bg-white/5 border-white/10 text-white/40 hover:text-white/60 hover:bg-white/10"
+                            )}
+                        >
+                            <div className={cn(
+                                "flex items-center justify-center w-5 h-5 rounded-full transition-all duration-300",
+                                searchMode === 'web' ? "bg-cyan-500 text-white rotate-0" : "bg-white/10 text-white/40 rotate-180"
+                            )}>
                                 <Globe className="w-3 h-3" />
-                                Web
-                            </button>
-                        </div>
+                            </div>
+                            <span className="text-xs font-semibold tracking-wide">
+                                {searchMode === 'web' ? 'GROUNDED SEARCH ACTIVE' : 'USE WEB CONTEXT'}
+                            </span>
+                            <div className={cn(
+                                "w-2 h-2 rounded-full animate-pulse",
+                                searchMode === 'web' ? "bg-cyan-500" : "bg-transparent"
+                            )} />
+                        </button>
                     </div>
 
                     <div className={cn(
                         "glass-input rounded-[26px] p-2 flex items-end gap-2 transition-all duration-300 relative overflow-hidden group",
-                        isFocused ? (searchMode === 'web' ? "ring-2 ring-cyan-500/20 bg-[#0a0a0c]/80" : "ring-2 ring-violet-500/20 bg-[#0a0a0c]/80") : "bg-[#0a0a0c]/60"
+                        isFocused ? (searchMode === 'web' ? "ring-2 ring-cyan-500/40 bg-[#0a0a0c]/80 shadow-[0_0_20px_rgba(6,182,212,0.1)]" : "ring-2 ring-violet-500/40 bg-[#0a0a0c]/80 shadow-[0_0_20px_rgba(139,92,246,0.1)]") : "bg-[#0a0a0c]/60"
                     )}>
                         {/* Glow Effect */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-violet-500/10 via-transparent to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                        <div className={cn(
+                            "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none",
+                            searchMode === 'web' ? "bg-gradient-to-r from-cyan-500/10 via-transparent to-blue-500/10" : "bg-gradient-to-r from-violet-500/10 via-transparent to-indigo-500/10"
+                        )} />
 
                         <div className="relative flex-1 min-h-[48px] flex items-center">
                             <textarea

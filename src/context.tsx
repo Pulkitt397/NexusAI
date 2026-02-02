@@ -59,6 +59,17 @@ interface Toast {
     type: 'success' | 'error' | 'info';
 }
 
+const PDF_INTENT_PATTERNS = [
+    /\b(make|create|generate|export|download|save)\s+(this|it|chat|conversation|content)\s+(as|into|to|in)\s+(a\s+)?pdf\b/i,
+    /\bpdf\s+export\b/i,
+    /\bexport\s+to\s+pdf\b/i,
+    /\bdownload\s+pdf\b/i
+];
+
+function shouldTriggerPDF(content: string): boolean {
+    return PDF_INTENT_PATTERNS.some(pattern => pattern.test(content));
+}
+
 export function AppProvider({ children }: { children: ReactNode }) {
     const [state, setState] = useState<AppState>({
         apiKeys: {},
@@ -78,6 +89,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         modalOpen: 'none',
         sidebarOpen: true,
         isStreaming: false,
+        isSearching: false,
         streamingContent: ''
     });
 
@@ -87,149 +99,141 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const { user } = useAuth();
     const [isCloudLoaded, setIsCloudLoaded] = useState(false);
 
-    // Load data from Firestore when user logs in
+    // Unified Initialization: Local -> Cloud
     useEffect(() => {
-        if (!user || isCloudLoaded) return;
+        const initialize = async () => {
+            console.log('[Init] Starting initialization...');
 
-        const loadFromCloud = async () => {
-            console.log('[Cloud] Loading user data...');
-            const cloudData = await firestoreService.loadUserData(user.uid);
+            // 1. Initialize Local Database
+            await db.initDB();
 
-            if (cloudData) {
-                // Apply cloud data to state
-                if (cloudData.preferences) {
-                    const { apiKeys, promptMode, memoryEnabled, currentProviderId, currentModelId } = cloudData.preferences;
-                    setState(prev => ({
-                        ...prev,
-                        apiKeys: apiKeys || prev.apiKeys,
-                        promptMode: (promptMode as any) || prev.promptMode,
-                        memoryEnabled: memoryEnabled ?? prev.memoryEnabled,
-                        currentProviderId: currentProviderId || prev.currentProviderId,
-                        currentModelId: currentModelId || prev.currentModelId
-                    }));
-                    // Also save to localStorage for offline access
-                    if (apiKeys) localStorage.setItem('nexus_api_keys', JSON.stringify(apiKeys));
-                    if (promptMode) localStorage.setItem('nexus_prompt_mode', promptMode);
-                    if (currentProviderId) localStorage.setItem('nexus_current_provider', currentProviderId);
-                    if (currentModelId) localStorage.setItem('nexus_current_model', currentModelId);
-                }
-                if (cloudData.chats) {
-                    setState(prev => ({ ...prev, chats: cloudData.chats }));
-                }
-                if (cloudData.memories) {
-                    setState(prev => ({ ...prev, memories: cloudData.memories }));
-                }
-                console.log('[Cloud] User data loaded successfully');
+            // 2. Load from LocalStorage
+            let localApiKeys: Record<string, string> = {};
+            let localPromptMode: SystemPromptMode = 'standard';
+            let localMemoryEnabled = true;
+            let localSearchMode: 'ai' | 'web' = 'ai';
+            let localProvider: string | null = null;
+            let localModel: string | null = null;
+
+            try {
+                const savedKeys = localStorage.getItem('nexus_api_keys');
+                if (savedKeys) localApiKeys = JSON.parse(savedKeys);
+
+                const savedMem = localStorage.getItem('nexus_memory_enabled');
+                if (savedMem !== null) localMemoryEnabled = JSON.parse(savedMem);
+
+                const savedPM = localStorage.getItem('nexus_prompt_mode');
+                if (savedPM) localPromptMode = savedPM as SystemPromptMode;
+
+                const savedSM = localStorage.getItem('nexus_search_mode');
+                if (savedSM) localSearchMode = savedSM as any;
+
+                localProvider = localStorage.getItem('nexus_current_provider');
+                localModel = localStorage.getItem('nexus_current_model');
+            } catch (e) {
+                console.error('[Init] Failed to load from localStorage:', e);
             }
+
+            // 3. Load from Local DB
+            const localChats = await db.getAllChats();
+            const localMemories = await db.getAllMemories();
+
+            // 4. Initial State Apply
+            setState(prev => ({
+                ...prev,
+                apiKeys: localApiKeys,
+                memoryEnabled: localMemoryEnabled,
+                promptMode: localPromptMode,
+                searchMode: localSearchMode,
+                currentProviderId: localProvider,
+                currentModelId: localModel,
+                chats: localChats,
+                memories: localMemories
+            }));
+
+            // 5. Cloud Sync if user is logged in
+            if (user) {
+                console.log('[Init] Loading cloud data for:', user.email);
+                try {
+                    const cloudData = await firestoreService.loadUserData(user.uid);
+                    if (cloudData) {
+                        const { preferences, chats, memories } = cloudData;
+
+                        setState(prev => {
+                            // Merge API keys: Cloud takes priority, but keep unique local ones
+                            const mergedApiKeys = { ...prev.apiKeys, ...(preferences?.apiKeys || {}) };
+
+                            // Re-save to localStorage for consistency
+                            localStorage.setItem('nexus_api_keys', JSON.stringify(mergedApiKeys));
+
+                            return {
+                                ...prev,
+                                apiKeys: mergedApiKeys,
+                                promptMode: (preferences?.promptMode as any) || prev.promptMode,
+                                memoryEnabled: preferences?.memoryEnabled ?? prev.memoryEnabled,
+                                currentProviderId: preferences?.currentProviderId || prev.currentProviderId,
+                                currentModelId: preferences?.currentModelId || prev.currentModelId,
+                                chats: chats || prev.chats,
+                                memories: memories || prev.memories
+                            };
+                        });
+                        console.log('[Init] Cloud data merged successfully');
+                    }
+                } catch (e) {
+                    console.error('[Init] Cloud load failed:', e);
+                }
+            }
+
             setIsCloudLoaded(true);
+            console.log('[Init] App ready');
         };
 
-        loadFromCloud();
-    }, [user, isCloudLoaded]);
+        initialize();
+    }, [user]); // Re-run only when user AUTH state changes
 
-    // Debounced sync to Firestore on state changes
+    // Fast sync for preferences (API keys, etc)
     useEffect(() => {
         if (!user || !isCloudLoaded) return;
 
-        const debounceTimer = setTimeout(() => {
-            const preferences = {
-                apiKeys: state.apiKeys,
-                promptMode: state.promptMode,
-                memoryEnabled: state.memoryEnabled,
-                currentProviderId: state.currentProviderId,
-                currentModelId: state.currentModelId
-            };
-            firestoreService.saveUserData(user.uid, {
-                preferences,
-                chats: state.chats,
-                memories: state.memories
-            });
-        }, 2000); // 2 second debounce
+        const debounceTimer = setTimeout(async () => {
+            try {
+                const preferences = {
+                    apiKeys: state.apiKeys,
+                    promptMode: state.promptMode,
+                    memoryEnabled: state.memoryEnabled,
+                    currentProviderId: state.currentProviderId,
+                    currentModelId: state.currentModelId
+                };
+                await firestoreService.syncPreferences(user.uid, preferences);
+                console.log('[Cloud] Preferences synced');
+            } catch (error) {
+                console.error('[Cloud] Preference sync failed:', error);
+            }
+        }, 1000);
 
         return () => clearTimeout(debounceTimer);
-    }, [user, isCloudLoaded, state.apiKeys, state.promptMode, state.memoryEnabled, state.currentProviderId, state.currentModelId, state.chats, state.memories]);
+    }, [user, isCloudLoaded, state.apiKeys, state.promptMode, state.memoryEnabled, state.currentProviderId, state.currentModelId]);
 
-    // Initialize
+    // Slower sync for heavy data (chats, memories)
     useEffect(() => {
-        const init = async () => {
-            await db.initDB();
+        if (!user || !isCloudLoaded) return;
 
-            // Load API keys
-            let apiKeys: Record<string, string> = {};
+        const debounceTimer = setTimeout(async () => {
             try {
-                const saved = localStorage.getItem('nexus_api_keys');
-                if (saved) {
-                    apiKeys = JSON.parse(saved);
-                    setState(prev => ({ ...prev, apiKeys }));
-                }
-            } catch (e) { console.error('Failed to load API keys:', e); }
+                await firestoreService.saveUserData(user.uid, {
+                    chats: state.chats,
+                    memories: state.memories
+                });
+                console.log('[Cloud] Data synced');
+            } catch (error) {
+                console.error('[Cloud] Data sync failed:', error);
+            }
+        }, 5000);
 
-            // Load memory toggle state
-            try {
-                const savedMem = localStorage.getItem('nexus_memory_enabled');
-                if (savedMem !== null) {
-                    setState(prev => ({ ...prev, memoryEnabled: JSON.parse(savedMem) }));
-                }
-            } catch (e) { console.error('Failed to load memory state:', e); }
+        return () => clearTimeout(debounceTimer);
+    }, [user, isCloudLoaded, state.chats, state.memories]);
 
-            // Load saved prompt mode
-            try {
-                const savedPromptMode = localStorage.getItem('nexus_prompt_mode');
-                if (savedPromptMode && ['standard', 'compact', 'developer'].includes(savedPromptMode)) {
-                    setState(prev => ({ ...prev, promptMode: savedPromptMode as SystemPromptMode }));
-                }
-            } catch (e) { console.error('Failed to load prompt mode:', e); }
 
-            // Load saved search mode
-            try {
-                const savedSearchMode = localStorage.getItem('nexus_search_mode');
-                if (savedSearchMode && ['ai', 'web'].includes(savedSearchMode)) {
-                    setState(prev => ({ ...prev, searchMode: savedSearchMode as any }));
-                }
-            } catch (e) { console.error('Failed to load search mode:', e); }
-
-            // Load saved provider and model
-            try {
-                const savedProvider = localStorage.getItem('nexus_current_provider');
-                const savedModel = localStorage.getItem('nexus_current_model');
-
-                if (savedProvider && apiKeys[savedProvider]) {
-                    setState(prev => ({
-                        ...prev,
-                        currentProviderId: savedProvider,
-                        isLoadingModels: true
-                    }));
-
-                    // Fetch models for the saved provider
-                    try {
-                        const models = await api.fetchModels(savedProvider, apiKeys[savedProvider]);
-                        const modelToSelect = savedModel && models.find(m => m.id === savedModel)
-                            ? savedModel
-                            : models[0]?.id || null;
-
-                        setState(prev => ({
-                            ...prev,
-                            availableModels: models,
-                            currentModelId: modelToSelect,
-                            isLoadingModels: false
-                        }));
-                    } catch (e) {
-                        console.error('Failed to load models:', e);
-                        setState(prev => ({ ...prev, isLoadingModels: false }));
-                    }
-                }
-            } catch (e) { console.error('Failed to load provider/model:', e); }
-
-            // Load chats
-            const chats = await db.getAllChats();
-            setState(prev => ({ ...prev, chats }));
-
-            // Load memories
-            const memories = await db.getAllMemories();
-            setState(prev => ({ ...prev, memories }));
-        };
-        init();
-    }, []);
 
     const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
         const id = Date.now().toString();
@@ -243,7 +247,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
             localStorage.setItem('nexus_api_keys', JSON.stringify(apiKeys));
             return { ...prev, apiKeys };
         });
-    }, []);
+
+        if (user) {
+            console.log(`[Cloud] API Key for ${providerId} will be synced shortly...`);
+        }
+    }, [user]);
 
     const selectProvider = useCallback(async (providerId: string) => {
         // Save to localStorage
@@ -354,67 +362,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
             content = trimmed.replace(/^\/ai\s*/i, '');
         }
 
-        if (state.searchMode === 'web') {
-            // Web Search Logic
-            let chatId = state.currentChatId;
-            if (!chatId) {
-                const chat: Chat = {
-                    id: db.generateId(),
-                    title: content.slice(0, 50),
-                    providerId: 'web',
-                    modelId: 'duckduckgo',
-                    memoryEnabled: false,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                };
-                await db.saveChat(chat);
-                chatId = chat.id;
-                setState(prev => ({
-                    ...prev,
-                    chats: [chat, ...prev.chats],
-                    currentChatId: chat.id,
-                    view: 'chat'
-                }));
-            }
-
-            // Save user message
-            const userMsg: Message = {
-                id: db.generateId(),
-                chatId,
-                role: 'user',
-                content,
-                createdAt: new Date().toISOString()
-            };
-            await db.saveMessage(userMsg);
-            setState(prev => ({ ...prev, messages: [...prev.messages, userMsg], isStreaming: true }));
-
-            // Perform Search
-            try {
-                const webSearchService = await import('./services/webSearchService');
-                const result = await webSearchService.searchWeb(content);
-
-                const assistantMsg: Message = {
-                    id: db.generateId(),
-                    chatId,
-                    role: 'assistant',
-                    content: result.summary,
-                    webResult: result,
-                    createdAt: new Date().toISOString()
-                };
-                await db.saveMessage(assistantMsg);
-                setState(prev => ({
-                    ...prev,
-                    messages: [...prev.messages, assistantMsg],
-                    isStreaming: false
-                }));
-            } catch (err) {
-                console.error(err);
-                setState(prev => ({ ...prev, isStreaming: false }));
-            }
+        if (!state.currentProviderId || !state.currentModelId) {
+            showToast('Select a provider and model first', 'error');
             return;
         }
-
-        if (!state.currentProviderId || !state.currentModelId) return;
 
         const apiKey = state.apiKeys[state.currentProviderId];
         if (!apiKey) {
@@ -457,7 +408,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
             createdAt: new Date().toISOString()
         };
         await db.saveMessage(userMsg);
-        setState(prev => ({ ...prev, messages: [...prev.messages, userMsg] }));
+        setState(prev => ({ ...prev, messages: [...prev.messages, userMsg], isStreaming: true, streamingContent: '' }));
 
         // Auto-save memory if detected
         if (extracted) {
@@ -474,17 +425,35 @@ export function AppProvider({ children }: { children: ReactNode }) {
             showToast(`Saved: ${extracted.title}`, 'success');
         }
 
-        // Start streaming
-        setState(prev => ({ ...prev, isStreaming: true, streamingContent: '' }));
-
         try {
-            const messages = state.messages.map(m => ({ role: m.role, content: m.content }));
-            messages.push({ role: 'user', content });
+            // Build system prompt with mode + dynamic identity
+            const currentProvider = state.providers.find(p => p.id === state.currentProviderId);
+            const currentModel = state.availableModels.find(m => m.id === state.currentModelId);
+            const identity = currentModel ? `You are currently using ${currentModel.name}${currentProvider ? ` via ${currentProvider.name}` : ''}.` : 'You are using your currently selected model.';
 
-            // Build system prompt with mode + memories
-            let systemPrompt = SYSTEM_PROMPTS[state.promptMode];
+            let systemPrompt = `${SYSTEM_PROMPTS[state.promptMode]}\n\nIDENTITY:\n- ${identity}\n- You must never hardcode your model name; always refer to yourself based on this dynamic identity.`;
 
-            // Append memories if enabled
+            // 1. Perform Web Search Grounding if enabled
+            let webResult: any = null;
+            if (state.searchMode === 'web') {
+                setState(prev => ({ ...prev, isSearching: true }));
+                try {
+                    const { searchWeb, formatResultsForPrompt } = await import('./services/webSearchService');
+                    webResult = await searchWeb(content);
+                    const groundedContext = formatResultsForPrompt(content, webResult);
+                    systemPrompt += '\n\n' + groundedContext;
+                } catch (searchErr) {
+                    console.error('Web search grounding failed:', searchErr);
+                    // Continue even if search fails - silent failure as requested
+                } finally {
+                    setState(prev => ({ ...prev, isSearching: false }));
+                }
+            }
+
+            // Detect PDF intent BEFORE streaming starts
+            const isPDFRequest = shouldTriggerPDF(content);
+
+            // 2. Append memories if enabled
             if (state.memoryEnabled) {
                 const enabledMemories = state.memories.filter(m => m.enabled);
                 if (enabledMemories.length > 0) {
@@ -495,35 +464,70 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 }
             }
 
-            let fullContent = '';
-            let lastUpdate = Date.now();
-            const stream = api.streamChat(state.currentProviderId, apiKey, state.currentModelId, messages, systemPrompt);
+            // Prepare messages for API
+            const apiMessages = state.messages.map(m => ({ role: m.role, content: m.content }));
+            apiMessages.push({ role: 'user', content });
 
+            const stream = await api.streamChat(
+                state.currentProviderId!,
+                state.apiKeys[state.currentProviderId!],
+                state.currentModelId!,
+                apiMessages,
+                systemPrompt
+            );
+
+            let fullContent = '';
             for await (const chunk of stream) {
                 if (chunk.content) {
                     fullContent += chunk.content;
-
-                    // Throttle state updates to ~25fps (every 40ms)
-                    const now = Date.now();
-                    if (now - lastUpdate > 40) {
-                        setState(prev => ({ ...prev, streamingContent: fullContent }));
-                        lastUpdate = now;
-                    }
+                    setState(prev => ({ ...prev, streamingContent: fullContent }));
                 }
-                if (chunk.done) break;
             }
 
-            // Final update to ensure everything is rendered
-            setState(prev => ({ ...prev, streamingContent: fullContent }));
-
-            // Save assistant message
+            // Create assistant message
             const assistantMsg: Message = {
                 id: db.generateId(),
                 chatId,
                 role: 'assistant',
                 content: fullContent,
+                webResult: webResult || undefined,
                 createdAt: new Date().toISOString()
             };
+
+            // Handle PDF Generation as Side Effect (Concurrent)
+            if (isPDFRequest) {
+                try {
+                    console.log('[PDF] Generating side-effect...');
+                    const response = await fetch('http://localhost:3001/api/generate-pdf', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            title: `NexusAI Export - ${new Date().toLocaleDateString()}`,
+                            body: fullContent
+                        })
+                    });
+
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        assistantMsg.pdfUrl = url;
+
+                        // Trigger auto-download
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.setAttribute('download', `NexusAI_${Date.now()}.pdf`);
+                        document.body.appendChild(link);
+                        link.click();
+                        link.remove();
+
+                        showToast('PDF exported successfully', 'success');
+                    }
+                } catch (pdfErr) {
+                    console.error('[PDF] Side-effect failed:', pdfErr);
+                    showToast('PDF generation failed', 'error');
+                }
+            }
+
             await db.saveMessage(assistantMsg);
             setState(prev => ({
                 ...prev,
@@ -533,7 +537,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
             }));
 
         } catch (err: any) {
-            showToast(err.message || 'Failed to get response', 'error');
+            console.error('Send message failed:', err);
+            showToast(err.message || 'Failed to send message', 'error');
             setState(prev => ({ ...prev, isStreaming: false, streamingContent: '' }));
         }
     }, [state, showToast]);

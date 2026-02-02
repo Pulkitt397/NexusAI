@@ -55,7 +55,8 @@ function Dashboard() {
     const formattedMessages = state.messages.map(m => ({
         id: m.id,
         role: m.role,
-        content: m.content
+        content: m.content,
+        webResult: m.webResult
     }));
 
     const enabledMemoryCount = state.memories.filter(m => m.enabled).length;
@@ -346,6 +347,7 @@ function Dashboard() {
                     onEnhance={enhancePrompt}
                     searchMode={state.searchMode}
                     onSetSearchMode={setSearchMode}
+                    isSearching={state.isSearching}
                 />
             </main>
 

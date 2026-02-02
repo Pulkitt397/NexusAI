@@ -23,6 +23,7 @@ export interface Message {
     content: string;
     createdAt: string;
     webResult?: WebSearchResult;
+    pdfUrl?: string;
 }
 
 export type SearchMode = 'ai' | 'web';
@@ -86,6 +87,7 @@ export interface AppState {
     modalOpen: 'none' | 'apiKey' | 'memory' | 'addMemory' | 'settings';
     sidebarOpen: boolean;
     isStreaming: boolean;
+    isSearching: boolean;
     streamingContent: string;
 }
 

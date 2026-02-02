@@ -58,7 +58,7 @@ export async function searchWeb(query: string): Promise<WebSearchResult> {
                 // Remove the used topic from related list so it's not duplicated
                 // related.shift(); 
             } else {
-                summary = "No direct answer found. Please try a different query or checking web results directly.";
+                summary = "Search completed but returned no direct summary context.";
             }
         }
 
@@ -74,10 +74,29 @@ export async function searchWeb(query: string): Promise<WebSearchResult> {
         console.error('Web Search Error:', error);
         return {
             type: 'web',
-            title: 'Search Failed',
-            summary: 'Unable to connect to web search service. This might be due to network options or CORS restrictions.',
+            title: 'Search unavailable',
+            summary: 'The web search tool encountered a technical limitation (network/CORS).',
             source: 'System',
             related: []
         };
     }
+}
+
+/**
+ * Formats results into a concise string for LLM context
+ */
+export function formatResultsForPrompt(query: string, result: WebSearchResult): string {
+    let context = `WEB SEARCH RESULTS for "${query}":\n`;
+    context += `SUMMARY: ${result.summary}\n\n`;
+
+    if (result.related.length > 0) {
+        context += `RELATED SOURCES:\n`;
+        result.related.slice(0, 5).forEach(link => {
+            context += `- ${link.text}: ${link.url}\n`;
+        });
+    }
+
+    context += `\nINSTRUCTIONS: Use the above information as grounding context to answer the user query. Reference links if necessary. If the search results don't contain enough information, use your internal knowledge to provide a complete answer.`;
+
+    return context;
 }

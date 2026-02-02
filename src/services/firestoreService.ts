@@ -58,7 +58,12 @@ export async function syncPreferences(
     userId: string,
     preferences: UserData['preferences']
 ): Promise<void> {
-    await saveUserData(userId, { preferences });
+    try {
+        await saveUserData(userId, { preferences });
+    } catch (error) {
+        console.error('[Firestore] Failed to sync preferences:', error);
+        throw error;
+    }
 }
 
 /**

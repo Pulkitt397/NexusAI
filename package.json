@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
+        "server": "node server/index.js",
         "build": "tsc && vite build",
         "preview": "vite preview"
     },
@@ -23,9 +24,12 @@
         "@types/react-syntax-highlighter": "^15.5.13",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
+        "cors": "^2.8.6",
+        "express": "^5.2.1",
         "firebase": "^12.8.0",
         "framer-motion": "^12.30.0",
         "lucide-react": "^0.563.0",
+        "pdf-lib": "^1.17.1",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
         "react-markdown": "^10.1.0",

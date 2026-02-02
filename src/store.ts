@@ -21,11 +21,12 @@ const initialState: AppState = {
     currentChatId: null,
     messages: [],
     memories: [],
-    memoryEnabled: true, // Default ON for persistent memory
+    memoryEnabled: true,
     view: 'welcome',
     modalOpen: 'none',
     sidebarOpen: true,
     isStreaming: false,
+    isSearching: false,
     streamingContent: ''
 };
 
@@ -206,6 +207,14 @@ export const actions = {
 
     toggleSidebar() {
         store.setState({ sidebarOpen: !store.getState().sidebarOpen });
+    },
+
+    setSearchMode(mode: AppState['searchMode']) {
+        store.setState({ searchMode: mode });
+    },
+
+    setSearching(isSearching: boolean) {
+        store.setState({ isSearching });
     }
 };
 
