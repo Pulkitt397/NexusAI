@@ -70,6 +70,30 @@ function shouldTriggerPDF(content: string): boolean {
     return PDF_INTENT_PATTERNS.some(pattern => pattern.test(content));
 }
 
+const GREETING_PATTERNS = [
+    /^(yo|hi|hello|hey|heyai|nexai|nexusai|nexus|hi\s+there|hello\s+there)$/i,
+    /^(ok|okay|thanks|thank\s+you|thx|cool|nice|great|good|fine)$/i,
+    /^(lol|haha|lmao|hehe)$/i,
+    /^[👍👋✋🙌✨🔥]$/u
+];
+
+function shouldSkipTools(content: string): boolean {
+    const trimmed = content.trim();
+    const words = trimmed.split(/\s+/);
+
+    // Rule: Short ambiguous utterance (<= 2 words) that are purely conversational
+    if (words.length <= 2) {
+        if (GREETING_PATTERNS.some(pattern => pattern.test(trimmed))) {
+            return true;
+        }
+    }
+
+    // Fallback: If it's just punctuation or symbols
+    if (/^[!?.~,;:'"\s]+$/.test(trimmed)) return true;
+
+    return false;
+}
+
 export function AppProvider({ children }: { children: ReactNode }) {
     const [state, setState] = useState<AppState>({
         apiKeys: {},
@@ -435,7 +459,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
             // 1. Perform Web Search Grounding if enabled
             let webResult: any = null;
-            if (state.searchMode === 'web') {
+            const isConversational = shouldSkipTools(content);
+
+            if (state.searchMode === 'web' && !isConversational) {
                 setState(prev => ({ ...prev, isSearching: true }));
                 try {
                     const { searchWeb, formatResultsForPrompt } = await import('./services/webSearchService');
@@ -448,6 +474,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 } finally {
                     setState(prev => ({ ...prev, isSearching: false }));
                 }
+            } else if (state.searchMode === 'web' && isConversational) {
+                console.log('[Routing] Bypassing tools for conversational intent:', content);
             }
 
             // Detect PDF intent BEFORE streaming starts
