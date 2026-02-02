@@ -15,6 +15,7 @@ const initialState: AppState = {
     currentModelId: null,
     availableModels: [],
     isLoadingModels: false,
+    promptMode: 'standard',
     chats: [],
     currentChatId: null,
     messages: [],

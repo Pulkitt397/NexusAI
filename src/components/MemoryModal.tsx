@@ -1,7 +1,7 @@
 // Memory Modal - View, Add, Edit, Delete Memories
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Brain, Plus, Trash2, Toggle } from 'lucide-react';
+import { X, Brain, Plus, Trash2 } from 'lucide-react';
 import { useApp } from '@/context';
 import { cn } from '@/lib/utils';
 import type { Memory } from '@/types';
