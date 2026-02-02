@@ -22,6 +22,20 @@ export interface Message {
     role: 'user' | 'assistant' | 'system';
     content: string;
     createdAt: string;
+    webResult?: WebSearchResult;
+}
+
+export type SearchMode = 'ai' | 'web';
+
+export interface WebSearchResult {
+    type: 'web';
+    title: string;
+    summary: string;
+    source: string;
+    related: Array<{
+        text: string;
+        url: string;
+    }>;
 }
 
 export interface Chat {
@@ -56,6 +70,7 @@ export interface AppState {
 
     // System Prompt
     promptMode: SystemPromptMode;
+    searchMode: SearchMode;
 
     // Chat
     chats: Chat[];

@@ -8,7 +8,8 @@ import {
     Brain,
     Settings,
     Sparkles,
-    Image as ImageIcon
+    Image as ImageIcon,
+    Globe
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import * as React from "react";
@@ -16,17 +17,19 @@ import { MessageContent } from "./MessageContent";
 import { ChatMessage } from "./ChatMessage";
 import { Virtuoso, type VirtuosoHandle, type Components } from 'react-virtuoso';
 
-// --- TYPES & INTERFACES ---
+import { WebSearchResult, SearchMode } from "@/types";
 
 interface MessageItem {
     role: string;
     content: string;
     id: string;
+    webResult?: WebSearchResult;
 }
 
 interface ChatContext {
     isStreaming: boolean;
     streamingContent: string;
+    searchMode?: SearchMode;
 }
 
 interface UseAutoResizeTextareaProps {
@@ -105,8 +108,10 @@ const StreamingFooter = ({ context }: { context?: ChatContext }) => {
                         <MessageContent content={streamingContent} isStreaming={true} />
                     ) : (
                         <div className="flex items-center gap-2 text-white/40 h-full py-1">
-                            <LoaderIcon className="w-4 h-4 animate-spin" />
-                            <span className="text-xs font-medium tracking-wide">Thinking...</span>
+                            <LoaderIcon className={cn("w-4 h-4 animate-spin", context?.searchMode === 'web' ? "text-cyan-400" : "text-violet-400")} />
+                            <span className="text-xs font-medium tracking-wide">
+                                {context?.searchMode === 'web' ? 'Searching web...' : 'Thinking...'}
+                            </span>
                         </div>
                     )}
                 </div>
@@ -131,6 +136,8 @@ interface AnimatedAIChatProps {
     currentModel: string | null;
     placeholder?: string;
     onEnhance?: (input: string) => Promise<string>;
+    searchMode: SearchMode;
+    onSetSearchMode: (mode: SearchMode) => void;
 }
 
 export function AnimatedAIChat({
@@ -143,11 +150,16 @@ export function AnimatedAIChat({
     memoryCount,
     currentModel,
     placeholder = "Describe what you want to build...",
-    onEnhance
+    onEnhance,
+    searchMode,
+    onSetSearchMode
 }: AnimatedAIChatProps) {
     const [value, setValue] = useState("");
     const [isFocused, setIsFocused] = useState(false);
     const [isEnhancing, setIsEnhancing] = useState(false);
+    // Auto-scroll state
+    const [isAtBottom, setIsAtBottom] = useState(true);
+
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({
         minHeight: 52,
         maxHeight: 200,
@@ -258,12 +270,13 @@ export function AnimatedAIChat({
                     <Virtuoso<MessageItem, ChatContext>
                         ref={virtuosoRef}
                         data={messages}
-                        context={{ isStreaming, streamingContent }}
+                        context={{ isStreaming, streamingContent, searchMode }}
                         style={{ height: '100%' }}
                         className="scrollbar-hide"
-                        followOutput="auto"
+                        followOutput={isAtBottom ? 'smooth' : false}
+                        atBottomStateChange={setIsAtBottom}
                         initialTopMostItemIndex={messages.length - 1} // Start at bottom
-                        atBottomThreshold={60}
+                        atBottomThreshold={150}
                         itemContent={(index, msg) => (
                             <div className="px-4 md:px-0 max-w-3xl mx-auto py-2">
                                 <ChatMessage
@@ -271,6 +284,7 @@ export function AnimatedAIChat({
                                     role={msg.role}
                                     content={msg.content}
                                     id={msg.id}
+                                    webResult={msg.webResult}
                                 />
                             </div>
                         )}
@@ -289,9 +303,39 @@ export function AnimatedAIChat({
                         isFocused ? "scale-[1.01]" : "scale-100"
                     )}
                 >
+                    {/* Search Mode Toggle */}
+                    <div className="flex justify-center mb-4">
+                        <div className="flex items-center p-1 rounded-full bg-[#0a0a0c]/80 border border-white/10 backdrop-blur-xl shadow-xl">
+                            <button
+                                onClick={() => onSetSearchMode('ai')}
+                                className={cn(
+                                    "px-4 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 transition-all duration-300",
+                                    searchMode === 'ai'
+                                        ? "bg-violet-600 text-white shadow-lg shadow-violet-600/20"
+                                        : "text-white/40 hover:text-white/70 hover:bg-white/5"
+                                )}
+                            >
+                                <Sparkles className="w-3 h-3" />
+                                AI
+                            </button>
+                            <button
+                                onClick={() => onSetSearchMode('web')}
+                                className={cn(
+                                    "px-4 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 transition-all duration-300",
+                                    searchMode === 'web'
+                                        ? "bg-cyan-600 text-white shadow-lg shadow-cyan-600/20"
+                                        : "text-white/40 hover:text-white/70 hover:bg-white/5"
+                                )}
+                            >
+                                <Globe className="w-3 h-3" />
+                                Web
+                            </button>
+                        </div>
+                    </div>
+
                     <div className={cn(
                         "glass-input rounded-[26px] p-2 flex items-end gap-2 transition-all duration-300 relative overflow-hidden group",
-                        isFocused ? "ring-2 ring-violet-500/20 bg-[#0a0a0c]/80" : "bg-[#0a0a0c]/60"
+                        isFocused ? (searchMode === 'web' ? "ring-2 ring-cyan-500/20 bg-[#0a0a0c]/80" : "ring-2 ring-violet-500/20 bg-[#0a0a0c]/80") : "bg-[#0a0a0c]/60"
                     )}>
                         {/* Glow Effect */}
                         <div className="absolute inset-0 bg-gradient-to-r from-violet-500/10 via-transparent to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />

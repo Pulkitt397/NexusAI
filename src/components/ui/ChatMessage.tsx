@@ -2,14 +2,17 @@ import React, { memo } from 'react';
 import { cn } from '@/lib/utils';
 import { MessageContent } from './MessageContent';
 import { motion } from 'framer-motion';
+import { WebSearchResultCard } from './WebSearchResultCard';
+import { WebSearchResult } from '@/types';
 
 interface ChatMessageProps {
     role: string;
     content: string;
     id: string;
+    webResult?: WebSearchResult;
 }
 
-export const ChatMessage = memo(({ role, content, id }: ChatMessageProps) => {
+export const ChatMessage = memo(({ role, content, id, webResult }: ChatMessageProps) => {
     const isUser = role === 'user';
 
     return (
@@ -33,24 +36,28 @@ export const ChatMessage = memo(({ role, content, id }: ChatMessageProps) => {
 
             {/* Message Card */}
             <div className={cn(
-                "relative max-w-[85%] md:max-w-[80%]",
+                "relative max-w-[85%] md:max-w-[80%] w-full",
                 isUser ? "items-end" : "items-start"
             )}>
-                <div className={cn(
-                    "rounded-2xl px-5 py-4 text-sm md:text-[15px] leading-relaxed shadow-sm",
-                    isUser
-                        ? "bg-[#27272a] text-white/95 border border-white/5"
-                        : "glass-panel text-white/90"
-                )}>
-                    {isUser ? (
-                        <div className="whitespace-pre-wrap">{content}</div>
-                    ) : (
-                        <MessageContent content={content} />
-                    )}
-                </div>
+                {webResult ? (
+                    <WebSearchResultCard result={webResult} />
+                ) : (
+                    <div className={cn(
+                        "rounded-2xl px-5 py-4 text-sm md:text-[15px] leading-relaxed shadow-sm w-fit",
+                        isUser
+                            ? "bg-[#27272a] text-white/95 border border-white/5 ml-auto"
+                            : "glass-panel text-white/90"
+                    )}>
+                        {isUser ? (
+                            <div className="whitespace-pre-wrap">{content}</div>
+                        ) : (
+                            <MessageContent content={content} />
+                        )}
+                    </div>
+                )}
             </div>
         </motion.div>
     );
 }, (prev, next) => {
-    return prev.content === next.content && prev.role === next.role && prev.id === next.id;
+    return prev.content === next.content && prev.role === next.role && prev.id === next.id && prev.webResult === next.webResult;
 });

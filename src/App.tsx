@@ -23,7 +23,8 @@ function Dashboard() {
         setPromptMode,
         openModal,
         closeModal,
-        enhancePrompt
+        enhancePrompt,
+        setSearchMode
     } = useApp();
 
     const [showProviderDropdown, setShowProviderDropdown] = React.useState(false);
@@ -343,6 +344,8 @@ function Dashboard() {
                     memoryCount={enabledMemoryCount}
                     currentModel={currentModel?.name || null}
                     onEnhance={enhancePrompt}
+                    searchMode={state.searchMode}
+                    onSetSearchMode={setSearchMode}
                 />
             </main>
 

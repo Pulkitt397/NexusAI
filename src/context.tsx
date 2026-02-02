@@ -23,7 +23,10 @@ interface AppContextType {
     selectProvider: (providerId: string) => Promise<void>;
     selectModel: (modelId: string) => void;
     // System Prompt actions
+    // System Prompt actions
     setPromptMode: (mode: SystemPromptMode) => void;
+    // Search actions
+    setSearchMode: (mode: 'ai' | 'web') => void;
     // Chat actions
     createChat: () => Promise<void>;
     selectChat: (chatId: string) => Promise<void>;
@@ -65,6 +68,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         availableModels: [],
         isLoadingModels: false,
         promptMode: 'standard',
+        searchMode: 'ai',
         chats: [],
         currentChatId: null,
         messages: [],
@@ -176,6 +180,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 }
             } catch (e) { console.error('Failed to load prompt mode:', e); }
 
+            // Load saved search mode
+            try {
+                const savedSearchMode = localStorage.getItem('nexus_search_mode');
+                if (savedSearchMode && ['ai', 'web'].includes(savedSearchMode)) {
+                    setState(prev => ({ ...prev, searchMode: savedSearchMode as any }));
+                }
+            } catch (e) { console.error('Failed to load search mode:', e); }
+
             // Load saved provider and model
             try {
                 const savedProvider = localStorage.getItem('nexus_current_provider');
@@ -282,6 +294,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setState(prev => ({ ...prev, promptMode: mode }));
     }, []);
 
+    const setSearchMode = useCallback((mode: 'ai' | 'web') => {
+        localStorage.setItem('nexus_search_mode', mode);
+        setState(prev => ({ ...prev, searchMode: mode }));
+    }, []);
+
     const createChat = useCallback(async () => {
         if (!state.currentProviderId || !state.currentModelId) {
             showToast('Select a provider and model first', 'error');
@@ -323,6 +340,80 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const sendMessage = useCallback(async (content: string) => {
+        const trimmed = content.trim();
+        const lower = trimmed.toLowerCase();
+
+        // Handle slash commands
+        if (lower.startsWith('/web')) {
+            setSearchMode('web');
+            if (lower === '/web') return; // Just switch mode
+            content = trimmed.replace(/^\/web\s*/i, '');
+        } else if (lower.startsWith('/ai')) {
+            setSearchMode('ai');
+            if (lower === '/ai') return; // Just switch mode
+            content = trimmed.replace(/^\/ai\s*/i, '');
+        }
+
+        if (state.searchMode === 'web') {
+            // Web Search Logic
+            let chatId = state.currentChatId;
+            if (!chatId) {
+                const chat: Chat = {
+                    id: db.generateId(),
+                    title: content.slice(0, 50),
+                    providerId: 'web',
+                    modelId: 'duckduckgo',
+                    memoryEnabled: false,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                await db.saveChat(chat);
+                chatId = chat.id;
+                setState(prev => ({
+                    ...prev,
+                    chats: [chat, ...prev.chats],
+                    currentChatId: chat.id,
+                    view: 'chat'
+                }));
+            }
+
+            // Save user message
+            const userMsg: Message = {
+                id: db.generateId(),
+                chatId,
+                role: 'user',
+                content,
+                createdAt: new Date().toISOString()
+            };
+            await db.saveMessage(userMsg);
+            setState(prev => ({ ...prev, messages: [...prev.messages, userMsg], isStreaming: true }));
+
+            // Perform Search
+            try {
+                const webSearchService = await import('./services/webSearchService');
+                const result = await webSearchService.searchWeb(content);
+
+                const assistantMsg: Message = {
+                    id: db.generateId(),
+                    chatId,
+                    role: 'assistant',
+                    content: result.summary,
+                    webResult: result,
+                    createdAt: new Date().toISOString()
+                };
+                await db.saveMessage(assistantMsg);
+                setState(prev => ({
+                    ...prev,
+                    messages: [...prev.messages, assistantMsg],
+                    isStreaming: false
+                }));
+            } catch (err) {
+                console.error(err);
+                setState(prev => ({ ...prev, isStreaming: false }));
+            }
+            return;
+        }
+
         if (!state.currentProviderId || !state.currentModelId) return;
 
         const apiKey = state.apiKeys[state.currentProviderId];
@@ -538,6 +629,7 @@ Output only the improved prompt text.`;
             selectProvider,
             selectModel,
             setPromptMode,
+            setSearchMode,
             createChat,
             selectChat,
             deleteChat,
