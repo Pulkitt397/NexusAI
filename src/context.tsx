@@ -63,7 +63,11 @@ const PDF_INTENT_PATTERNS = [
     /\b(make|create|generate|export|download|save)\s+(this|it|chat|conversation|content)\s+(as|into|to|in)\s+(a\s+)?pdf\b/i,
     /\bpdf\s+export\b/i,
     /\bexport\s+to\s+pdf\b/i,
-    /\bdownload\s+pdf\b/i
+    /\bdownload\s+pdf\b/i,
+    /\bgenerate\s+a\s+pdf\b/i,
+    /\bexport\s+this\b/i,
+    /\bdownload\s+this\b/i,
+    /\bgive\s+me\s+a\s+file\b/i
 ];
 
 function shouldTriggerPDF(content: string): boolean {
