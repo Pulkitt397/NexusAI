@@ -3,8 +3,8 @@ import { firestoreDb } from '@/lib/firebase';
 import type { Chat, Memory } from '@/types';
 
 export interface UserData {
+    apiKeys: Record<string, string>; // Moved to top level as requested
     preferences: {
-        apiKeys: Record<string, string>;
         promptMode: string;
         memoryEnabled: boolean;
         currentProviderId: string | null;
@@ -53,6 +53,16 @@ export async function loadUserData(userId: string): Promise<UserData | null> {
 
 /**
  * Sync preferences only
+ */
+/**
+ * Sync API keys specifically
+ */
+export async function saveApiKeys(userId: string, apiKeys: Record<string, string>): Promise<void> {
+    await saveUserData(userId, { apiKeys });
+}
+
+/**
+ * Sync preferences (excluding API keys now)
  */
 export async function syncPreferences(
     userId: string,

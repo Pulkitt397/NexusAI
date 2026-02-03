@@ -185,11 +185,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 try {
                     const cloudData = await firestoreService.loadUserData(user.uid);
                     if (cloudData) {
-                        const { preferences, chats, memories } = cloudData;
+                        const { preferences, chats, memories, apiKeys: cloudApiKeys } = cloudData;
 
                         setState(prev => {
-                            // Merge API keys: Cloud takes priority, but keep unique local ones
-                            const mergedApiKeys = { ...prev.apiKeys, ...(preferences?.apiKeys || {}) };
+                            // Merge API keys: Cloud takes priority for existing keys, but keep unique local ones
+                            // Use cloud keys as the source of truth if they exist
+                            const mergedApiKeys = {
+                                ...prev.apiKeys,
+                                ...(cloudApiKeys || {})
+                            };
 
                             // Re-save to localStorage for consistency
                             localStorage.setItem('nexus_api_keys', JSON.stringify(mergedApiKeys));
@@ -226,7 +230,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const debounceTimer = setTimeout(async () => {
             try {
                 const preferences = {
-                    apiKeys: state.apiKeys,
                     promptMode: state.promptMode,
                     memoryEnabled: state.memoryEnabled,
                     currentProviderId: state.currentProviderId,
@@ -277,9 +280,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
         });
 
         if (user) {
-            console.log(`[Cloud] API Key for ${providerId} will be synced shortly...`);
+            // Immediate sync for API keys
+            // We use the functional update 'apiKeys' result to ensure we sync the latest state
+            // But since setState is async, we reconstruct the object locally for the sync call
+            const newKeys = { ...state.apiKeys, [providerId]: key };
+            firestoreService.saveApiKeys(user.uid, newKeys)
+                .then(() => console.log(`[Cloud] API Key for ${providerId} synced.`))
+                .catch(err => console.error(`[Cloud] API Key sync failed:`, err));
         }
-    }, [user]);
+    }, [user, state.apiKeys]);
 
     const selectProvider = useCallback(async (providerId: string) => {
         // Save to localStorage
