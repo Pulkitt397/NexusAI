@@ -97,7 +97,7 @@ function Dashboard() {
     }
 
     return (
-        <div className="h-screen w-screen bg-[#0a0a0b] flex overflow-hidden fixed inset-0">
+        <div className="h-[100dvh] w-screen bg-[#0a0a0b] flex overflow-hidden fixed inset-0 supports-[height:100dvh]:h-[100dvh]">
             {/* Sidebar */}
             {/* Mobile Backdrop */}
             <AnimatePresence>
