@@ -9,7 +9,10 @@ import {
     Settings,
     Sparkles,
     Image as ImageIcon,
-    Globe
+    Globe,
+    Mic,
+    ChevronDown,
+    Search
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import * as React from "react";
@@ -17,7 +20,7 @@ import { MessageContent } from "./MessageContent";
 import { ChatMessage } from "./ChatMessage";
 import { Virtuoso, type VirtuosoHandle, type Components } from 'react-virtuoso';
 
-import { WebSearchResult, SearchMode } from "@/types";
+import { WebSearchResult, SearchMode, Model } from "@/types";
 
 interface MessageItem {
     role: string;
@@ -93,10 +96,10 @@ function useAutoResizeTextarea({
 const StreamingFooter = ({ context }: { context?: ChatContext }) => {
     const { isStreaming, streamingContent } = context || {};
 
-    if (!isStreaming) return <div className="pb-32" />; // Just padding when not streaming
+    if (!isStreaming) return <div className="pb-4" />; // Small padding
 
     return (
-        <div className="px-4 md:px-0 max-w-3xl mx-auto pb-32">
+        <div className="px-4 md:px-0 max-w-3xl mx-auto pb-4">
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -123,7 +126,7 @@ const StreamingFooter = ({ context }: { context?: ChatContext }) => {
 };
 
 // 2. Stable Header Component
-const ChatHeader = () => <div className="h-8" />;
+const ChatHeader = () => <div className="h-4" />;
 
 // --- MAIN COMPONENT ---
 
@@ -141,6 +144,10 @@ interface AnimatedAIChatProps {
     onEnhance?: (input: string) => Promise<string>;
     searchMode: SearchMode;
     onSetSearchMode: (mode: SearchMode) => void;
+    // New Props for Super Bar
+    availableModels: Model[];
+    currentModelId: string | null;
+    onSelectModel: (modelId: string) => void;
 }
 
 export function AnimatedAIChat({
@@ -151,29 +158,33 @@ export function AnimatedAIChat({
     onOpenMemory,
     onOpenSettings,
     memoryCount,
-    currentModel,
-    placeholder = "Describe what you want to build...",
+    currentModel, // Display name
+    placeholder = "Message NexusAI...",
     onEnhance,
     searchMode,
     onSetSearchMode,
-    isSearching
+    isSearching,
+    availableModels,
+    currentModelId,
+    onSelectModel
 }: AnimatedAIChatProps) {
     const [value, setValue] = useState("");
     const [isFocused, setIsFocused] = useState(false);
     const [isEnhancing, setIsEnhancing] = useState(false);
+    const [showModelSelector, setShowModelSelector] = useState(false);
+
     // Auto-scroll state
     const [isAtBottom, setIsAtBottom] = useState(true);
 
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({
-        minHeight: 52,
-        maxHeight: 200,
+        minHeight: 24, // Compact start
+        maxHeight: 120,
     });
 
     // Virtual List Ref
     const virtuosoRef = useRef<VirtuosoHandle>(null);
 
     // Virtuoso Components (Memoized to be stable references)
-    // We cast keys to any to avoid generic constraints issues with Virtuoso types, but the structures match
     const virtuosoComponents = useMemo<Components<MessageItem, ChatContext>>(() => ({
         Header: ChatHeader,
         Footer: StreamingFooter as any
@@ -182,7 +193,6 @@ export function AnimatedAIChat({
     // Initial scroll on load
     useEffect(() => {
         if (messages.length > 0 && !isStreaming) {
-            // Small delay to ensure layout is ready
             setTimeout(() => {
                 virtuosoRef.current?.scrollToIndex({ index: messages.length - 1, align: 'end' });
             }, 100);
@@ -223,49 +233,73 @@ export function AnimatedAIChat({
         }
     };
 
+    const handleMicClick = () => {
+        // Basic check for browser support
+        if (!('webkitSpeechRecognition' in window)) {
+            alert("Voice input is not supported in this browser.");
+            return;
+        }
+        // @ts-ignore
+        const recognition = new window.webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => {
+            // Visual cue could be added here
+        };
+
+        recognition.onresult = (event: any) => {
+            const transcript = event.results[0][0].transcript;
+            setValue(prev => (prev ? prev + ' ' : '') + transcript);
+            adjustHeight();
+        };
+
+        recognition.start();
+    };
+
     return (
-        <div className="relative h-full w-full flex flex-col overflow-hidden bg-[#050507] text-white selection:bg-violet-500/30">
+        <div className="flex flex-col h-full w-full bg-[#050507] text-white selection:bg-violet-500/30 overflow-hidden">
             {/* Ambient Background */}
             <div className="fixed inset-0 pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-violet-600/10 rounded-full blur-[120px] mix-blend-screen opacity-50" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] mix-blend-screen opacity-30" />
-                <div className="absolute top-[20%] right-[20%] w-[300px] h-[300px] bg-blue-500/5 rounded-full blur-[100px] mix-blend-screen opacity-20" />
                 <div className="bg-noise absolute inset-0 opacity-[0.03]" />
             </div>
 
-            {/* Main Content Area */}
-            <div className="flex-1 relative z-10 px-4 md:px-0 flex flex-col h-full overflow-hidden max-w-full">
-
+            {/* 1. Scrollable Content Area (Flex Grow) */}
+            <div className="flex-1 min-h-0 relative z-10">
                 {/* Welcome State */}
                 <AnimatePresence>
                     {messages.length === 0 && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="absolute inset-0 flex flex-col items-center justify-center text-center z-20 pointer-events-none"
-                        >
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-violet-500/20 to-indigo-500/20 border border-white/10 flex items-center justify-center mb-6 shadow-2xl shadow-violet-500/10 backdrop-blur-xl pointer-events-auto">
-                                <Sparkles className="w-8 h-8 text-white/80" />
-                            </div>
-                            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-white/90 mb-3 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60 pointer-events-auto">
-                                Nexus AI
-                            </h1>
-                            <p className="text-white/40 max-w-md text-sm md:text-base leading-relaxed pointer-events-auto">
-                                {currentModel ? `Powered by ${currentModel}` : "Ready to build, design, and code."}
-                            </p>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-20 pointer-events-none">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="pointer-events-auto"
+                            >
+                                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-violet-500/20 to-indigo-500/20 border border-white/10 flex items-center justify-center mb-6 shadow-2xl shadow-violet-500/10 backdrop-blur-xl mx-auto">
+                                    <Sparkles className="w-8 h-8 text-white/80" />
+                                </div>
+                                <h1 className="text-3xl font-semibold tracking-tight text-white/90 mb-3">
+                                    Nexus AI
+                                </h1>
+                                <p className="text-white/40 max-w-sm mx-auto text-sm leading-relaxed mb-6">
+                                    Ready to build, design, and code with advanced AI models.
+                                </p>
 
-                            <div className="flex gap-3 mt-8 pointer-events-auto">
-                                <button onClick={onOpenMemory} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-xs font-medium text-white/60 transition-all">
-                                    <Brain className="w-3.5 h-3.5" />
-                                    <span>Memory {memoryCount > 0 && `(${memoryCount})`}</span>
-                                </button>
-                                <button onClick={onOpenSettings} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-xs font-medium text-white/60 transition-all">
-                                    <Settings className="w-3.5 h-3.5" />
-                                    <span>Configure</span>
-                                </button>
-                            </div>
-                        </motion.div>
+                                <div className="flex gap-3 justify-center">
+                                    <button onClick={onOpenMemory} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-xs font-medium text-white/60 transition-all">
+                                        <Brain className="w-3.5 h-3.5" />
+                                        <span>Memory {memoryCount > 0 && `(${memoryCount})`}</span>
+                                    </button>
+                                    <button onClick={onOpenSettings} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-xs font-medium text-white/60 transition-all">
+                                        <Settings className="w-3.5 h-3.5" />
+                                        <span>Configure</span>
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </div>
                     )}
                 </AnimatePresence>
 
@@ -279,7 +313,7 @@ export function AnimatedAIChat({
                         className="scrollbar-hide"
                         followOutput={isAtBottom ? 'smooth' : false}
                         atBottomStateChange={setIsAtBottom}
-                        initialTopMostItemIndex={messages.length - 1} // Start at bottom
+                        initialTopMostItemIndex={messages.length - 1}
                         atBottomThreshold={150}
                         itemContent={(index, msg) => (
                             <div className="px-4 md:px-0 max-w-3xl mx-auto py-2">
@@ -298,54 +332,75 @@ export function AnimatedAIChat({
                 )}
             </div>
 
-            {/* Floating Input Area */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:pb-6 z-20 pointer-events-none flex justify-center">
-                <motion.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    className={cn(
-                        "pointer-events-auto w-full max-w-3xl relative transition-all duration-300",
-                        isFocused ? "scale-[1.01]" : "scale-100"
-                    )}
-                >
-                    {/* Grounded Search Toggle */}
-                    <div className="flex justify-center mb-4">
-                        <button
-                            onClick={() => onSetSearchMode(searchMode === 'web' ? 'ai' : 'web')}
-                            className={cn(
-                                "group flex items-center gap-3 px-4 py-2 rounded-full border transition-all duration-300 backdrop-blur-xl shadow-xl",
-                                searchMode === 'web'
-                                    ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400"
-                                    : "bg-white/5 border-white/10 text-white/40 hover:text-white/60 hover:bg-white/10"
-                            )}
-                        >
-                            <div className={cn(
-                                "flex items-center justify-center w-5 h-5 rounded-full transition-all duration-300",
-                                searchMode === 'web' ? "bg-cyan-500 text-white rotate-0" : "bg-white/10 text-white/40 rotate-180"
-                            )}>
-                                <Globe className="w-3 h-3" />
-                            </div>
-                            <span className="text-xs font-semibold tracking-wide">
-                                {searchMode === 'web' ? 'GROUNDED SEARCH ACTIVE' : 'USE WEB CONTEXT'}
-                            </span>
-                            <div className={cn(
-                                "w-2 h-2 rounded-full animate-pulse",
-                                searchMode === 'web' ? "bg-cyan-500" : "bg-transparent"
-                            )} />
-                        </button>
-                    </div>
-
+            {/* 2. Super Input Bar (Sticky Bottom) */}
+            <div className="shrink-0 z-20 bg-[#050507]/95 backdrop-blur-xl border-t border-white/5 pb-[env(safe-area-inset-bottom)]">
+                <div className="max-w-3xl mx-auto px-2 py-2">
                     <div className={cn(
-                        "glass-input rounded-[26px] p-2 flex items-end gap-2 transition-all duration-300 relative overflow-hidden group",
-                        isFocused ? (searchMode === 'web' ? "ring-2 ring-cyan-500/40 bg-[#0a0a0c]/80 shadow-[0_0_20px_rgba(6,182,212,0.1)]" : "ring-2 ring-violet-500/40 bg-[#0a0a0c]/80 shadow-[0_0_20px_rgba(139,92,246,0.1)]") : "bg-[#0a0a0c]/60"
+                        "relative flex items-end gap-2 p-2 rounded-[24px] transition-all duration-300",
+                        isFocused ? "bg-white/10 ring-1 ring-white/10" : "bg-white/5"
                     )}>
-                        {/* Glow Effect */}
-                        <div className={cn(
-                            "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none",
-                            searchMode === 'web' ? "bg-gradient-to-r from-cyan-500/10 via-transparent to-blue-500/10" : "bg-gradient-to-r from-violet-500/10 via-transparent to-indigo-500/10"
-                        )} />
 
-                        <div className="relative flex-1 min-h-[48px] flex items-center">
+                        {/* Left: Model Selector & Search Toggle */}
+                        <div className="flex items-center gap-1 pb-1">
+                            {/* Model Selector Trigger */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setShowModelSelector(!showModelSelector)}
+                                    className="flex items-center gap-1.5 px-2 py-1.5 rounded-full hover:bg-white/10 text-xs font-medium text-white/70 transition-colors"
+                                    title="Select Model"
+                                >
+                                    <span className="max-w-[80px] truncate">
+                                        {availableModels.find(m => m.id === currentModelId)?.name || "Model"}
+                                    </span>
+                                    <ChevronDown className="w-3 h-3 opacity-50" />
+                                </button>
+                                {/* Model Dropdown */}
+                                <AnimatePresence>
+                                    {showModelSelector && (
+                                        <>
+                                            <div className="fixed inset-0 z-40" onClick={() => setShowModelSelector(false)} />
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.95 }}
+                                                className="absolute bottom-full left-0 mb-2 w-48 bg-[#1a1a1c] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1"
+                                            >
+                                                {availableModels.map(model => (
+                                                    <button
+                                                        key={model.id}
+                                                        onClick={() => {
+                                                            onSelectModel(model.id);
+                                                            setShowModelSelector(false);
+                                                        }}
+                                                        className={cn(
+                                                            "w-full text-left px-3 py-2 text-xs font-medium transition-colors hover:bg-white/5",
+                                                            currentModelId === model.id ? "text-violet-400 bg-violet-500/10" : "text-white/70"
+                                                        )}
+                                                    >
+                                                        {model.name}
+                                                    </button>
+                                                ))}
+                                            </motion.div>
+                                        </>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
+                            {/* Web Search Toggle */}
+                            <button
+                                onClick={() => onSetSearchMode(searchMode === 'web' ? 'ai' : 'web')}
+                                className={cn(
+                                    "p-2 rounded-full transition-colors",
+                                    searchMode === 'web' ? "bg-cyan-500/20 text-cyan-400" : "text-white/40 hover:text-white/70 hover:bg-white/5"
+                                )}
+                                title={searchMode === 'web' ? "Web Search Active" : "Enable Web Search"}
+                            >
+                                <Globe className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {/* Center: Auto-resizing Input */}
+                        <div className="flex-1 min-w-0 py-1.5">
                             <textarea
                                 ref={textareaRef}
                                 value={value}
@@ -357,53 +412,55 @@ export function AnimatedAIChat({
                                 onFocus={() => setIsFocused(true)}
                                 onBlur={() => setIsFocused(false)}
                                 placeholder={placeholder}
-                                className="w-full bg-transparent border-none focus:outline-none focus:ring-0 text-white text-[15px] placeholder:text-white/20 px-4 py-3 max-h-[200px] resize-none scrollbar-hide"
-                                style={{ height: 52 }}
+                                className="w-full bg-transparent border-none focus:outline-none focus:ring-0 text-white text-[15px] placeholder:text-white/30 resize-none scrollbar-hide leading-relaxed"
+                                style={{ height: 24, maxHeight: 120 }}
+                                rows={1}
                             />
                         </div>
 
-                        <div className="flex items-center gap-2 pb-1.5 pr-1.5">
-                            {/* Enhance Prompt Button */}
+                        {/* Right: Actions */}
+                        <div className="flex items-center gap-1 pb-1">
+                            {/* Enhance */}
                             {value.trim().length > 0 && onEnhance && (
                                 <button
                                     onClick={handleEnhance}
                                     disabled={isEnhancing || isStreaming}
-                                    className={cn(
-                                        "h-10 w-10 rounded-full flex items-center justify-center transition-all duration-300",
-                                        isEnhancing
-                                            ? "bg-violet-500/20 text-violet-400"
-                                            : "text-white/40 hover:text-violet-400 hover:bg-violet-500/10"
-                                    )}
-                                    title="Enhance Prompt (AI)"
+                                    className="p-2 rounded-full text-white/40 hover:text-violet-400 hover:bg-white/5 transition-colors"
                                 >
-                                    {isEnhancing ? (
-                                        <Sparkles className="w-4 h-4 animate-pulse" />
-                                    ) : (
-                                        <Sparkles className="w-4 h-4" />
-                                    )}
+                                    <Sparkles className={cn("w-4 h-4", isEnhancing && "animate-pulse text-violet-400")} />
                                 </button>
                             )}
 
-                            {/* Send Button */}
+                            {/* Mic */}
+                            {!value.trim() && (
+                                <button
+                                    onClick={handleMicClick}
+                                    className="p-2 rounded-full text-white/40 hover:text-white/90 hover:bg-white/5 transition-colors"
+                                >
+                                    <Mic className="w-4 h-4" />
+                                </button>
+                            )}
+
+                            {/* Send */}
                             <button
                                 onClick={handleSend}
                                 disabled={!value.trim() || isStreaming}
                                 className={cn(
-                                    "h-10 w-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg",
+                                    "p-2 rounded-full transition-all duration-200",
                                     value.trim() && !isStreaming
-                                        ? "bg-white text-black hover:scale-105 hover:bg-white/90 shadow-white/10"
+                                        ? "bg-violet-600 text-white shadow-lg hover:bg-violet-700 hover:scale-105"
                                         : "bg-white/5 text-white/20 cursor-not-allowed"
                                 )}
                             >
-                                {isStreaming ? (
-                                    <LoaderIcon className="w-4 h-4 animate-spin" />
-                                ) : (
-                                    <SendIcon className="w-4 h-4 ml-0.5" />
-                                )}
+                                {isStreaming ? <LoaderIcon className="w-4 h-4 animate-spin" /> : <SendIcon className="w-4 h-4" />}
                             </button>
                         </div>
                     </div>
-                </motion.div>
+                    {/* Helper Text / Mode Indicator */}
+                    <div className="text-[10px] text-center text-white/20 mt-1.5 font-medium tracking-wide">
+                        {searchMode === 'web' ? 'Searching the web for answers' : 'AI mode active'}
+                    </div>
+                </div>
             </div>
         </div>
     );

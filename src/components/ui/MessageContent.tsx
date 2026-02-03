@@ -3,10 +3,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Copy, Check, Play } from 'lucide-react';
+import { Copy, Check, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { isPreviewable } from '@/utils/codeDetection';
-import { LivePreviewModal } from '@/components/LivePreviewModal';
+import { isPreviewable, extractPreviewableCode, buildPreviewDocument } from '@/utils/codeDetection';
 import { SmartImage } from '@/components/ui/SmartImage';
 
 // Stable, lightweight syntax highlighting
@@ -210,10 +209,28 @@ const CodeBlock = React.memo(({
 
 
 export function MessageContent({ content, className, isStreaming }: MessageContentProps) {
-    const [showPreview, setShowPreview] = useState(false);
-
     // Memoize the check
     const canPreview = useMemo(() => isPreviewable(content), [content]);
+
+    const handleLivePreview = () => {
+        try {
+            const extracted = extractPreviewableCode(content);
+            const previewDoc = buildPreviewDocument(extracted);
+
+            // robust open: open blank, then write
+            const newWindow = window.open('', '_blank');
+            if (newWindow) {
+                newWindow.document.open();
+                newWindow.document.write(previewDoc);
+                newWindow.document.close();
+            } else {
+                alert("Popup was blocked! Please allow popups for this site to see the Live Preview.");
+            }
+        } catch (e) {
+            console.error("Failed to open preview:", e);
+            alert("Failed to generate preview. See console for details.");
+        }
+    };
 
     return (
         <div className={cn("relative w-full overflow-hidden", className)}>
@@ -245,19 +262,13 @@ export function MessageContent({ content, className, isStreaming }: MessageConte
                 <motion.button
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    onClick={() => setShowPreview(true)}
+                    onClick={handleLivePreview}
                     className="flex items-center gap-2 px-3 py-1.5 mt-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-lg text-xs font-medium transition-all border border-emerald-500/30"
                 >
-                    <Play className="w-3.5 h-3.5" />
-                    Live Preview
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    Open Live Preview
                 </motion.button>
             )}
-
-            <LivePreviewModal
-                isOpen={showPreview}
-                onClose={() => setShowPreview(false)}
-                content={content}
-            />
         </div>
     );
 }

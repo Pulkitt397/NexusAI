@@ -386,8 +386,6 @@ function Dashboard() {
                     onSendMessage={sendMessage}
                     isStreaming={state.isStreaming}
                     streamingContent={state.streamingContent}
-
-
                     messages={formattedMessages}
                     onOpenMemory={() => openModal('memory')}
                     onOpenSettings={() => openModal('apiKey')}
@@ -397,6 +395,10 @@ function Dashboard() {
                     searchMode={state.searchMode}
                     onSetSearchMode={setSearchMode}
                     isSearching={state.isSearching}
+                    // New Props for Super Input Bar
+                    availableModels={state.availableModels}
+                    currentModelId={state.currentModelId}
+                    onSelectModel={selectModel}
                 />
             </main>
 
