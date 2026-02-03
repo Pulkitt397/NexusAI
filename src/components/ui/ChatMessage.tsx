@@ -44,7 +44,7 @@ export const ChatMessage = memo(({ role, content, id, webResult, pdfUrl }: ChatM
                 {webResult && <WebSearchResultCard result={webResult} />}
 
                 <div className={cn(
-                    "rounded-2xl px-5 py-4 text-sm md:text-[15px] leading-relaxed shadow-sm w-fit",
+                    "rounded-2xl px-5 py-4 text-sm md:text-[15px] leading-relaxed shadow-sm w-fit max-w-full overflow-hidden break-words",
                     isUser
                         ? "bg-[#27272a] text-white/95 border border-white/5 ml-auto text-right"
                         : "glass-panel text-white/90"

@@ -26,6 +26,16 @@
     border-color: var(--color-border);
 }
 
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    max-width: 100vw;
+}
+
 body {
     background-color: var(--color-background);
     color: var(--color-foreground);

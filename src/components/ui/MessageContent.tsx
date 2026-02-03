@@ -216,8 +216,8 @@ export function MessageContent({ content, className, isStreaming }: MessageConte
     const canPreview = useMemo(() => isPreviewable(content), [content]);
 
     return (
-        <div className={cn("relative", className)}>
-            <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-pre:p-0 prose-pre:bg-transparent prose-pre:m-0">
+        <div className={cn("relative w-full overflow-hidden", className)}>
+            <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-pre:p-0 prose-pre:bg-transparent prose-pre:m-0 break-words overflow-hidden">
                 <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{

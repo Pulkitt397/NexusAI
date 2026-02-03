@@ -6,7 +6,7 @@ import { MemoryModal } from '@/components/MemoryModal';
 import { useApp } from '@/context';
 import { PROMPT_MODE_LABELS, type SystemPromptMode } from '@/systemPrompts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Plus, Trash2, ChevronDown, LogOut } from 'lucide-react';
+import { MessageSquare, Plus, Trash2, ChevronDown, LogOut, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { LoginPage } from '@/components/LoginPage';
@@ -35,6 +35,21 @@ function Dashboard() {
     const currentModel = state.availableModels.find(m => m.id === state.currentModelId);
     const hasMessages = state.messages.length > 0;
     const currentPromptLabel = PROMPT_MODE_LABELS[state.promptMode];
+
+    const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+    const [isMobile, setIsMobile] = React.useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            const mobile = window.innerWidth < 768;
+            setIsMobile(mobile);
+            if (mobile) setIsSidebarOpen(false);
+            else setIsSidebarOpen(true);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const handleProviderSelect = async (providerId: string) => {
         setShowProviderDropdown(false);
@@ -82,12 +97,34 @@ function Dashboard() {
     }
 
     return (
-        <div className="h-screen bg-[#0a0a0b] flex overflow-hidden">
+        <div className="h-screen w-screen bg-[#0a0a0b] flex overflow-hidden fixed inset-0">
+            {/* Sidebar */}
+            {/* Mobile Backdrop */}
+            <AnimatePresence>
+                {isMobile && isSidebarOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
+                    />
+                )}
+            </AnimatePresence>
+
             {/* Sidebar */}
             <motion.aside
-                initial={{ x: -280 }}
-                animate={{ x: 0 }}
-                className="w-64 h-full border-r border-white/10 flex flex-col bg-[#0a0a0b]/80 backdrop-blur-xl shrink-0"
+                initial={false}
+                animate={{
+                    width: isMobile ? 280 : (isSidebarOpen ? 280 : 0),
+                    x: isMobile && !isSidebarOpen ? -280 : 0,
+                    opacity: !isMobile && !isSidebarOpen ? 0 : 1
+                }}
+                transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                className={cn(
+                    "h-full border-r border-white/10 flex flex-col bg-[#0a0a0b]/95 backdrop-blur-xl shrink-0 overflow-hidden",
+                    isMobile ? "fixed inset-y-0 left-0 z-50 w-[280px]" : "relative"
+                )}
             >
                 {/* Logo */}
                 <div className="p-4 border-b border-white/10">
@@ -332,7 +369,19 @@ function Dashboard() {
             </motion.aside>
 
             {/* Main content */}
-            <main className="flex-1 h-full overflow-hidden">
+            <main className="flex-1 h-full overflow-hidden relative flex flex-col">
+                {/* Mobile Header / Toggle Button */}
+                <div className="absolute top-4 left-4 z-30">
+                    <button
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                        className={cn(
+                            "p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all",
+                            isMobile && isSidebarOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+                        )}
+                    >
+                        <Menu className="w-6 h-6" />
+                    </button>
+                </div>
                 <AnimatedAIChat
                     onSendMessage={sendMessage}
                     isStreaming={state.isStreaming}

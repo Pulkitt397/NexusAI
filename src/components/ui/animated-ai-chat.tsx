@@ -234,7 +234,7 @@ export function AnimatedAIChat({
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 relative z-10 px-4 md:px-0 flex flex-col h-full">
+            <div className="flex-1 relative z-10 px-4 md:px-0 flex flex-col h-full overflow-hidden max-w-full">
 
                 {/* Welcome State */}
                 <AnimatePresence>
