@@ -310,8 +310,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
                 // Best models per provider (in priority order)
                 const PREFERRED_MODELS: Record<string, string[]> = {
-                    gemini: ['gemini-2.0-flash-exp', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'],
-                    groq: ['llama-3.3-70b-versatile', 'llama-3.1-70b-versatile', 'mixtral-8x7b-32768', 'llama3-70b-8192'],
+                    gemini: ['gemini-2.5-flash', 'gemini-2.0-flash-exp', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'],
+                    groq: ['deepseek-r1-distill-llama-70b', 'llama-3.3-70b-versatile', 'llama-3.1-70b-versatile', 'mixtral-8x7b-32768'],
                     openrouter: ['anthropic/claude-3.5-sonnet', 'google/gemini-2.0-flash-exp:free', 'meta-llama/llama-3.3-70b-instruct', 'google/gemini-flash-1.5'],
                     huggingface: ['mistralai/Mistral-7B-Instruct-v0.3', 'Qwen/Qwen2.5-7B-Instruct', 'google/gemma-2-9b-it', 'meta-llama/Llama-3.2-3B-Instruct']
                 };
