@@ -100,10 +100,80 @@ export async function* streamOpenRouter(apiKey: string, model: string, messages:
             'HTTP-Referer': window.location.origin,
             'X-Title': 'NexusAI'
         },
-        body: JSON.stringify({ model, messages: msgs, stream: true, max_tokens: 4096 })
+        body: JSON.stringify({ model, messages: msgs, stream: true, max_tokens: 8192 })
     });
 
     if (!res.ok) throw new Error('OpenRouter API error');
+    yield* parseOpenAISSE(res);
+}
+
+// Hugging Face API
+export async function fetchHuggingFaceModels(apiKey: string): Promise<Model[]> {
+    // Verify the API key by making a simple request
+    const verifyRes = await fetch('https://huggingface.co/api/whoami-v2', {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+    });
+    if (!verifyRes.ok) throw new Error('Invalid Hugging Face API key');
+
+    // Fetch all text-generation models that are available for inference (free tier)
+    const modelsRes = await fetch(
+        'https://huggingface.co/api/models?pipeline_tag=text-generation&inference=warm&sort=downloads&direction=-1&limit=100',
+        { headers: { 'Authorization': `Bearer ${apiKey}` } }
+    );
+
+    if (!modelsRes.ok) throw new Error('Failed to fetch Hugging Face models');
+    const modelsData = await modelsRes.json();
+
+    // Also fetch conversational models
+    const chatRes = await fetch(
+        'https://huggingface.co/api/models?pipeline_tag=conversational&inference=warm&sort=downloads&direction=-1&limit=50',
+        { headers: { 'Authorization': `Bearer ${apiKey}` } }
+    );
+
+    let chatModels: any[] = [];
+    if (chatRes.ok) {
+        chatModels = await chatRes.json();
+    }
+
+    // Combine and deduplicate models
+    const allModels = [...modelsData, ...chatModels];
+    const seen = new Set<string>();
+    const uniqueModels = allModels.filter((m: any) => {
+        if (seen.has(m.id)) return false;
+        seen.add(m.id);
+        return true;
+    });
+
+    return uniqueModels.map((m: any) => ({
+        id: m.id,
+        name: formatModelName(m.id),
+        description: m.pipeline_tag,
+        contextLength: m.config?.max_position_embeddings || 4096
+    }));
+}
+
+export async function* streamHuggingFace(apiKey: string, model: string, messages: { role: string, content: string }[], systemPrompt?: string): AsyncGenerator<StreamChunk> {
+    const msgs = systemPrompt ? [{ role: 'system', content: systemPrompt }, ...messages] : messages;
+
+    const res = await fetch(`https://api-inference.huggingface.co/models/${model}/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model,
+            messages: msgs,
+            stream: true,
+            max_tokens: 4096,
+            temperature: 0.7
+        })
+    });
+
+    if (!res.ok) {
+        const error = await res.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(error.error || 'Hugging Face API error');
+    }
     yield* parseOpenAISSE(res);
 }
 
@@ -113,6 +183,7 @@ export async function fetchModels(providerId: string, apiKey: string): Promise<M
         case 'gemini': return fetchGeminiModels(apiKey);
         case 'groq': return fetchGroqModels(apiKey);
         case 'openrouter': return fetchOpenRouterModels(apiKey);
+        case 'huggingface': return fetchHuggingFaceModels(apiKey);
         default: throw new Error('Unknown provider');
     }
 }
@@ -122,6 +193,7 @@ export async function* streamChat(providerId: string, apiKey: string, model: str
         case 'gemini': yield* streamGemini(apiKey, model, messages, systemPrompt); break;
         case 'groq': yield* streamGroq(apiKey, model, messages, systemPrompt); break;
         case 'openrouter': yield* streamOpenRouter(apiKey, model, messages, systemPrompt); break;
+        case 'huggingface': yield* streamHuggingFace(apiKey, model, messages, systemPrompt); break;
         default: throw new Error('Unknown provider');
     }
 }

@@ -40,6 +40,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         { id: 'gemini', name: 'Google Gemini', icon: '✨', link: 'https://aistudio.google.com/apikey' },
         { id: 'groq', name: 'Groq', icon: '⚡', link: 'https://console.groq.com/keys' },
         { id: 'openrouter', name: 'OpenRouter', icon: '🌐', link: 'https://openrouter.ai/keys' },
+        { id: 'huggingface', name: 'Hugging Face', icon: '🤗', link: 'https://huggingface.co/settings/tokens' },
     ];
 
     if (!isOpen) return null;

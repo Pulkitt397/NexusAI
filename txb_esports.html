@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TXB ESPORTS | Free Fire Pro Team</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        txb: {
+                            black: '#0a0a0a',
+                            dark: '#111111',
+                            card: '#1a1a1a',
+                            orange: '#ff6b00',
+                            gold: '#ffb800',
+                            cyan: '#00d9ff'
+                        }
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0a0a0a;
+            overflow-x: hidden;
+        }
+
+        .glitch {
+            position: relative;
+            color: white;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -1px 0 #ff6b00;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -1px 0 #00d9ff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% {
+                clip: rect(12px, 9999px, 52px, 0);
+            }
+
+            20% {
+                clip: rect(65px, 9999px, 100px, 0);
+            }
+
+            40% {
+                clip: rect(26px, 9999px, 6px, 0);
+            }
+
+            60% {
+                clip: rect(82px, 9999px, 44px, 0);
+            }
+
+            80% {
+                clip: rect(32px, 9999px, 78px, 0);
+            }
+
+            100% {
+                clip: rect(54px, 9999px, 12px, 0);
+            }
+        }
+
+        @keyframes glitch-anim2 {
+            0% {
+                clip: rect(65px, 9999px, 100px, 0);
+            }
+
+            20% {
+                clip: rect(12px, 9999px, 52px, 0);
+            }
+
+            40% {
+                clip: rect(82px, 9999px, 44px, 0);
+            }
+
+            60% {
+                clip: rect(32px, 9999px, 78px, 0);
+            }
+
+            80% {
+                clip: rect(26px, 9999px, 6px, 0);
+            }
+
+            100% {
+                clip: rect(12px, 9999px, 52px, 0);
+            }
+        }
+
+        .glow-orange {
+            box-shadow: 0 0 20px rgba(255, 107, 0, 0.3);
+        }
+
+        .glow-cyan {
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .text-glow {
+            text-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(255, 107, 0, 0.2);
+            border-color: #ff6b00;
+        }
+
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(#1a1a1a, #1a1a1a) padding-box,
+                linear-gradient(135deg, #ff6b00, #00d9ff) border-box;
+            border: 2px solid transparent;
+        }
+
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .nav-scrolled {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 107, 0, 0.2);
+        }
+
+        .stat-number {
+            background: linear-gradient(135deg, #ff6b00, #ffb800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+
+<body class="font-rajdhani text-gray-300">
+
+    <!-- Particle Background -->
+    <canvas id="particles"></canvas>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 py-4">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 bg-gradient-to-br from-txb-orange to-txb-gold rounded flex items-center justify-center font-orbitron font-bold text-black text-xl glow-orange">
+                    TXB
+                </div>
+                <span class="font-orbitron font-bold text-2xl text-white tracking-wider">ESPORTS</span>
+            </div>
+
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#home" class="hover:text-txb-orange transition-colors font-bold tracking-wide">HOME</a>
+                <a href="#roster" class="hover:text-txb-orange transition-colors font-bold tracking-wide">ROSTER</a>
+                <a href="#achievements"
+                    class="hover:text-txb-orange transition-colors font-bold tracking-wide">ACHIEVEMENTS</a>
+                <a href="#partners" class="hover:text-txb-orange transition-colors font-bold tracking-wide">PARTNERS</a>
+                <button
+                    class="px-6 py-2 bg-txb-orange text-black font-bold rounded hover:bg-txb-gold transition-all glow-orange font-orbitron">
+                    JOIN US
+                </button>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden text-white hover:text-txb-orange">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen flex items-center justify-center relative pt-20">
+        <div class="container mx-auto px-6 text-center z-10">
+            <div
+                class="mb-4 inline-block px-4 py-1 rounded-full border border-txb-orange/30 bg-txb-orange/10 text-txb-orange font-bold text-sm tracking-widest uppercase">
+                Dominating the Battlegrounds
+            </div>
+            <h1 class="font-orbitron text-6xl md:text-8xl font-black mb-6 uppercase leading-tight">
+                <span class="glitch" data-text="DOMINATE">DOMINATE</span> <br>
+                <span class="text-white">THE GAME</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-400 mb-10 max-w-2xl mx-auto">
+                Team Xtreme Battle (TXB) is the premier Free Fire esports organization,
+                forging champions and defining the meta since 2023.
+            </p>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+                <button
+                    class="px-8 py-4 bg-gradient-to-r from-txb-orange to-txb-gold text-black font-orbitron font-bold text-lg rounded skew-x-[-10deg] hover:skew-x-[-15deg] transition-all glow-orange">
+                    <span class="skew-x-[10deg] inline-block">WATCH HIGHLIGHTS</span>
+                </button>
+                <button
+                    class="px-8 py-4 border border-white/20 hover:border-txb-cyan hover:text-txb-cyan bg-white/5 backdrop-blur font-orbitron font-bold text-lg rounded skew-x-[-10deg] transition-all">
+                    <span class="skew-x-[10deg] inline-block">MEET THE SQUAD</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Hero Background Elements -->
+        <div
+            class="absolute inset-0 bg-gradient-to-t from-txb-black via-transparent to-transparent pointer-events-none">
+        </div>
+    </section>
+
+    <!-- Roster Section -->
+    <section id="roster" class="py-24 bg-txb-dark relative">
+        <div class="container mx-auto px-6">
+            <h2 class="font-orbitron text-5xl font-bold mb-16 text-center">
+                ACTIVE <span class="text-txb-orange">ROSTER</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Player Card 1 -->
+                <div class="group relative rounded-xl overflow-hidden bg-txb-card border border-white/5 card-hover">
+                    <div class="aspect-[3/4] bg-neutral-800 relative overflow-hidden">
+                        <img src="https://via.placeholder.com/400x600/101010/333333?text=RUSHER" alt="Player"
+                            class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-80"></div>
+                        <div class="absolute bottom-4 left-4">
+                            <h3 class="font-orbitron text-2xl font-bold text-white">VENOM</h3>
+                            <p class="text-txb-orange font-bold text-sm">MAIN RUSHER</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Card 2 -->
+                <div class="group relative rounded-xl overflow-hidden bg-txb-card border border-white/5 card-hover">
+                    <div class="aspect-[3/4] bg-neutral-800 relative overflow-hidden">
+                        <img src="https://via.placeholder.com/400x600/101010/333333?text=IGL" alt="Player"
+                            class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-80"></div>
+                        <div class="absolute bottom-4 left-4">
+                            <h3 class="font-orbitron text-2xl font-bold text-white">COMMANDER</h3>
+                            <p class="text-txb-cyan font-bold text-sm">IGL / TACTICIAN</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Card 3 -->
+                <div class="group relative rounded-xl overflow-hidden bg-txb-card border border-white/5 card-hover">
+                    <div class="aspect-[3/4] bg-neutral-800 relative overflow-hidden">
+                        <img src="https://via.placeholder.com/400x600/101010/333333?text=SNIPER" alt="Player"
+                            class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-80"></div>
+                        <div class="absolute bottom-4 left-4">
+                            <h3 class="font-orbitron text-2xl font-bold text-white">EAGLE</h3>
+                            <p class="text-txb-gold font-bold text-sm">SNIPER SUPPORT</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Card 4 -->
+                <div class="group relative rounded-xl overflow-hidden bg-txb-card border border-white/5 card-hover">
+                    <div class="aspect-[3/4] bg-neutral-800 relative overflow-hidden">
+                        <img src="https://via.placeholder.com/400x600/101010/333333?text=FLANKER" alt="Player"
+                            class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-80"></div>
+                        <div class="absolute bottom-4 left-4">
+                            <h3 class="font-orbitron text-2xl font-bold text-white">GHOST</h3>
+                            <p class="text-txb-orange font-bold text-sm">FLANKER</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-20 border-y border-white/5 bg-black">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+                <div>
+                    <div class="text-5xl font-orbitron font-black stat-number mb-2">50+</div>
+                    <div class="text-gray-400 font-bold tracking-widest text-sm">TOURNAMENTS WON</div>
+                </div>
+                <div>
+                    <div class="text-5xl font-orbitron font-black stat-number mb-2">12K</div>
+                    <div class="text-gray-400 font-bold tracking-widest text-sm">KILLS RECORDED</div>
+                </div>
+                <div>
+                    <div class="text-5xl font-orbitron font-black stat-number mb-2">94%</div>
+                    <div class="text-gray-400 font-bold tracking-widest text-sm">WIN RATE</div>
+                </div>
+                <div>
+                    <div class="text-5xl font-orbitron font-black stat-number mb-2">5M+</div>
+                    <div class="text-gray-400 font-bold tracking-widest text-sm">FANS GLOBALLY</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Particle System
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speedX = (Math.random() * 1) - 0.5;
+                this.speedY = (Math.random() * 1) - 0.5;
+                this.color = Math.random() > 0.5 ? '#ff6b00' : '#00d9ff';
+                this.opacity = Math.random() * 0.5;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            for (let i = 0; i < 100; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('nav-scrolled');
+            } else {
+                nav.classList.remove('nav-scrolled');
+            }
+        });
+
+        // Resize Canvas
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
+    </script>
+</body>
+
+</html>
