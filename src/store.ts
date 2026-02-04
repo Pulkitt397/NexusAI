@@ -5,7 +5,8 @@ import * as db from './db';
 const PROVIDERS: Provider[] = [
     { id: 'gemini', name: 'Google Gemini', icon: '✨', color: '#4285f4', baseUrl: 'https://generativelanguage.googleapis.com/v1beta' },
     { id: 'groq', name: 'Groq', icon: '⚡', color: '#f97316', baseUrl: 'https://api.groq.com/openai/v1' },
-    { id: 'openrouter', name: 'OpenRouter', icon: '🌐', color: '#8b5cf6', baseUrl: 'https://openrouter.ai/api/v1' }
+    { id: 'openrouter', name: 'OpenRouter', icon: '🌐', color: '#8b5cf6', baseUrl: 'https://openrouter.ai/api/v1' },
+    { id: 'huggingface', name: 'Hugging Face', icon: '🤗', color: '#ffcc00', baseUrl: 'https://api-inference.huggingface.co' }
 ];
 
 const initialState: AppState = {
