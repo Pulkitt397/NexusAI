@@ -177,6 +177,49 @@ export async function* streamHuggingFace(apiKey: string, model: string, messages
     yield* parseOpenAISSE(res);
 }
 
+// NVIDIA Kimi API (OpenAI compatible)
+export async function fetchNvidiaModels(apiKey: string): Promise<Model[]> {
+    // Verify API key with a simple request
+    const res = await fetch('https://integrate.api.nvidia.com/v1/models', {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+    });
+
+    if (!res.ok) throw new Error('Invalid NVIDIA API key');
+
+    // Return single Kimi K2.5 model
+    return [{
+        id: 'moonshotai/kimi-k2.5',
+        name: 'Kimi K2.5',
+        description: '1T multimodal MoE model',
+        contextLength: 128000
+    }];
+}
+
+export async function* streamNvidia(apiKey: string, model: string, messages: { role: string, content: string }[], systemPrompt?: string): AsyncGenerator<StreamChunk> {
+    const msgs = systemPrompt ? [{ role: 'system', content: systemPrompt }, ...messages] : messages;
+
+    const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model,
+            messages: msgs,
+            stream: true,
+            max_tokens: 4096,
+            temperature: 0.7
+        })
+    });
+
+    if (!res.ok) {
+        const error = await res.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(error.error?.message || error.detail || 'NVIDIA API error');
+    }
+    yield* parseOpenAISSE(res);
+}
+
 // Universal functions
 export async function fetchModels(providerId: string, apiKey: string): Promise<Model[]> {
     switch (providerId) {
@@ -184,6 +227,7 @@ export async function fetchModels(providerId: string, apiKey: string): Promise<M
         case 'groq': return fetchGroqModels(apiKey);
         case 'openrouter': return fetchOpenRouterModels(apiKey);
         case 'huggingface': return fetchHuggingFaceModels(apiKey);
+        case 'nvidia': return fetchNvidiaModels(apiKey);
         default: throw new Error('Unknown provider');
     }
 }
@@ -194,6 +238,7 @@ export async function* streamChat(providerId: string, apiKey: string, model: str
         case 'groq': yield* streamGroq(apiKey, model, messages, systemPrompt); break;
         case 'openrouter': yield* streamOpenRouter(apiKey, model, messages, systemPrompt); break;
         case 'huggingface': yield* streamHuggingFace(apiKey, model, messages, systemPrompt); break;
+        case 'nvidia': yield* streamNvidia(apiKey, model, messages, systemPrompt); break;
         default: throw new Error('Unknown provider');
     }
 }
