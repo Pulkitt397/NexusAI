@@ -307,18 +307,42 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (apiKey) {
             try {
                 const models = await api.fetchModels(providerId, apiKey);
-                const firstModelId = models.length > 0 ? models[0].id : null;
+
+                // Best models per provider (in priority order)
+                const PREFERRED_MODELS: Record<string, string[]> = {
+                    gemini: ['gemini-2.0-flash-exp', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'],
+                    groq: ['llama-3.3-70b-versatile', 'llama-3.1-70b-versatile', 'mixtral-8x7b-32768', 'llama3-70b-8192'],
+                    openrouter: ['anthropic/claude-3.5-sonnet', 'google/gemini-2.0-flash-exp:free', 'meta-llama/llama-3.3-70b-instruct', 'google/gemini-flash-1.5'],
+                    huggingface: ['mistralai/Mistral-7B-Instruct-v0.3', 'Qwen/Qwen2.5-7B-Instruct', 'google/gemma-2-9b-it', 'meta-llama/Llama-3.2-3B-Instruct']
+                };
+
+                // Find the best available model
+                const preferredList = PREFERRED_MODELS[providerId] || [];
+                let bestModelId: string | null = null;
+
+                for (const preferredId of preferredList) {
+                    const found = models.find(m => m.id === preferredId || m.id.includes(preferredId));
+                    if (found) {
+                        bestModelId = found.id;
+                        break;
+                    }
+                }
+
+                // Fallback to first model if no preferred match
+                if (!bestModelId && models.length > 0) {
+                    bestModelId = models[0].id;
+                }
 
                 // Save default model
-                if (firstModelId) {
-                    localStorage.setItem('nexus_current_model', firstModelId);
+                if (bestModelId) {
+                    localStorage.setItem('nexus_current_model', bestModelId);
                 }
 
                 setState(prev => ({
                     ...prev,
                     availableModels: models,
                     isLoadingModels: false,
-                    currentModelId: firstModelId
+                    currentModelId: bestModelId
                 }));
             } catch (err) {
                 showToast('Failed to load models', 'error');
