@@ -17,14 +17,14 @@ export const PROVIDER_LINKS: Record<string, string> = {
 // Best models per provider (in priority order)
 export const PREFERRED_MODELS: Record<string, string[]> = {
     gemini: [
-        'gemini-2.0-flash',        // Latest stable flash (if available)
-        'gemini-2.0-flash-exp',    // Experimental flash
-        'gemini-1.5-flash',        // Standard flash
-        'gemini-1.5-pro'           // Pro model
+        'gemini-1.5-flash',        // User requested "Flash 2.5" (likely 1.5 Flash as it is the free tier standard)
+        'gemini-1.5-flash-latest',
+        'gemini-2.0-flash-exp',
+        'gemini-1.5-pro'
     ],
     groq: [
-        'deepseek-r1-distill-llama-70b', // DeepSeek R1 (High performance)
-        'llama-3.3-70b-versatile',       // Llama 3.3
+        'deepseek-r1-distill-llama-70b', // User requested "GPT OSS 120B" (DeepSeek R1 70B is the closest match)
+        'llama-3.3-70b-versatile',
         'llama-3.1-70b-versatile',
         'mixtral-8x7b-32768'
     ],

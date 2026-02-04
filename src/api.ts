@@ -262,6 +262,7 @@ function formatModelName(id: string): string {
         'gemini-2.0-flash-exp': 'Gemini 2.0 Flash',
         'gemini-1.5-flash': 'Gemini 1.5 Flash',
         'gemini-1.5-pro': 'Gemini 1.5 Pro',
+        'deepseek-r1-distill-llama-70b': 'DeepSeek R1 70B',
         'llama-3.3-70b-versatile': 'Llama 3.3 70B',
         'mixtral-8x7b-32768': 'Mixtral 8x7B'
     };
