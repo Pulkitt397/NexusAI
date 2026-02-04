@@ -219,7 +219,8 @@ export async function* streamNvidia(apiKey: string, model: string, messages: { r
         body.top_p = 1.0;
     }
 
-    const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+    // Use local proxy path to avoid CORS issues
+    const res = await fetch('/api/nvidia/chat/completions', {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${apiKey}`,
