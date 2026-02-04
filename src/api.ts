@@ -179,12 +179,8 @@ export async function* streamHuggingFace(apiKey: string, model: string, messages
 
 // NVIDIA Kimi API (OpenAI compatible)
 export async function fetchNvidiaModels(apiKey: string): Promise<Model[]> {
-    // Verify API key with a simple request
-    const res = await fetch('https://integrate.api.nvidia.com/v1/models', {
-        headers: { 'Authorization': `Bearer ${apiKey}` }
-    });
-
-    if (!res.ok) throw new Error('Invalid NVIDIA API key');
+    // Skip verification for NVIDIA to allow all keys (including trial/restricted keys)
+    // We'll trust the key works for the chat endpoint
 
     // Return single Kimi K2.5 model
     return [{
