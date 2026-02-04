@@ -5,6 +5,7 @@ import { X, Key, ExternalLink, Check } from 'lucide-react';
 import { useApp } from '@/context';
 import { cn } from '@/lib/utils';
 import * as api from '@/api';
+import { PROVIDER_LINKS } from '@/constants';
 
 interface SettingsModalProps {
     isOpen: boolean;
@@ -16,6 +17,13 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     const [selectedProvider, setSelectedProvider] = useState(state.currentProviderId || 'gemini');
     const [keyValue, setKeyValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+
+    // Sync selected provider when modal opens or state changes
+    React.useEffect(() => {
+        if (state.currentProviderId) {
+            setSelectedProvider(state.currentProviderId);
+        }
+    }, [state.currentProviderId, isOpen]);
 
     const handleSave = async () => {
         if (!keyValue.trim()) return;
@@ -36,12 +44,13 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         }
     };
 
-    const providers = [
-        { id: 'gemini', name: 'Google Gemini', icon: '✨', link: 'https://aistudio.google.com/apikey' },
-        { id: 'groq', name: 'Groq', icon: '⚡', link: 'https://console.groq.com/keys' },
-        { id: 'openrouter', name: 'OpenRouter', icon: '🌐', link: 'https://openrouter.ai/keys' },
-        { id: 'huggingface', name: 'Hugging Face', icon: '🤗', link: 'https://huggingface.co/settings/tokens' },
-    ];
+    // Merge provider info with links
+    const providers = React.useMemo(() => {
+        return state.providers.map(p => ({
+            ...p,
+            link: PROVIDER_LINKS[p.id] || '#'
+        }));
+    }, [state.providers]);
 
     if (!isOpen) return null;
 
