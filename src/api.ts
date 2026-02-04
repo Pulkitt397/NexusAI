@@ -182,17 +182,42 @@ export async function fetchNvidiaModels(apiKey: string): Promise<Model[]> {
     // Skip verification for NVIDIA to allow all keys (including trial/restricted keys)
     // We'll trust the key works for the chat endpoint
 
-    // Return single Kimi K2.5 model
-    return [{
-        id: 'moonshotai/kimi-k2.5',
-        name: 'Kimi K2.5',
-        description: '1T multimodal MoE model',
-        contextLength: 128000
-    }];
+    // Comprehensive list of NVIDIA NIM models
+    const models = [
+        { id: 'moonshotai/kimi-k2.5', name: 'Kimi K2.5', description: '1T multimodal MoE', contextLength: 128000 },
+        { id: 'meta/llama-3.1-405b-instruct', name: 'Llama 3.1 405B', description: 'Meta Flagship Model', contextLength: 128000 },
+        { id: 'meta/llama-3.1-70b-instruct', name: 'Llama 3.1 70B', description: 'Meta High Performance', contextLength: 128000 },
+        { id: 'meta/llama-3.1-8b-instruct', name: 'Llama 3.1 8B', description: 'Meta Efficient', contextLength: 128000 },
+        { id: 'nvidia/llama-3.1-nemotron-70b-instruct', name: 'Llama 3.1 Nemotron 70B', description: 'NVIDIA Optimized Llama', contextLength: 128000 },
+        { id: 'mistralai/mistral-large-2-instruct', name: 'Mistral Large 2', description: 'Mistral Flagship', contextLength: 128000 },
+        { id: 'mistralai/mixtral-8x22b-instruct-v0.1', name: 'Mixtral 8x22B', description: 'High Performance MoE', contextLength: 64000 },
+        { id: 'google/gemma-2-27b-it', name: 'Gemma 2 27B', description: 'Google Efficient', contextLength: 8192 },
+        { id: 'google/gemma-2-9b-it', name: 'Gemma 2 9B', description: 'Google Small', contextLength: 8192 },
+        { id: 'deepseek-ai/deepseek-r1', name: 'DeepSeek R1', description: 'Reasoning Model', contextLength: 128000 },
+        { id: 'microsoft/phi-3.5-mini-instruct', name: 'Phi 3.5 Mini', description: 'Microsoft Small', contextLength: 128000 },
+        { id: 'nvidia/nemotron-4-340b-instruct', name: 'Nemotron 4 340B', description: 'NVIDIA Foundation', contextLength: 4096 }
+    ];
+
+    return models;
 }
 
 export async function* streamNvidia(apiKey: string, model: string, messages: { role: string, content: string }[], systemPrompt?: string): AsyncGenerator<StreamChunk> {
     const msgs = systemPrompt ? [{ role: 'system', content: systemPrompt }, ...messages] : messages;
+
+    const body: any = {
+        model,
+        messages: msgs,
+        stream: true,
+        max_tokens: 4096,
+        temperature: 0.7
+    };
+
+    // Special handling for Kimi K2.5
+    if (model.includes('kimi')) {
+        body.max_tokens = 16384;
+        body.chat_template_kwargs = { thinking: true };
+        body.top_p = 1.0;
+    }
 
     const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
         method: 'POST',
@@ -201,15 +226,7 @@ export async function* streamNvidia(apiKey: string, model: string, messages: { r
             'Content-Type': 'application/json',
             'Accept': 'text/event-stream'
         },
-        body: JSON.stringify({
-            model,
-            messages: msgs,
-            stream: true,
-            max_tokens: 16384,
-            temperature: 0.7,
-            top_p: 1.00,
-            chat_template_kwargs: { thinking: true }
-        })
+        body: JSON.stringify(body)
     });
 
     if (!res.ok) {
