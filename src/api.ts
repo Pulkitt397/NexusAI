@@ -202,14 +202,17 @@ export async function* streamNvidia(apiKey: string, model: string, messages: { r
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept': 'text/event-stream'
         },
         body: JSON.stringify({
             model,
             messages: msgs,
             stream: true,
-            max_tokens: 4096,
-            temperature: 0.7
+            max_tokens: 16384,
+            temperature: 0.7,
+            top_p: 1.00,
+            chat_template_kwargs: { thinking: true }
         })
     });
 
