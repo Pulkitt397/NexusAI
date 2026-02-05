@@ -213,9 +213,10 @@ export async function* streamNvidia(apiKey: string, model: string, messages: { r
     };
 
     // Special handling for Kimi K2.5
+    // Special handling for Kimi K2.5
     if (model.includes('kimi')) {
         body.max_tokens = 16384;
-        body.chat_template_kwargs = { thinking: true };
+        // body.chat_template_kwargs = { thinking: true }; // Temporarily disabled as it might ensure 404
         body.top_p = 1.0;
     }
 
@@ -237,6 +238,64 @@ export async function* streamNvidia(apiKey: string, model: string, messages: { r
     yield* parseOpenAISSE(res);
 }
 
+// Z.ai API (OpenAI Compatible)
+export async function fetchZaiModels(apiKey: string): Promise<Model[]> {
+    // Attempt to fetch models from the API
+    try {
+        const res = await fetch('https://api.z.ai/api/paas/v4/models', {
+            headers: { 'Authorization': `Bearer ${apiKey}` }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            return (data.data || [])
+                .map((m: any) => ({
+                    id: m.id,
+                    name: formatModelName(m.id),
+                    // Z.ai models are generally 128k context but this might vary
+                    contextLength: 128000
+                }));
+        }
+    } catch (e) {
+        console.warn('Failed to fetch Z.ai models, using fallback list', e);
+    }
+
+    // Fallback list if API fails (common for some providers or key permission issues)
+    const fallbackModels = [
+        { id: 'glm-4-plus', name: 'GLM 4 Plus', description: 'Strongest GLM Model', contextLength: 128000 },
+        { id: 'glm-4-0520', name: 'GLM 4', description: 'High Intelligence', contextLength: 128000 },
+        { id: 'glm-4-air', name: 'GLM 4 Air', description: 'Cost Effective', contextLength: 128000 },
+        { id: 'glm-4-flash', name: 'GLM 4 Flash', description: 'Fastest', contextLength: 128000 },
+        { id: 'glm-4v-plus', name: 'GLM 4V Plus', description: 'Video Understanding', contextLength: 8192 }
+    ];
+
+    return fallbackModels;
+}
+
+export async function* streamZai(apiKey: string, model: string, messages: { role: string, content: string }[], systemPrompt?: string): AsyncGenerator<StreamChunk> {
+    const msgs = systemPrompt ? [{ role: 'system', content: systemPrompt }, ...messages] : messages;
+
+    const res = await fetch('https://api.z.ai/api/paas/v4/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model,
+            messages: msgs,
+            stream: true,
+            temperature: 0.7
+        })
+    });
+
+    if (!res.ok) {
+        const error = await res.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(error.error?.message || 'Z.ai API error');
+    }
+    yield* parseOpenAISSE(res);
+}
+
 // Universal functions
 export async function fetchModels(providerId: string, apiKey: string): Promise<Model[]> {
     switch (providerId) {
@@ -245,6 +304,7 @@ export async function fetchModels(providerId: string, apiKey: string): Promise<M
         case 'openrouter': return fetchOpenRouterModels(apiKey);
         case 'huggingface': return fetchHuggingFaceModels(apiKey);
         case 'nvidia': return fetchNvidiaModels(apiKey);
+        case 'zai': return fetchZaiModels(apiKey);
         default: throw new Error('Unknown provider');
     }
 }
@@ -256,6 +316,7 @@ export async function* streamChat(providerId: string, apiKey: string, model: str
         case 'openrouter': yield* streamOpenRouter(apiKey, model, messages, systemPrompt); break;
         case 'huggingface': yield* streamHuggingFace(apiKey, model, messages, systemPrompt); break;
         case 'nvidia': yield* streamNvidia(apiKey, model, messages, systemPrompt); break;
+        case 'zai': yield* streamZai(apiKey, model, messages, systemPrompt); break;
         default: throw new Error('Unknown provider');
     }
 }

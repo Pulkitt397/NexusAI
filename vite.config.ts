@@ -17,10 +17,7 @@ export default defineConfig({
                 target: 'https://integrate.api.nvidia.com/v1',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api\/nvidia/, ''),
-                secure: false,
-                headers: {
-                    'Origin': 'https://integrate.api.nvidia.com'
-                }
+                secure: false
             }
         }
     },

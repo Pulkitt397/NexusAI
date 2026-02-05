@@ -5,7 +5,8 @@ export const PROVIDERS: Provider[] = [
     { id: 'groq', name: 'Groq', icon: '⚡', color: '#f97316', baseUrl: 'https://api.groq.com/openai/v1' },
     { id: 'openrouter', name: 'OpenRouter', icon: '🌐', color: '#8b5cf6', baseUrl: 'https://openrouter.ai/api/v1' },
     { id: 'huggingface', name: 'Hugging Face', icon: '🤗', color: '#ffcc00', baseUrl: 'https://api-inference.huggingface.co' },
-    { id: 'nvidia', name: 'NVIDIA Kimi', icon: '🟢', color: '#76b900', baseUrl: 'https://integrate.api.nvidia.com/v1' }
+    { id: 'nvidia', name: 'NVIDIA Kimi', icon: '🟢', color: '#76b900', baseUrl: 'https://integrate.api.nvidia.com/v1' },
+    { id: 'zai', name: 'Zhipu AI', icon: '🇿', color: '#3b82f6', baseUrl: 'https://api.z.ai/api/paas/v4' }
 ];
 
 export const PROVIDER_LINKS: Record<string, string> = {
@@ -13,7 +14,8 @@ export const PROVIDER_LINKS: Record<string, string> = {
     groq: 'https://console.groq.com/keys',
     openrouter: 'https://openrouter.ai/keys',
     huggingface: 'https://huggingface.co/settings/tokens',
-    nvidia: 'https://build.nvidia.com/explore/discover'
+    nvidia: 'https://build.nvidia.com/explore/discover',
+    zai: 'https://open.bigmodel.cn/usercenter/apikeys'
 };
 
 // Best models per provider (in priority order)
@@ -43,10 +45,16 @@ export const PREFERRED_MODELS: Record<string, string[]> = {
         'meta-llama/Llama-3.2-3B-Instruct'
     ],
     nvidia: [
-        'moonshotai/kimi-k2.5',
         'meta/llama-3.1-405b-instruct',
+        'moonshotai/kimi-k2.5',
         'meta/llama-3.1-70b-instruct',
         'nvidia/llama-3.1-nemotron-70b-instruct',
         'mistralai/mistral-large-2-instruct'
+    ],
+    zai: [
+        'glm-4-plus',
+        'glm-4-0520',
+        'glm-4-air',
+        'glm-4-flash'
     ]
 };
