@@ -124,7 +124,6 @@ export function buildPreviewDocument(extracted: ExtractedCode): string {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>React Live Preview</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -138,23 +137,39 @@ export function buildPreviewDocument(extracted: ExtractedCode): string {
             }
         }
     </script>
-    <!-- React & Babel -->
-    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
     <style>
-        body { background: #000; color: #fff; padding: 20px; }
+        body { background: #000; color: #fff; padding: 0; margin: 0; }
         #root { width: 100%; height: 100%; }
+        /* Loader */
+        .preview-loader { display: flex; justify-content: center; align-items: center; height: 100vh; color: #888; font-family: sans-serif; }
         ${css}
     </style>
+    <!-- Import Map for React and key libraries -->
+    <script type="importmap">
+    {
+        "imports": {
+            "react": "https://esm.sh/react@18.2.0",
+            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+            "framer-motion": "https://esm.sh/framer-motion@10.16.4",
+            "lucide-react": "https://esm.sh/lucide-react@0.292.0",
+            "clsx": "https://esm.sh/clsx",
+            "tailwind-merge": "https://esm.sh/tailwind-merge"
+        }
+    }
+    </script>
+    <!-- Babel for transpilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
-    <div id="root"></div>
+    <div id="root">
+        <div class="preview-loader">Initializing Preview...</div>
+    </div>
 
-    <script type="text/babel" data-presets="env,react">
-        const { useState, useEffect, useRef, useMemo, useCallback } = React;
-        const { createRoot } = ReactDOM;
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import * as Lucide from 'lucide-react';
+        import * as Framer from 'framer-motion';
 
         // Error boundary helper
         class ErrorBoundary extends React.Component {
@@ -186,14 +201,16 @@ export function buildPreviewDocument(extracted: ExtractedCode): string {
             // Try to find the component
             let ComponentToRender = null;
             
-            // 1. Check if App or Main is defined in the global scope (after Babel execution)
-            // Note: Babel standalone runs in local scope of script, but 'var' or 'function' might hoist or attach to window depending on transform
-            // We use eval-like check or rely on convention
-            
+            // Heuristic to find the main component
             if (typeof App !== 'undefined') ComponentToRender = App;
             else if (typeof Main !== 'undefined') ComponentToRender = Main;
-            else if (typeof Demo !== 'undefined') ComponentToRender = Demo;
-            else if (typeof Component !== 'undefined') ComponentToRender = Component;
+            else if (typeof DefaultExport !== 'undefined') ComponentToRender = DefaultExport;
+            else if (typeof Page !== 'undefined') ComponentToRender = Page;
+            else if (typeof Dashboard !== 'undefined') ComponentToRender = Dashboard;
+            else if (typeof Landing !== 'undefined') ComponentToRender = Landing;
+            else {
+                // Fallback: Check for any function that looks like a component (Capitalized)
+            }
 
             if (ComponentToRender) {
                 const root = createRoot(document.getElementById('root'));
@@ -203,14 +220,12 @@ export function buildPreviewDocument(extracted: ExtractedCode): string {
                     </ErrorBoundary>
                 );
             } else {
-                 // Fallback: If code didn't define a named component but is just an expression? 
-                 // React usually needs a component.
-                 // We will render a message if nothing found.
+                 console.warn("No main component found. Looking for default export or common names.");
                  const root = createRoot(document.getElementById('root'));
                  root.render(
-                    <div className="text-white/50 text-sm">
-                        No component named 'App', 'Main', or 'Demo' found.
-                        Ensure you define: <code>function App() {'{...}'}</code>
+                    <div className="text-white/50 text-sm flex flex-col items-center justify-center h-screen">
+                        <p>No component named 'App', 'Main', 'Page', 'Dashboard' found.</p>
+                        <p className="mt-2 text-xs opacity-50">Ensure you define: <code>export default function App() {'{...}'}</code></p>
                     </div>
                  );
             }
@@ -267,13 +282,23 @@ export function buildPreviewDocument(extracted: ExtractedCode): string {
 }
 
 function processReactCode(code: string): string {
-    // Remove imports (React, Lucide, etc) to prevent runtime errors in browser
-    let clean = code
-        .replace(/import\s+.*?from\s+['"].*?['"];?/g, '')
-        .replace(/export\s+default\s+/g, '') // Remove export default so it becomes a local var
-        .replace(/export\s+/g, ''); // Remove named exports
+    // 1. Rewrite imports to use esm.sh
+    // This allows `import { motion } from 'framer-motion'` to work in browser via Import Map
+    // We already added the importmap in the HTML template.
 
-    // Apply asset URL replacement to the code logic as well (e.g. strings in the code)
+    let clean = code
+        // Universal replacement for export default -> const DefaultExport =
+        // Works for: export default function App() {} -> const DefaultExport = function App() {}
+        // Works for: export default class App {} -> const DefaultExport = class App {}
+        // Works for: export default () => {} -> const DefaultExport = () => {}
+        .replace(/export\s+default\s+/g, 'const DefaultExport = ')
+        .replace(/export\s+/g, ''); // Remove named exports to keep code valid
+
+    // We don't need to remove imports if we use importmap!
+    // But we need to ensure the standard imports match the importmap keys.
+    // e.g. "import ... from 'lucide-react'" matches "lucide-react" key.
+
+    // Apply asset URL replacement
     clean = replaceAssetUrls(clean);
 
     return clean;

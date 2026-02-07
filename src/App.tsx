@@ -396,8 +396,22 @@ function Dashboard() {
                 </div>
             </motion.aside>
 
+            {/* Top Brand Bar (more noticeable) */}
+            <div className="w-full fixed top-0 left-0 right-0 h-14 bg-gradient-to-r from-violet-600 to-indigo-700 text-white z-40 shadow-lg flex items-center px-6 gap-4">
+                <div className="flex items-center gap-2 font-semibold text-xl">
+                    <span className="animate-pulse text-white/90" aria-label="brand-icon">✦</span>
+                    NexusAI
+                    <span className="ml-2 text-sm opacity-90 bg-white/10 px-2 py-1 rounded-full">Live</span>
+                </div>
+                <div className="ml-auto flex items-center gap-2">
+                    <span className="text-xs uppercase tracking-wider opacity-80">Theme</span>
+                    <button className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-sm">Dark</button>
+                    <button className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-sm">Vibrant</button>
+                </div>
+            </div>
+
             {/* Main content */}
-            <main className="flex-1 h-full overflow-hidden relative flex flex-col">
+            <main className="flex-1 h-full overflow-hidden relative flex flex-col pt-16">
                 {/* Mobile Header / Toggle Button */}
                 <div className="absolute top-4 left-4 z-30">
                     <button
