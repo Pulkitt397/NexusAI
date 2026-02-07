@@ -98,7 +98,7 @@ function Dashboard() {
     }
 
     return (
-        <div className="h-[100dvh] w-screen bg-[#0a0a0b] flex overflow-hidden fixed inset-0 supports-[height:100dvh]:h-[100dvh]">
+        <div className="h-[100dvh] w-screen bg-transparent flex overflow-hidden fixed inset-0 supports-[height:100dvh]:h-[100dvh]">
             {/* Sidebar */}
             {/* Mobile Backdrop */}
             <AnimatePresence>
@@ -123,7 +123,7 @@ function Dashboard() {
                 }}
                 transition={{ type: "spring", bounce: 0, duration: 0.4 }}
                 className={cn(
-                    "h-full border-r border-white/10 flex flex-col bg-[#0a0a0b]/95 backdrop-blur-xl shrink-0 overflow-hidden",
+                    "h-full border-r border-white/10 flex flex-col bg-[#050507]/60 backdrop-blur-2xl shrink-0 overflow-hidden",
                     isMobile ? "fixed inset-y-0 left-0 z-50 w-[280px]" : "relative"
                 )}
             >

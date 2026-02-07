@@ -267,7 +267,7 @@ export function AnimatedAIChat({
     };
 
     return (
-        <div className="flex flex-col h-full w-full bg-[#050507] text-white selection:bg-violet-500/30 overflow-hidden">
+        <div className="flex flex-col h-full w-full bg-transparent text-white selection:bg-violet-500/30 overflow-hidden">
             {/* Ambient Background */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
                 <motion.div
@@ -396,7 +396,7 @@ export function AnimatedAIChat({
             </div>
 
             {/* 2. Super Input Bar (Sticky Bottom) */}
-            <div className="shrink-0 z-20 bg-[#050507]/95 backdrop-blur-xl border-t border-white/5 pb-[env(safe-area-inset-bottom)]">
+            <div className="shrink-0 z-20 bg-[#050507]/40 backdrop-blur-2xl border-t border-white/5 pb-[env(safe-area-inset-bottom)]">
                 <div className="max-w-3xl mx-auto px-2 py-2">
                     <div className={cn(
                         "relative flex items-end gap-2 p-2 rounded-[24px] transition-all duration-300",
