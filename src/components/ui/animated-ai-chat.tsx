@@ -351,10 +351,13 @@ export function AnimatedAIChat({
                         context={{ isStreaming, isSearching, streamingContent, searchMode }}
                         style={{ height: '100%' }}
                         className="scrollbar-hide"
-                        followOutput={isAtBottom ? 'smooth' : false}
-                        atBottomStateChange={setIsAtBottom}
-                        initialTopMostItemIndex={messages.length - 1}
-                        atBottomThreshold={150}
+                        followOutput={isAtBottom ? 'auto' : false}
+                        atBottomStateChange={(bottom) => {
+                            if (bottom !== isAtBottom) setIsAtBottom(bottom);
+                        }}
+                        initialTopMostItemIndex={messages.length > 0 ? messages.length - 1 : 0}
+                        atBottomThreshold={100}
+                        increaseViewportBy={{ top: 200, bottom: 200 }}
                         itemContent={(index, msg) => (
                             <div className="px-4 md:px-0 max-w-3xl mx-auto py-2">
                                 <ChatMessage
