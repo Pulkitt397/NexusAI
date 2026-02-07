@@ -131,7 +131,7 @@ const ChatHeader = () => <div className="h-4" />;
 
 // --- MAIN COMPONENT ---
 
-interface AnimatedAIChatProps {
+export interface AnimatedAIChatProps {
     onSendMessage: (message: string) => void;
     isStreaming: boolean;
     isSearching: boolean;

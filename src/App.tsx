@@ -11,6 +11,8 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { LoginPage } from '@/components/LoginPage';
 import { SelectionMenu } from '@/components/ui/SelectionMenu';
+import { WebDevEnvironment } from '@/components/WebDevEnvironment';
+import { Code, LayoutTemplate } from 'lucide-react';
 
 function Dashboard() {
     const {
@@ -39,6 +41,7 @@ function Dashboard() {
 
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
     const [isMobile, setIsMobile] = React.useState(false);
+    const [isWebDevMode, setIsWebDevMode] = React.useState(false);
 
     useEffect(() => {
         const checkMobile = () => {
@@ -144,17 +147,33 @@ function Dashboard() {
                 {/* New Chat */}
                 <div className="p-3">
                     <button
-                        onClick={createChat}
+                        onClick={() => {
+                            createChat();
+                            setIsWebDevMode(false);
+                        }}
                         disabled={!state.currentModelId}
                         className={cn(
-                            "w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all",
+                            "w-full flex items-center justify-center gap-2 px-4 py-2.5 mb-2 rounded-lg text-sm font-medium transition-all group",
                             state.currentModelId
                                 ? "bg-violet-500/20 hover:bg-violet-500/30 text-violet-400 border border-violet-500/30"
                                 : "bg-white/5 text-white/40 cursor-not-allowed"
                         )}
                     >
-                        <Plus className="w-4 h-4" />
+                        <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
                         New Chat
+                    </button>
+
+                    <button
+                        onClick={() => setIsWebDevMode(true)}
+                        className={cn(
+                            "w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all border group",
+                            isWebDevMode
+                                ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-lg shadow-emerald-500/10"
+                                : "bg-white/5 text-white/60 border-white/5 hover:bg-white/10 hover:text-emerald-300"
+                        )}
+                    >
+                        <Code className="w-4 h-4" />
+                        WebDev Studio
                     </button>
                 </div>
 
@@ -389,27 +408,51 @@ function Dashboard() {
                         <Menu className="w-6 h-6" />
                     </button>
                 </div>
-                <AnimatedAIChat
-                    onSendMessage={sendMessage}
-                    isStreaming={state.isStreaming}
-                    streamingContent={state.streamingContent}
-                    messages={formattedMessages}
-                    onOpenMemory={() => openModal('memory')}
-                    onOpenSettings={() => openModal('apiKey')}
-                    memoryCount={enabledMemoryCount}
-                    currentModel={currentModel?.name || null}
-                    onEnhance={enhancePrompt}
-                    searchMode={state.searchMode}
-                    onSetSearchMode={setSearchMode}
-                    isSearching={state.isSearching}
-                    // New Props for Super Input Bar
-                    availableModels={state.availableModels}
-                    currentModelId={state.currentModelId}
-                    onSelectModel={selectModel}
-                    providers={state.providers}
-                    currentProviderId={state.currentProviderId}
-                    onSelectProvider={selectProvider}
-                />
+                {isWebDevMode ? (
+                    <WebDevEnvironment
+                        onClose={() => setIsWebDevMode(false)}
+                        onSendMessage={sendMessage}
+                        isStreaming={state.isStreaming}
+                        streamingContent={state.streamingContent}
+                        messages={formattedMessages}
+                        onOpenMemory={() => openModal('memory')}
+                        onOpenSettings={() => openModal('apiKey')}
+                        memoryCount={enabledMemoryCount}
+                        currentModel={currentModel?.name || null}
+                        onEnhance={enhancePrompt}
+                        searchMode={state.searchMode}
+                        onSetSearchMode={setSearchMode}
+                        isSearching={state.isSearching}
+                        availableModels={state.availableModels}
+                        currentModelId={state.currentModelId}
+                        onSelectModel={selectModel}
+                        providers={state.providers}
+                        currentProviderId={state.currentProviderId}
+                        onSelectProvider={selectProvider}
+                        placeholder="Coding in WebDev Mode..."
+                    />
+                ) : (
+                    <AnimatedAIChat
+                        onSendMessage={sendMessage}
+                        isStreaming={state.isStreaming}
+                        streamingContent={state.streamingContent}
+                        messages={formattedMessages}
+                        onOpenMemory={() => openModal('memory')}
+                        onOpenSettings={() => openModal('apiKey')}
+                        memoryCount={enabledMemoryCount}
+                        currentModel={currentModel?.name || null}
+                        onEnhance={enhancePrompt}
+                        searchMode={state.searchMode}
+                        onSetSearchMode={setSearchMode}
+                        isSearching={state.isSearching}
+                        availableModels={state.availableModels}
+                        currentModelId={state.currentModelId}
+                        onSelectModel={selectModel}
+                        providers={state.providers}
+                        currentProviderId={state.currentProviderId}
+                        onSelectProvider={selectProvider}
+                    />
+                )}
             </main>
 
             {/* Modals */}
