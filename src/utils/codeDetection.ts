@@ -7,6 +7,7 @@ export interface ExtractedCode {
     tsx: string;
     type: 'html' | 'react';
     hasPreviewableContent: boolean;
+    files: Array<{ name: string; language: string; content: string }>;
 }
 
 /**
@@ -18,22 +19,65 @@ export function extractPreviewableCode(content: string): ExtractedCode {
     let js = '';
     let tsx = '';
     let type: 'html' | 'react' = 'html';
+    const files: Array<{ name: string; language: string; content: string }> = [];
 
-    // Extract code blocks
+    // Extract code blocks with filenames
+    // Regex matches:
+    // 1. Optional "Filename: name.ext" (case insensitive) followed by newline or space
+    // 2. Code block start ```lang
+    // 3. Content
+    // 4. Code block end ```
+
+    // We iterate line by line or block by block to capture context
     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
     let match;
+
+    // Helper to find filename preceding the match
+    const findFilename = (index: number, fullText: string): string | null => {
+        // Look back from the start of the code block
+        const precedingText = fullText.substring(0, index).trim();
+        const lines = precedingText.split('\n');
+        if (lines.length === 0) return null;
+
+        // Check last few lines for "Filename: x"
+        for (let i = lines.length - 1; i >= Math.max(0, lines.length - 3); i--) {
+            const line = lines[i].trim();
+            const fileMatch = line.match(/Filename:\s*([`"']?)([\w./-]+)\1/i);
+            if (fileMatch) return fileMatch[2];
+            // Also check comment style // Filename: x or <!-- Filename: x -->
+            const commentMatch = line.match(/(?:\/\/|<!--)\s*Filename:\s*([`"']?)([\w./-]+)\1/i);
+            if (commentMatch) return commentMatch[2];
+        }
+        return null;
+    };
 
     while ((match = codeBlockRegex.exec(content)) !== null) {
         const language = (match[1] || '').toLowerCase();
         const code = match[2].trim();
+        const index = match.index;
 
-        if (language === 'html' || language === 'htm') {
+        let filename = findFilename(index, content);
+
+        // Auto-assign filename if missing based on language or content
+        if (!filename) {
+            if (language === 'html' || code.includes('<!DOCTYPE html>')) filename = 'index.html';
+            else if (language === 'css') filename = 'styles.css';
+            else if (language === 'js' || language === 'javascript') filename = 'script.js';
+            else if (language === 'tsx' || language === 'jsx' || language === 'react') filename = 'App.tsx';
+            else filename = `file.${language || 'txt'}`;
+        }
+
+        // Add to files list
+        files.push({ name: filename, language: language || 'text', content: code });
+
+        // Populate legacy fields for preview generation
+        if (filename === 'index.html' || (language === 'html' && !html)) {
             html += code + '\n';
-        } else if (language === 'css') {
+        } else if (filename === 'styles.css' || (language === 'css' && !css)) {
             css += code + '\n';
-        } else if (language === 'javascript' || language === 'js') {
+        } else if (filename === 'script.js' || (language === 'js' && !js)) {
             js += code + '\n';
-        } else if (language === 'jsx' || language === 'tsx' || language === 'react' || language === 'typescript') {
+        } else if (filename === 'App.tsx' || (language === 'tsx' && !tsx)) {
             tsx += code + '\n';
         }
     }
@@ -49,17 +93,20 @@ export function extractPreviewableCode(content: string): ExtractedCode {
         }
     }
 
-    // Check for inline HTML document (full page)
+    // Check for inline HTML document (full page) if logic above missed it (e.g. no filename)
     if (!html && (content.includes('<!DOCTYPE html>') || content.includes('<html'))) {
         const htmlMatch = content.match(/```(?:html)?\n(<!DOCTYPE[\s\S]*?<\/html>)\n```/i);
         if (htmlMatch) {
             html = htmlMatch[1];
+            if (!files.some(f => f.name === 'index.html')) {
+                files.push({ name: 'index.html', language: 'html', content: html });
+            }
         }
     }
 
-    const hasPreviewableContent = !!(html || (css && js) || tsx || html.includes('<body'));
+    const hasPreviewableContent = files.length > 0;
 
-    return { html, css, js, tsx, type, hasPreviewableContent };
+    return { html, css, js, tsx, type, hasPreviewableContent, files };
 }
 
 /**
