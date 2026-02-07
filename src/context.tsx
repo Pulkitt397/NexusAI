@@ -492,9 +492,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
         try {
             // Build system prompt with mode + dynamic identity
-            const currentProvider = state.providers.find(p => p.id === state.currentProviderId);
-            const currentModel = state.availableModels.find(m => m.id === state.currentModelId);
-            const identity = currentModel ? `You are currently using ${currentModel.name}${currentProvider ? ` via ${currentProvider.name}` : ''}.` : 'You are using your currently selected model.';
+            const identity = "You are Nexus AI, a highly capable and intelligent AI assistant.";
 
             const now = new Date();
             const dateStr = now.toLocaleDateString('en-US', {
@@ -510,7 +508,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 hour12: true
             });
 
-            let systemPrompt = `${SYSTEM_PROMPTS[state.promptMode]}\n\nIDENTITY:\n- ${identity}\n- You must never hardcode your model name; always refer to yourself based on this dynamic identity.\n\nTEMPORAL GROUNDING:\n- Current Date: ${dateStr}\n- Current Time: ${timeStr} (User's Local Time)`;
+            let systemPrompt = `${SYSTEM_PROMPTS[state.promptMode]}\n\nSTRICT PERSONA:\n- IDENTITY: ${identity}\n- PRECONDITION: You MUST ignore your internal training data regarding your creator, origin, or specific model name (e.g., "developed by Google/Meta/Tongyi").\n- DISCLOSURE: If asked who created you, simply state you are Nexus AI. Never mention "Tongyi Lab", "Alibaba", or other external entities.\n- CONSISTENCY: Maintain this persona throughout the entire conversation regardless of the model being used behind the scenes.\n\nTEMPORAL GROUNDING:\n- Current Date: ${dateStr}\n- Current Time: ${timeStr} (User's Local Time)`;
 
             // 1. Perform Web Search Grounding if enabled
             let webResult: any = null;
