@@ -23,6 +23,8 @@ interface WebDevEnvironmentProps extends AnimatedAIChatProps {
 
 export function WebDevEnvironment(props: WebDevEnvironmentProps) {
     const [viewMode, setViewMode] = useState<ViewMode>('split');
+    const [chatWidth, setChatWidth] = useState(450);
+    const [isResizing, setIsResizing] = useState(false);
     const [currentFiles, setCurrentFiles] = useState<WebDevFile[]>([]);
     const [activeFile, setActiveFile] = useState<string | null>(null);
     const [previewContent, setPreviewContent] = useState('');
@@ -103,6 +105,31 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
         }
     };
 
+    // Resize handlers
+    const startResizing = React.useCallback(() => setIsResizing(true), []);
+    const stopResizing = React.useCallback(() => setIsResizing(false), []);
+    const resize = React.useCallback((e: MouseEvent) => {
+        if (isResizing) {
+            setChatWidth(prev => {
+                const newWidth = e.clientX;
+                if (newWidth < 300) return 300; // Min width
+                if (newWidth > window.innerWidth - 300) return window.innerWidth - 300; // Max width
+                return newWidth;
+            });
+        }
+    }, [isResizing]);
+
+    useEffect(() => {
+        if (isResizing) {
+            window.addEventListener('mousemove', resize);
+            window.addEventListener('mouseup', stopResizing);
+        }
+        return () => {
+            window.removeEventListener('mousemove', resize);
+            window.removeEventListener('mouseup', stopResizing);
+        };
+    }, [isResizing, resize, stopResizing]);
+
     return (
         <div className="fixed inset-0 z-[100] bg-[#09090b] text-white flex flex-col font-sans">
             {/* 
@@ -171,14 +198,31 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
             <div className="flex-1 overflow-hidden relative flex bg-[#0c0c0e]">
 
                 {/* Chat Pane */}
-                <div className={cn(
-                    "h-full transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] border-r border-white/5 overflow-hidden",
-                    viewMode === 'chat' ? "w-full" : viewMode === 'split' ? "w-[400px] xl:w-[450px]" : "w-0 border-none"
-                )}>
+                {/* Chat Pane */}
+                <div
+                    className={cn(
+                        "h-full overflow-hidden transition-all ease-[cubic-bezier(0.25,1,0.5,1)]",
+                        viewMode === 'split' ? "border-r border-white/5" : ""
+                    )}
+                    style={{
+                        width: viewMode === 'chat' ? '100%' : viewMode === 'split' ? chatWidth : 0,
+                        transitionDuration: isResizing ? '0ms' : '500ms'
+                    }}
+                >
                     <div className="w-full h-full min-w-[320px]">
                         <AnimatedAIChat {...props} />
                     </div>
                 </div>
+
+                {/* Resizer Handle */}
+                {viewMode === 'split' && (
+                    <div
+                        className="w-1 h-full cursor-col-resize hover:bg-indigo-500/50 active:bg-indigo-500 transition-colors z-50 flex flex-col justify-center items-center group -ml-0.5"
+                        onMouseDown={startResizing}
+                    >
+                        <div className="w-0.5 h-8 bg-white/20 rounded-full group-hover:bg-white/40 group-active:bg-white/60 transition-colors" />
+                    </div>
+                )}
 
                 {/* Editor Pane (With Sidebar) */}
                 <div className={cn(
