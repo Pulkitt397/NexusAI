@@ -1,12 +1,12 @@
 import { Provider } from './types';
 
 export const PROVIDERS: Provider[] = [
-    { id: 'gemini', name: 'Google Gemini', icon: '✨', color: '#4285f4', baseUrl: 'https://generativelanguage.googleapis.com/v1beta' },
-    { id: 'groq', name: 'Groq', icon: '⚡', color: '#f97316', baseUrl: 'https://api.groq.com/openai/v1' },
-    { id: 'openrouter', name: 'OpenRouter', icon: '🌐', color: '#8b5cf6', baseUrl: 'https://openrouter.ai/api/v1' },
-    { id: 'huggingface', name: 'Hugging Face', icon: '🤗', color: '#ffcc00', baseUrl: 'https://api-inference.huggingface.co' },
-    { id: 'nvidia', name: 'NVIDIA Kimi', icon: '🟢', color: '#76b900', baseUrl: 'https://integrate.api.nvidia.com/v1' },
-    { id: 'zai', name: 'Zhipu AI', icon: '🇿', color: '#3b82f6', baseUrl: 'https://api.z.ai/api/paas/v4' }
+    { id: 'gemini', name: 'Google Gemini', icon: '/logos/gemini.svg', color: '#4285f4', baseUrl: 'https://generativelanguage.googleapis.com/v1beta' },
+    { id: 'groq', name: 'Groq', icon: '/logos/groq.svg', color: '#f97316', baseUrl: 'https://api.groq.com/openai/v1' },
+    { id: 'openrouter', name: 'OpenRouter', icon: '/logos/openrouter.svg', color: '#8b5cf6', baseUrl: 'https://openrouter.ai/api/v1' },
+    { id: 'huggingface', name: 'Hugging Face', icon: '/logos/huggingface.svg', color: '#ffcc00', baseUrl: 'https://api-inference.huggingface.co' },
+    { id: 'nvidia', name: 'NVIDIA Kimi', icon: '/logos/nvidia.svg', color: '#76b900', baseUrl: 'https://integrate.api.nvidia.com/v1' },
+    { id: 'zai', name: 'Zhipu AI', icon: '/logos/zai.svg', color: '#3b82f6', baseUrl: 'https://api.z.ai/api/paas/v4' }
 ];
 
 export const PROVIDER_LINKS: Record<string, string> = {

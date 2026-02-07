@@ -417,8 +417,11 @@ export function AnimatedAIChat({
                                     className="flex items-center gap-1.5 px-2 py-1.5 rounded-full hover:bg-white/10 text-xs font-medium text-white/70 transition-colors"
                                     title="Select Provider"
                                 >
-                                    <span className="max-w-[80px] truncate">
-                                        {providers.find(p => p.id === currentProviderId)?.icon || "🔌"}
+                                    <span className="max-w-[80px] truncate flex items-center justify-center">
+                                        {(() => {
+                                            const p = providers.find(p => p.id === currentProviderId);
+                                            return p ? <img src={p.icon} alt={p.name} className="w-4 h-4 object-contain" /> : "🔌";
+                                        })()}
                                     </span>
                                     <ChevronDown className="w-3 h-3 opacity-50" />
                                 </button>
@@ -431,6 +434,7 @@ export function AnimatedAIChat({
                                                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                                 exit={{ opacity: 0, scale: 0.95 }}
+                                                // Updated height to accommodate images
                                                 className="absolute bottom-full left-0 mb-2 w-48 bg-[#1a1a1c] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1"
                                             >
                                                 {providers.map(p => (
@@ -445,7 +449,7 @@ export function AnimatedAIChat({
                                                             currentProviderId === p.id ? "text-violet-400 bg-violet-500/10" : "text-white/70"
                                                         )}
                                                     >
-                                                        <span>{p.icon}</span>
+                                                        <img src={p.icon} alt={p.name} className="w-4 h-4 object-contain" />
                                                         {p.name}
                                                     </button>
                                                 ))}

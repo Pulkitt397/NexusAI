@@ -193,7 +193,7 @@ function Dashboard() {
                             <span className="flex items-center gap-2">
                                 {currentProvider ? (
                                     <>
-                                        <span>{currentProvider.icon}</span>
+                                        <img src={currentProvider.icon} alt={currentProvider.name} className="w-5 h-5 object-contain" />
                                         {currentProvider.name}
                                     </>
                                 ) : (
@@ -219,7 +219,7 @@ function Dashboard() {
                                                 p.id === state.currentProviderId ? "bg-violet-500/20 text-violet-400" : "text-white/70"
                                             )}
                                         >
-                                            <span>{p.icon}</span>
+                                            <img src={p.icon} alt={p.name} className="w-5 h-5 object-contain shrink-0" />
                                             {p.name}
                                             {state.apiKeys[p.id] && (
                                                 <span className="ml-auto text-green-400 text-xs">✓</span>

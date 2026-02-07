@@ -110,7 +110,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                                             : "bg-white/5 text-white/60 hover:bg-white/10 border border-transparent"
                                     )}
                                 >
-                                    <span>{p.icon}</span>
+                                    <img src={p.icon} alt={p.name} className="w-5 h-5 object-contain" />
                                     <span>{p.name}</span>
                                     {state.apiKeys[p.id] && (
                                         <Check className="w-3 h-3 text-green-400" />
