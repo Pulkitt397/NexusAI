@@ -102,7 +102,10 @@ export const SYSTEM_PROMPTS: Record<SystemPromptMode, string> = {
 
 ## STACK (IMMUTABLE)
 - React 18+, Vite, Tailwind CSS, Framer Motion, Lucide React.
-- **NO MOCK IMAGES**: Use solid colors, vivid gradients, or Lucide icons instead of <img>.
+- **IMAGES (MANDATORY)**: Use high-quality **Unsplash** images for backgrounds and cards.
+  - Format: \`https://images.unsplash.com/photo-ID?auto=format&fit=crop&w=800&q=80\`
+  - Keywords: Use searching keywords in Unsplash URLs if specific IDs aren't known (e.g., \`https://source.unsplash.com/featured/?technology,dark\`).
+
 
 ## MULTI-FILE GENERATION (WEBDEV MODE)
 - When generating complex web applications or when specifically in WebDev Mode:
