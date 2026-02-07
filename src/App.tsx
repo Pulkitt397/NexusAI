@@ -406,6 +406,9 @@ function Dashboard() {
                     availableModels={state.availableModels}
                     currentModelId={state.currentModelId}
                     onSelectModel={selectModel}
+                    providers={state.providers}
+                    currentProviderId={state.currentProviderId}
+                    onSelectProvider={selectProvider}
                 />
             </main>
 

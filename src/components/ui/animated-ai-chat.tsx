@@ -21,7 +21,7 @@ import { MessageContent } from "./MessageContent";
 import { ChatMessage } from "./ChatMessage";
 import { Virtuoso, type VirtuosoHandle, type Components } from 'react-virtuoso';
 
-import { WebSearchResult, SearchMode, Model } from "@/types";
+import { WebSearchResult, SearchMode, Model, Provider } from "@/types";
 
 interface MessageItem {
     role: string;
@@ -149,6 +149,9 @@ interface AnimatedAIChatProps {
     availableModels: Model[];
     currentModelId: string | null;
     onSelectModel: (modelId: string) => void;
+    providers: Provider[];
+    currentProviderId: string | null;
+    onSelectProvider: (providerId: string) => Promise<void>;
 }
 
 export function AnimatedAIChat({
@@ -167,12 +170,16 @@ export function AnimatedAIChat({
     isSearching,
     availableModels,
     currentModelId,
-    onSelectModel
+    onSelectModel,
+    providers,
+    currentProviderId,
+    onSelectProvider
 }: AnimatedAIChatProps) {
     const [value, setValue] = useState("");
     const [isFocused, setIsFocused] = useState(false);
     const [isEnhancing, setIsEnhancing] = useState(false);
     const [showModelSelector, setShowModelSelector] = useState(false);
+    const [showProviderSelector, setShowProviderSelector] = useState(false);
 
     // Auto-scroll state
     const [isAtBottom, setIsAtBottom] = useState(true);
@@ -396,12 +403,63 @@ export function AnimatedAIChat({
                         isFocused ? "bg-white/10 ring-1 ring-white/10" : "bg-white/5"
                     )}>
 
-                        {/* Left: Model Selector & Search Toggle */}
+                        {/* Left: Provider & Model Selector & Search Toggle */}
                         <div className="flex items-center gap-1 pb-1">
+                            {/* Provider Selector Trigger */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => {
+                                        setShowProviderSelector(!showProviderSelector);
+                                        setShowModelSelector(false);
+                                    }}
+                                    className="flex items-center gap-1.5 px-2 py-1.5 rounded-full hover:bg-white/10 text-xs font-medium text-white/70 transition-colors"
+                                    title="Select Provider"
+                                >
+                                    <span className="max-w-[80px] truncate">
+                                        {providers.find(p => p.id === currentProviderId)?.icon || "🔌"}
+                                    </span>
+                                    <ChevronDown className="w-3 h-3 opacity-50" />
+                                </button>
+                                {/* Provider Dropdown */}
+                                <AnimatePresence>
+                                    {showProviderSelector && (
+                                        <>
+                                            <div className="fixed inset-0 z-40" onClick={() => setShowProviderSelector(false)} />
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.95 }}
+                                                className="absolute bottom-full left-0 mb-2 w-48 bg-[#1a1a1c] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1"
+                                            >
+                                                {providers.map(p => (
+                                                    <button
+                                                        key={p.id}
+                                                        onClick={() => {
+                                                            onSelectProvider(p.id);
+                                                            setShowProviderSelector(false);
+                                                        }}
+                                                        className={cn(
+                                                            "w-full text-left px-3 py-2 text-xs font-medium transition-colors hover:bg-white/5 flex items-center gap-2",
+                                                            currentProviderId === p.id ? "text-violet-400 bg-violet-500/10" : "text-white/70"
+                                                        )}
+                                                    >
+                                                        <span>{p.icon}</span>
+                                                        {p.name}
+                                                    </button>
+                                                ))}
+                                            </motion.div>
+                                        </>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
                             {/* Model Selector Trigger */}
                             <div className="relative">
                                 <button
-                                    onClick={() => setShowModelSelector(!showModelSelector)}
+                                    onClick={() => {
+                                        setShowModelSelector(!showModelSelector);
+                                        setShowProviderSelector(false);
+                                    }}
                                     className="flex items-center gap-1.5 px-2 py-1.5 rounded-full hover:bg-white/10 text-xs font-medium text-white/70 transition-colors"
                                     title="Select Model"
                                 >

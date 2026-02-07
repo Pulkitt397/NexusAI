@@ -163,17 +163,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
             const localMemories = await db.getAllMemories();
 
             // 4. Initial State Apply
+            const initialProvider = localProvider || (PROVIDERS.length > 0 ? PROVIDERS[0].id : null);
             setState(prev => ({
                 ...prev,
                 apiKeys: localApiKeys,
                 memoryEnabled: localMemoryEnabled,
                 promptMode: localPromptMode,
                 searchMode: localSearchMode,
-                currentProviderId: localProvider,
+                currentProviderId: initialProvider,
                 currentModelId: localModel,
                 chats: localChats,
                 memories: localMemories
             }));
+
+            // If we picked a default provider, load its models
+            if (initialProvider && !localModel) {
+                // We'll let the selectProvider logic handle this if possible or just trigger it
+                // Actually, the selectProvider is a callback, we can just call it or duplicate logic
+            }
 
             // 5. Cloud Sync if user is logged in
             if (user) {
@@ -339,6 +346,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
             setState(prev => ({ ...prev, isLoadingModels: false, modalOpen: 'apiKey' }));
         }
     }, [state.apiKeys, showToast]);
+
+    useEffect(() => {
+        if (isCloudLoaded && state.currentProviderId && state.availableModels.length === 0 && !state.isLoadingModels) {
+            const apiKey = state.apiKeys[state.currentProviderId];
+            if (apiKey) {
+                selectProvider(state.currentProviderId);
+            }
+        }
+    }, [isCloudLoaded, state.currentProviderId, state.availableModels.length, state.isLoadingModels, state.apiKeys, selectProvider]);
 
     const selectModel = useCallback((modelId: string) => {
         // Save to localStorage
