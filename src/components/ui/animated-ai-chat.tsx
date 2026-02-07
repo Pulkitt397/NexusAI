@@ -419,7 +419,7 @@ export function AnimatedAIChat({
                                                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                                 exit={{ opacity: 0, scale: 0.95 }}
-                                                className="absolute bottom-full left-0 mb-2 w-48 bg-[#1a1a1c] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1"
+                                                className="absolute bottom-full left-0 mb-2 w-64 max-h-64 bg-[#1a1a1c] border border-white/10 rounded-xl shadow-2xl z-50 overflow-y-auto py-1 scrollbar-hide"
                                             >
                                                 {availableModels.map(model => (
                                                     <button
