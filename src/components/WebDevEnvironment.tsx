@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatedAIChat, AnimatedAIChatProps } from '@/components/ui/animated-ai-chat';
 import { LivePreviewPane } from '@/components/LivePreviewPane';
+import { CodeEditor } from '@/components/CodeEditor';
 import { extractPreviewableCode, buildPreviewDocument } from '@/utils/codeDetection';
 import { cn } from '@/lib/utils';
-import { LayoutPanelLeft, SquareSplitHorizontal, AppWindow, X } from 'lucide-react';
+import { LayoutPanelLeft, SquareSplitHorizontal, AppWindow, X, FileCode } from 'lucide-react';
 
-type ViewMode = 'chat' | 'split' | 'preview';
+type ViewMode = 'chat' | 'split' | 'code' | 'preview';
 
 interface WebDevEnvironmentProps extends AnimatedAIChatProps {
     onClose: () => void;
@@ -39,7 +40,7 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                         <code className="text-emerald-400 font-bold text-sm">{'</>'}</code>
                     </div>
                     <div>
-                        <h1 className="text-sm font-semibold text-white/90">Nexus WebDev</h1>
+                        <h1 className="text-sm font-semibold text-white/90">Nexus Studios</h1>
                         <p className="text-[10px] text-white/40 font-mono">Environment Active</p>
                     </div>
                 </div>
@@ -67,6 +68,16 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                         <span>Split</span>
                     </button>
                     <button
+                        onClick={() => setViewMode('code')}
+                        className={cn(
+                            "flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all",
+                            viewMode === 'code' ? "bg-white/10 text-white shadow-sm" : "text-white/40 hover:text-white/60"
+                        )}
+                    >
+                        <FileCode className="w-4 h-4" />
+                        <span>Editor</span>
+                    </button>
+                    <button
                         onClick={() => setViewMode('preview')}
                         className={cn(
                             "flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all",
@@ -92,22 +103,53 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
 
             {/* Main Content Area */}
             <div className="flex-1 overflow-hidden relative flex">
-                {/* Chat Pane */}
+
+                {/* 
+                    LAYOUT LOGIC:
+                    Chat: Chat (Full)
+                    Split: Chat (50%) | Preview (50%)
+                    Code: Editor (Full)
+                    Preview: Preview (Full)
+                    
+                    Wait, "Editor" mode should probably show Editor.
+                    "Split" is typically Code + Preview in IDEs, but here chat is central.
+                    Let's maybe add a secondary split or just toggles.
+                    Actually, if I select 'code', I show the Code Editor.
+                    I will render 3 panes but control their width/visibility.
+                */}
+
+                {/* Pane 1: Chat */}
                 <div className={cn(
-                    "h-full transition-all duration-300 ease-in-out border-r border-white/10",
+                    "h-full transition-all duration-300 ease-in-out border-r border-white/10 overflow-hidden",
                     viewMode === 'chat' ? "w-full" :
-                        viewMode === 'split' ? "w-1/2" : "w-0 overflow-hidden border-none"
+                        viewMode === 'split' ? "w-1/2" : "w-0 border-none"
                 )}>
-                    <div className="w-full h-full">
+                    <div className="w-full h-full min-w-[320px]">
                         <AnimatedAIChat {...props} />
                     </div>
                 </div>
 
-                {/* Preview Pane */}
+                {/* Pane 2: Editor */}
                 <div className={cn(
-                    "h-full transition-all duration-300 ease-in-out bg-[#0f0f12]",
+                    "h-full transition-all duration-300 ease-in-out border-r border-white/10 bg-[#1e1e1e] overflow-hidden",
+                    viewMode === 'code' ? "w-full" : "w-0 border-none"
+                )}>
+                    {viewMode === 'code' && (
+                        <div className="w-full h-full p-2">
+                            <CodeEditor
+                                code={currentCode}
+                                language="html"
+                                onChange={setCurrentCode}
+                            />
+                        </div>
+                    )}
+                </div>
+
+                {/* Pane 3: Preview */}
+                <div className={cn(
+                    "h-full transition-all duration-300 ease-in-out bg-[#0f0f12] overflow-hidden",
                     viewMode === 'preview' ? "w-full" :
-                        viewMode === 'split' ? "w-1/2" : "w-0 overflow-hidden"
+                        viewMode === 'split' ? "w-1/2" : "w-0"
                 )}>
                     <LivePreviewPane
                         code={currentCode}
