@@ -31,11 +31,11 @@ export async function searchWeb(query: string): Promise<WebSearchResult> {
         // 1. Title
         const title = data.Heading || query;
 
-        // 2. Summary (Abstract)
-        let summary = data.Abstract || data.AbstractText || '';
+        // 2. Summary (Abstract or Answer)
+        let summary = data.Answer || data.Abstract || data.AbstractText || '';
 
         // 3. Source
-        const source = data.AbstractSource || 'DuckDuckGo';
+        const source = data.AbstractSource || (data.Answer ? 'DuckDuckGo Answer' : 'DuckDuckGo');
 
         // 4. Related Links
         const related: Array<{ text: string; url: string }> = [];
@@ -46,6 +46,13 @@ export async function searchWeb(query: string): Promise<WebSearchResult> {
                         text: topic.Text,
                         url: topic.FirstURL
                     });
+                } else if (topic.Topics && Array.isArray(topic.Topics)) {
+                    // Handle nested topics
+                    topic.Topics.forEach((subTopic: any) => {
+                        if (subTopic.Text && subTopic.FirstURL) {
+                            related.push({ text: subTopic.Text, url: subTopic.FirstURL });
+                        }
+                    });
                 }
             });
         }
@@ -55,10 +62,8 @@ export async function searchWeb(query: string): Promise<WebSearchResult> {
             // If no abstract, try to use the first related topic as summary
             if (related.length > 0) {
                 summary = related[0].text;
-                // Remove the used topic from related list so it's not duplicated
-                // related.shift(); 
             } else {
-                summary = "Search completed but returned no direct summary context.";
+                summary = "The search query did not yield a direct summary. Please rely on authoritative internal knowledge while acknowledging the current temporal grounding if provided.";
             }
         }
 

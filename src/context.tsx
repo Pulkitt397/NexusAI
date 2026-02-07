@@ -480,7 +480,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
             const currentModel = state.availableModels.find(m => m.id === state.currentModelId);
             const identity = currentModel ? `You are currently using ${currentModel.name}${currentProvider ? ` via ${currentProvider.name}` : ''}.` : 'You are using your currently selected model.';
 
-            let systemPrompt = `${SYSTEM_PROMPTS[state.promptMode]}\n\nIDENTITY:\n- ${identity}\n- You must never hardcode your model name; always refer to yourself based on this dynamic identity.`;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            const timeStr = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+
+            let systemPrompt = `${SYSTEM_PROMPTS[state.promptMode]}\n\nIDENTITY:\n- ${identity}\n- You must never hardcode your model name; always refer to yourself based on this dynamic identity.\n\nTEMPORAL GROUNDING:\n- Current Date: ${dateStr}\n- Current Time: ${timeStr} (User's Local Time)`;
 
             // 1. Perform Web Search Grounding if enabled
             let webResult: any = null;
