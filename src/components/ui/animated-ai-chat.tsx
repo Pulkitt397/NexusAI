@@ -298,7 +298,6 @@ export function AnimatedAIChat({
                     }}
                     className="absolute bottom-[-20%] right-[-20%] w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-[120px] mix-blend-screen opacity-30"
                 />
-                <div className="bg-noise absolute inset-0 opacity-[0.03]" />
             </div>
 
             {/* 1. Scrollable Content Area (Flex Grow) */}
