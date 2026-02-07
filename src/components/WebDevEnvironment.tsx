@@ -4,7 +4,7 @@ import { LivePreviewPane } from '@/components/LivePreviewPane';
 import { CodeEditor } from '@/components/CodeEditor';
 import { extractPreviewableCode, buildPreviewDocument } from '@/utils/codeDetection';
 import { cn } from '@/lib/utils';
-import { LayoutPanelLeft, SquareSplitHorizontal, AppWindow, X, FileCode, ArrowLeft, Rocket, Layers, Play, Settings2, Plus, FileText } from 'lucide-react';
+import { LayoutPanelLeft, SquareSplitHorizontal, AppWindow, X, FileCode, ArrowLeft, Rocket, Layers, Play, Settings2, Plus, FileText, ChevronRight, Search, GitBranch, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 type ViewMode = 'chat' | 'split' | 'code' | 'preview';
@@ -233,43 +233,78 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                         <>
                             {/* File Explorer - VS Code Style */}
                             <div className="w-64 bg-[#09090b] border-r border-white/5 flex flex-col">
-                                <div className="p-4 flex items-center justify-between border-b border-white/5">
-                                    <span className="text-[11px] font-bold text-white/30 uppercase tracking-widest">Explorer</span>
-                                    <button onClick={handleCreateFile} className="text-white/30 hover:text-white transition-colors">
-                                        <Plus className="w-4 h-4" />
-                                    </button>
+                                <div className="h-9 px-4 flex items-center justify-between border-b border-white/5 bg-[#0c0c0e]">
+                                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest flex items-center gap-2">
+                                        <ChevronRight className="w-3 h-3" /> Project
+                                    </span>
+                                    <div className="flex items-center gap-1">
+                                        <button className="p-1 hover:bg-white/10 rounded text-white/40 hover:text-white transition-colors">
+                                            <Search className="w-3 h-3" />
+                                        </button>
+                                        <button onClick={handleCreateFile} className="p-1 hover:bg-white/10 rounded text-white/40 hover:text-white transition-colors">
+                                            <Plus className="w-3 h-3" />
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="flex-1 p-2 space-y-0.5">
+                                <div className="flex-1 p-2 space-y-0.5 overflow-y-auto">
                                     {currentFiles.map(file => (
                                         <button
                                             key={file.name}
                                             onClick={() => setActiveFile(file.name)}
                                             className={cn(
-                                                "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] text-left transition-all border border-transparent",
+                                                "w-full flex items-center gap-2 px-2 py-1.5 rounded-sm text-[13px] text-left transition-all border border-transparent group",
                                                 activeFile === file.name
-                                                    ? "bg-indigo-500/10 text-indigo-300 border-indigo-500/20"
-                                                    : "text-white/50 hover:text-white hover:bg-white/5"
+                                                    ? "bg-[#2a2d2e] text-white"
+                                                    : "text-white/60 hover:text-white hover:bg-white/5"
                                             )}
                                         >
-                                            <FileText className={cn("w-4 h-4 shrink-0", activeFile === file.name ? "text-indigo-400" : "text-white/20")} />
-                                            <span className="truncate flex-1">{file.name}</span>
+                                            <FileCode className={cn("w-4 h-4 shrink-0",
+                                                file.name.endsWith('html') ? "text-orange-400" :
+                                                    file.name.endsWith('css') ? "text-blue-400" :
+                                                        file.name.endsWith('js') || file.name.endsWith('ts') || file.name.endsWith('tsx') ? "text-yellow-400" :
+                                                            "text-white/20"
+                                            )} />
+                                            <span className="truncate flex-1 font-medium">{file.name}</span>
                                         </button>
                                     ))}
                                 </div>
                             </div>
-                            <div className="flex-1 h-full flex flex-col">
+                            <div className="flex-1 h-full flex flex-col bg-[#1e1e1e]">
                                 {/* Tab Bar */}
-                                <div className="h-10 border-b border-white/5 flex items-center px-4 bg-[#0c0c0e]">
+                                <div className="h-9 flex items-center bg-[#09090b] border-b border-white/5 overflow-x-auto scrollbar-hide">
                                     {activeFile && (
-                                        <div className="flex items-center gap-2 px-3 py-1.5 bg-[#18181b] border border-white/5 rounded-md text-xs text-white/80">
-                                            <FileCode className="w-3 h-3 text-blue-400" />
-                                            {activeFile}
-                                            <X className="w-3 h-3 ml-2 text-white/20 hover:text-white cursor-pointer" />
+                                        <div className="h-full flex items-center gap-2 px-3 bg-[#1e1e1e] border-t-2 border-indigo-500 min-w-[120px] max-w-[200px] group relative">
+                                            <FileCode className={cn("w-3.5 h-3.5",
+                                                activeFile.endsWith('html') ? "text-orange-400" :
+                                                    activeFile.endsWith('css') ? "text-blue-400" :
+                                                        "text-yellow-400"
+                                            )} />
+                                            <span className="text-[13px] text-white/90 truncate flex-1">{activeFile}</span>
+                                            <X className="w-3.5 h-3.5 text-white/20 hover:text-white cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity" />
                                         </div>
                                     )}
                                 </div>
-                                <div className="flex-1">
+                                <div className="flex-1 relative">
                                     <CodeEditor code={activeFileContent} language={activeFileLang} onChange={handleCodeChange} />
+                                </div>
+                                {/* VS Code Status Bar */}
+                                <div className="h-6 bg-[#007acc] flex items-center px-3 justify-between text-[11px] text-white font-medium select-none">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center gap-1.5 hover:bg-white/10 px-1 rounded cursor-pointer">
+                                            <GitBranch className="w-3 h-3" />
+                                            <span>main*</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 hover:bg-white/10 px-1 rounded cursor-pointer">
+                                            <CheckCircle2 className="w-3 h-3" />
+                                            <span>0 errors</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <span className="hover:bg-white/10 px-1 rounded cursor-pointer">Ln 12, Col 42</span>
+                                        <span className="hover:bg-white/10 px-1 rounded cursor-pointer">UTF-8</span>
+                                        <span className="hover:bg-white/10 px-1 rounded cursor-pointer">{activeFileLang.toUpperCase()}</span>
+                                        <span className="hover:bg-white/10 px-1 rounded cursor-pointer">Prettier</span>
+                                    </div>
                                 </div>
                             </div>
                         </>

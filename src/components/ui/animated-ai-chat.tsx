@@ -321,21 +321,21 @@ export function AnimatedAIChat({
                                     <Sparkles className="w-12 h-12 text-white/80 group-hover:text-white transition-colors" />
                                     <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-violet-500 to-indigo-500 opacity-0 group-hover:opacity-10 blur-xl transition-opacity" />
                                 </motion.div>
-                                <h1 className="text-5xl font-bold tracking-tight text-white mb-4 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40">
+                                <h1 className="text-6xl font-black tracking-tight text-white mb-6 bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/40 drop-shadow-2xl">
                                     Nexus AI
                                 </h1>
-                                <p className="text-white/50 max-w-md mx-auto text-lg leading-relaxed mb-10 font-medium">
-                                    Ready to build, design, and code with advanced AI models.
+                                <p className="text-white/40 max-w-lg mx-auto text-lg leading-relaxed mb-10 font-medium font-sans">
+                                    The next-generation workspace for <span className="text-violet-300">builders</span>, <span className="text-indigo-300">creators</span>, and <span className="text-cyan-300">visionaries</span>.
                                 </p>
 
                                 <div className="flex gap-4 justify-center">
-                                    <button onClick={onOpenMemory} className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-sm font-semibold text-white/70 transition-all hover:scale-105 active:scale-95 shadow-lg">
-                                        <Brain className="w-4 h-4 text-violet-400" />
-                                        <span>Memory {memoryCount > 0 && `(${memoryCount})`}</span>
+                                    <button onClick={onOpenMemory} className="flex items-center gap-3 px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-sm font-semibold text-white/80 transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] group">
+                                        <Brain className="w-5 h-5 text-violet-400 group-hover:text-violet-300 transition-colors" />
+                                        <span>Memory Base</span>
                                     </button>
-                                    <button onClick={onOpenSettings} className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-sm font-semibold text-white/70 transition-all hover:scale-105 active:scale-95 shadow-lg">
-                                        <Settings className="w-4 h-4 text-violet-400" />
-                                        <span>Configure</span>
+                                    <button onClick={onOpenSettings} className="flex items-center gap-3 px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-sm font-semibold text-white/80 transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] group">
+                                        <Settings className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 transition-colors" />
+                                        <span>System Config</span>
                                     </button>
                                 </div>
                             </motion.div>
@@ -401,8 +401,8 @@ export function AnimatedAIChat({
             <div className="shrink-0 z-20 bg-[#050507]/40 backdrop-blur-2xl border-t border-white/5 pb-[env(safe-area-inset-bottom)]">
                 <div className="max-w-3xl mx-auto px-2 py-2">
                     <div className={cn(
-                        "relative flex items-end gap-2 p-2 rounded-[24px] transition-all duration-300",
-                        isFocused ? "bg-white/10 ring-1 ring-white/10" : "bg-white/5"
+                        "relative flex items-end gap-2 p-2 rounded-[24px] transition-all duration-300 border border-transparent",
+                        isFocused ? "bg-[#18181b] border-indigo-500/30 animate-pulse-glow" : "bg-white/5 hover:bg-white/10 hover:border-white/5"
                     )}>
 
                         {/* Left: Provider & Model Selector & Search Toggle */}
