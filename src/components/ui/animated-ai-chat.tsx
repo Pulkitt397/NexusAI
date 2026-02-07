@@ -316,25 +316,25 @@ export function AnimatedAIChat({
                                         boxShadow: ["0 0 0px rgba(139, 92, 246, 0)", "0 0 40px rgba(139, 92, 246, 0.2)", "0 0 0px rgba(139, 92, 246, 0)"],
                                     }}
                                     transition={{ duration: 4, repeat: Infinity }}
-                                    className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-violet-500/20 to-indigo-500/20 border border-white/10 flex items-center justify-center mb-6 shadow-2xl backdrop-blur-xl mx-auto relative group"
+                                    className="w-24 h-24 rounded-3xl bg-gradient-to-tr from-violet-500/20 to-indigo-500/20 border border-white/10 flex items-center justify-center mb-8 shadow-2xl backdrop-blur-xl mx-auto relative group"
                                 >
-                                    <Sparkles className="w-8 h-8 text-white/80 group-hover:text-white transition-colors" />
-                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-violet-500 to-indigo-500 opacity-0 group-hover:opacity-10 blur-xl transition-opacity" />
+                                    <Sparkles className="w-12 h-12 text-white/80 group-hover:text-white transition-colors" />
+                                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-violet-500 to-indigo-500 opacity-0 group-hover:opacity-10 blur-xl transition-opacity" />
                                 </motion.div>
-                                <h1 className="text-3xl font-semibold tracking-tight text-white/90 mb-3">
+                                <h1 className="text-5xl font-bold tracking-tight text-white mb-4 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40">
                                     Nexus AI
                                 </h1>
-                                <p className="text-white/40 max-w-sm mx-auto text-sm leading-relaxed mb-6">
+                                <p className="text-white/50 max-w-md mx-auto text-lg leading-relaxed mb-10 font-medium">
                                     Ready to build, design, and code with advanced AI models.
                                 </p>
 
-                                <div className="flex gap-3 justify-center">
-                                    <button onClick={onOpenMemory} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-xs font-medium text-white/60 transition-all">
-                                        <Brain className="w-3.5 h-3.5" />
+                                <div className="flex gap-4 justify-center">
+                                    <button onClick={onOpenMemory} className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-sm font-semibold text-white/70 transition-all hover:scale-105 active:scale-95 shadow-lg">
+                                        <Brain className="w-4 h-4 text-violet-400" />
                                         <span>Memory {memoryCount > 0 && `(${memoryCount})`}</span>
                                     </button>
-                                    <button onClick={onOpenSettings} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-xs font-medium text-white/60 transition-all">
-                                        <Settings className="w-3.5 h-3.5" />
+                                    <button onClick={onOpenSettings} className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-sm font-semibold text-white/70 transition-all hover:scale-105 active:scale-95 shadow-lg">
+                                        <Settings className="w-4 h-4 text-violet-400" />
                                         <span>Configure</span>
                                     </button>
                                 </div>
