@@ -4,7 +4,7 @@ import { LivePreviewPane } from '@/components/LivePreviewPane';
 import { CodeEditor } from '@/components/CodeEditor';
 import { extractPreviewableCode, buildPreviewDocument } from '@/utils/codeDetection';
 import { cn } from '@/lib/utils';
-import { LayoutPanelLeft, SquareSplitHorizontal, AppWindow, X, FileCode, FolderOpen, FileText } from 'lucide-react';
+import { LayoutPanelLeft, SquareSplitHorizontal, AppWindow, X, FileCode, FolderOpen, FileText, Plus, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
 type ViewMode = 'chat' | 'split' | 'code' | 'preview';
 
@@ -25,17 +25,23 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
     const [currentFiles, setCurrentFiles] = useState<WebDevFile[]>([]);
     const [activeFile, setActiveFile] = useState<string | null>(null);
     const [previewContent, setPreviewContent] = useState('');
+    const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
+    // Sync visual sidebar state with parent (App.tsx)
     useEffect(() => {
         if (props.onToggleSidebar) {
-            // Hide sidebar in 'code' mode (Editor), show in others
-            if (viewMode === 'code' || viewMode === 'preview') {
-                props.onToggleSidebar(false);
-            } else {
-                props.onToggleSidebar(true);
-            }
+            props.onToggleSidebar(isSidebarVisible);
         }
-    }, [viewMode, props.onToggleSidebar]);
+    }, [isSidebarVisible, props.onToggleSidebar]);
+
+    // Force sidebar hide on editor logic, IF that was the preference, but user wants manual toggle.
+    // Let's default to visible, but allow toggle.
+    // The previous logic was: "Hide sidebar in code mode". 
+    // User requested: "The sidebar still visible make a small toggle to hide or show it on top and add index space in its space"
+    // Meaning: They want to retain the ability to use the sidebar, but maybe replace it?
+    // Let's just implement the manual toggle button and let the user decide.
+    // We will initialize `isSidebarVisible` to `true` generally, or `false` if in code mode?
+    // Let's stick to true by default and let user toggle it off.
 
     // Extract code from the latest message
     useEffect(() => {
@@ -83,31 +89,59 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
         );
         setCurrentFiles(updatedFiles);
 
-        // Rebuild preview? Ideally we need to rebuild the full doc from the updated files.
-        // For now, if we are editing index.html, we might want to update previewContent.
-        // But `buildPreviewDocument` takes `ExtractedCode`.
-        // We'd need to reverse-map `files` to `ExtractedCode`.
-        // This is complex for a quick edit. 
-        // For now, let's just update the local editor state. 
-        // Real-time preview update from multi-file editor requires a robust bundler logic in browser.
-        // We'll stick to displaying the latest AI generation in Preview, 
-        // OR we can try to re-assemble simple HTML/CSS/JS.
-
-        // Simple re-assembly for single file cases:
         if (activeFile === 'index.html') {
-            setPreviewContent(newCode); // very rough approximation
+            setPreviewContent(newCode);
+        }
+    };
+
+    const handleCreateFile = () => {
+        const name = prompt("Enter file name (e.g. styles.css):");
+        if (name && !currentFiles.find(f => f.name === name)) {
+            const ext = name.split('.').pop() || '';
+            let lang = 'text';
+            if (['js', 'jsx', 'ts', 'tsx'].includes(ext)) lang = 'javascript';
+            if (ext === 'html') lang = 'html';
+            if (ext === 'css') lang = 'css';
+
+            const newFile: WebDevFile = {
+                name,
+                language: lang,
+                content: '',
+                path: name
+            };
+            setCurrentFiles([...currentFiles, newFile]);
+            setActiveFile(name);
         }
     };
 
     return (
         <div className={cn(
             "flex flex-col font-sans bg-[#050507] text-white",
-            // If in code mode, use fixed/z-high to cover sidebar. Else absolute within main.
-            viewMode === 'code' ? "fixed inset-0 z-[60]" : "absolute inset-0 z-50"
+            // Use static positioning so it respects the sidebar flow, UNLESS in full-screen code mode where we want to take over?
+            // Actually, if we want to "add index space in its space", we should just occupy the full width.
+            // If viewMode is code, we set fixed inset-0 to cover everything, including the main sidebar.
+            // BUT we provide a toggle to bring the main sidebar back (by unmounting fixed, or by shifting).
+            // Let's respect the isSidebarVisible state. 
+            // If isSidebarVisible is TRUE, the Main Sidebar is shown (app layout shifts).
+            // This component is rendered inside <main>, so it sits to right of sidebar.
+            // If we want to hide sidebar, we tell parent to hide it.
+
+            // Let's use absolute inset-0. This makes it fill the <main> area.
+            // If parent sidebar is hidden, <main> expands to full width.
+            "absolute inset-0 z-50"
         )}>
             {/* Top Bar */}
             <header className="h-14 shrink-0 border-b border-white/10 bg-[#0a0a0b]/80 backdrop-blur-md flex items-center justify-between px-4 z-50">
                 <div className="flex items-center gap-3">
+                    {/* Toggle Sidebar Button */}
+                    <button
+                        onClick={() => setIsSidebarVisible(!isSidebarVisible)}
+                        className="p-1.5 text-white/40 hover:text-white rounded-md hover:bg-white/10 transition-colors"
+                        title={isSidebarVisible ? "Hide Sidebar" : "Show Sidebar"}
+                    >
+                        {isSidebarVisible ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}
+                    </button>
+
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-emerald-500/20 to-cyan-500/20 flex items-center justify-center border border-white/5">
                         <code className="text-emerald-400 font-bold text-sm">{'</>'}</code>
                     </div>
@@ -198,6 +232,13 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                             <div className="w-64 bg-[#181818] border-r border-white/5 flex flex-col">
                                 <div className="p-3 text-xs font-semibold text-white/40 uppercase tracking-wider flex items-center justify-between">
                                     <span>Explorer</span>
+                                    <button
+                                        onClick={handleCreateFile}
+                                        className="p-1 hover:bg-white/10 rounded text-white/40 hover:text-emerald-400 transition-colors"
+                                        title="New File"
+                                    >
+                                        <Plus className="w-3.5 h-3.5" />
+                                    </button>
                                 </div>
                                 <div className="flex-1 overflow-y-auto">
                                     {currentFiles.length === 0 ? (
