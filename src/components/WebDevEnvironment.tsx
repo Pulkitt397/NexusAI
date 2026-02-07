@@ -17,6 +17,7 @@ interface WebDevFile {
 
 interface WebDevEnvironmentProps extends AnimatedAIChatProps {
     onClose: () => void;
+    onToggleSidebar?: (isOpen: boolean) => void;
 }
 
 export function WebDevEnvironment(props: WebDevEnvironmentProps) {
@@ -24,6 +25,17 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
     const [currentFiles, setCurrentFiles] = useState<WebDevFile[]>([]);
     const [activeFile, setActiveFile] = useState<string | null>(null);
     const [previewContent, setPreviewContent] = useState('');
+
+    useEffect(() => {
+        if (props.onToggleSidebar) {
+            // Hide sidebar in 'code' mode (Editor), show in others
+            if (viewMode === 'code' || viewMode === 'preview') {
+                props.onToggleSidebar(false);
+            } else {
+                props.onToggleSidebar(true);
+            }
+        }
+    }, [viewMode, props.onToggleSidebar]);
 
     // Extract code from the latest message
     useEffect(() => {

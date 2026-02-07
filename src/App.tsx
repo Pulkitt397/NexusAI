@@ -127,6 +127,8 @@ function Dashboard() {
                 transition={{ type: "spring", bounce: 0, duration: 0.4 }}
                 className={cn(
                     "h-full border-r border-white/10 flex flex-col bg-[#050507]/60 backdrop-blur-2xl shrink-0 overflow-hidden",
+                    // If in WebDev Mode and full screen editor, we might want to hide sidebar entirely, 
+                    // but we will control that via isSidebarOpen state passed from WebDevEnvironment
                     isMobile ? "fixed inset-y-0 left-0 z-50 w-[280px]" : "relative"
                 )}
             >
@@ -430,6 +432,7 @@ function Dashboard() {
                         currentProviderId={state.currentProviderId}
                         onSelectProvider={selectProvider}
                         placeholder="Coding in WebDev Mode..."
+                        onToggleSidebar={(isOpen) => setIsSidebarOpen(isOpen)}
                     />
                 ) : (
                     <AnimatedAIChat
