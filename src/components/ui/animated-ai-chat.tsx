@@ -12,7 +12,8 @@ import {
     Globe,
     Mic,
     ChevronDown,
-    Search
+    Search,
+    ArrowDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import * as React from "react";
@@ -261,9 +262,35 @@ export function AnimatedAIChat({
     return (
         <div className="flex flex-col h-full w-full bg-[#050507] text-white selection:bg-violet-500/30 overflow-hidden">
             {/* Ambient Background */}
-            <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-violet-600/10 rounded-full blur-[120px] mix-blend-screen opacity-50" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] mix-blend-screen opacity-30" />
+            <div className="fixed inset-0 pointer-events-none overflow-hidden">
+                <motion.div
+                    animate={{
+                        scale: [1, 1.2, 1],
+                        rotate: [0, 90, 0],
+                        x: [-50, 50, -50],
+                        y: [-50, 50, -50],
+                    }}
+                    transition={{
+                        duration: 20,
+                        repeat: Infinity,
+                        ease: "linear"
+                    }}
+                    className="absolute top-[-20%] left-[-20%] w-[800px] h-[800px] bg-violet-600/10 rounded-full blur-[120px] mix-blend-screen opacity-50"
+                />
+                <motion.div
+                    animate={{
+                        scale: [1.2, 1, 1.2],
+                        rotate: [0, -90, 0],
+                        x: [50, -50, 50],
+                        y: [50, -50, 50],
+                    }}
+                    transition={{
+                        duration: 25,
+                        repeat: Infinity,
+                        ease: "linear"
+                    }}
+                    className="absolute bottom-[-20%] right-[-20%] w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-[120px] mix-blend-screen opacity-30"
+                />
                 <div className="bg-noise absolute inset-0 opacity-[0.03]" />
             </div>
 
@@ -278,9 +305,16 @@ export function AnimatedAIChat({
                                 animate={{ opacity: 1, y: 0 }}
                                 className="pointer-events-auto"
                             >
-                                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-violet-500/20 to-indigo-500/20 border border-white/10 flex items-center justify-center mb-6 shadow-2xl shadow-violet-500/10 backdrop-blur-xl mx-auto">
-                                    <Sparkles className="w-8 h-8 text-white/80" />
-                                </div>
+                                <motion.div
+                                    animate={{
+                                        boxShadow: ["0 0 0px rgba(139, 92, 246, 0)", "0 0 40px rgba(139, 92, 246, 0.2)", "0 0 0px rgba(139, 92, 246, 0)"],
+                                    }}
+                                    transition={{ duration: 4, repeat: Infinity }}
+                                    className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-violet-500/20 to-indigo-500/20 border border-white/10 flex items-center justify-center mb-6 shadow-2xl backdrop-blur-xl mx-auto relative group"
+                                >
+                                    <Sparkles className="w-8 h-8 text-white/80 group-hover:text-white transition-colors" />
+                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-violet-500 to-indigo-500 opacity-0 group-hover:opacity-10 blur-xl transition-opacity" />
+                                </motion.div>
                                 <h1 className="text-3xl font-semibold tracking-tight text-white/90 mb-3">
                                     Nexus AI
                                 </h1>
@@ -330,6 +364,28 @@ export function AnimatedAIChat({
                         components={virtuosoComponents}
                     />
                 )}
+
+                {/* Scroll to Bottom Button */}
+                <AnimatePresence>
+                    {!isAtBottom && messages.length > 0 && (
+                        <motion.button
+                            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                            onClick={() => {
+                                virtuosoRef.current?.scrollToIndex({
+                                    index: messages.length - 1,
+                                    align: 'end',
+                                    behavior: 'smooth'
+                                });
+                                setIsAtBottom(true);
+                            }}
+                            className="absolute bottom-4 right-4 z-30 p-2.5 rounded-full bg-violet-600/90 text-white shadow-xl shadow-violet-500/20 backdrop-blur-md hover:bg-violet-700 transition-colors border border-white/10"
+                        >
+                            <ArrowDown className="w-5 h-5" />
+                        </motion.button>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* 2. Super Input Bar (Sticky Bottom) */}

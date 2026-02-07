@@ -45,8 +45,8 @@ export const PREFERRED_MODELS: Record<string, string[]> = {
         'meta-llama/Llama-3.2-3B-Instruct'
     ],
     nvidia: [
-        'meta/llama-3.1-405b-instruct',
         'moonshotai/kimi-k2.5',
+        'meta/llama-3.1-405b-instruct',
         'meta/llama-3.1-70b-instruct',
         'nvidia/llama-3.1-nemotron-70b-instruct',
         'mistralai/mistral-large-2-instruct'

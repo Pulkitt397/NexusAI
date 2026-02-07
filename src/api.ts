@@ -212,12 +212,12 @@ export async function* streamNvidia(apiKey: string, model: string, messages: { r
         temperature: 0.7
     };
 
-    // Special handling for Kimi K2.5
-    // Special handling for Kimi K2.5
+    // Special handling for Kimi K2.5 as requested
     if (model.includes('kimi')) {
         body.max_tokens = 16384;
-        // body.chat_template_kwargs = { thinking: true }; // Temporarily disabled as it might ensure 404
+        body.temperature = 1.0;
         body.top_p = 1.0;
+        body.chat_template_kwargs = { thinking: true };
     }
 
     // Use local proxy path to avoid CORS issues

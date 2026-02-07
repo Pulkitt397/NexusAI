@@ -4,7 +4,7 @@ import { MessageContent } from './MessageContent';
 import { motion } from 'framer-motion';
 import { WebSearchResultCard } from './WebSearchResultCard';
 import { WebSearchResult } from '@/types';
-import { FileDown } from 'lucide-react';
+import { FileDown, Volume2, VolumeX } from 'lucide-react';
 
 interface ChatMessageProps {
     role: string;
@@ -16,6 +16,30 @@ interface ChatMessageProps {
 
 export const ChatMessage = memo(({ role, content, id, webResult, pdfUrl }: ChatMessageProps) => {
     const isUser = role === 'user';
+    const [isPlaying, setIsPlaying] = React.useState(false);
+
+    const toggleSpeech = () => {
+        if (isPlaying) {
+            window.speechSynthesis.cancel();
+            setIsPlaying(false);
+            return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(content);
+        utterance.onend = () => setIsPlaying(false);
+        utterance.onerror = () => setIsPlaying(false);
+
+        // Clean markdown for better speech
+        const plainText = content
+            .replace(/```[\s\S]*?```/g, ' [code block] ')
+            .replace(/`([^`]+)`/g, '$1')
+            .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+            .replace(/[#*_]/g, '');
+
+        utterance.text = plainText;
+        window.speechSynthesis.speak(utterance);
+        setIsPlaying(true);
+    };
 
     return (
         <motion.div
@@ -27,13 +51,27 @@ export const ChatMessage = memo(({ role, content, id, webResult, pdfUrl }: ChatM
             )}
         >
             {/* Avatar */}
-            <div className={cn(
-                "w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-medium tracking-wide shadow-lg",
-                !isUser
-                    ? "bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-violet-500/20"
-                    : "bg-white/10 text-white/70 border border-white/5"
-            )}>
-                {!isUser ? "AI" : "YOU"}
+            <div className="flex flex-col items-center gap-2">
+                <div className={cn(
+                    "w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-medium tracking-wide shadow-lg",
+                    !isUser
+                        ? "bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-violet-500/20"
+                        : "bg-white/10 text-white/70 border border-white/5"
+                )}>
+                    {!isUser ? "AI" : "YOU"}
+                </div>
+                {!isUser && (
+                    <button
+                        onClick={toggleSpeech}
+                        className={cn(
+                            "p-1.5 rounded-md transition-all opacity-0 group-hover:opacity-100",
+                            isPlaying ? "bg-violet-500/20 text-violet-400 opacity-100" : "text-white/30 hover:text-white/60 hover:bg-white/5"
+                        )}
+                        title={isPlaying ? "Stop listening" : "Listen to response"}
+                    >
+                        {isPlaying ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                    </button>
+                )}
             </div>
 
             {/* Message Card */}

@@ -10,6 +10,7 @@ import { MessageSquare, Plus, Trash2, ChevronDown, LogOut, Menu } from 'lucide-r
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { LoginPage } from '@/components/LoginPage';
+import { SelectionMenu } from '@/components/ui/SelectionMenu';
 
 function Dashboard() {
     const {
@@ -128,9 +129,15 @@ function Dashboard() {
             >
                 {/* Logo */}
                 <div className="p-4 border-b border-white/10">
-                    <div className="flex items-center gap-2">
-                        <span className="text-2xl">✦</span>
-                        <span className="font-semibold text-white">NexusAI</span>
+                    <div className="flex items-center gap-2 group cursor-pointer">
+                        <motion.span
+                            animate={{ rotate: [0, 15, -15, 0] }}
+                            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                            className="text-2xl"
+                        >
+                            ✦
+                        </motion.span>
+                        <span className="font-semibold text-white group-hover:text-violet-400 transition-colors">NexusAI</span>
                     </div>
                 </div>
 
@@ -410,6 +417,16 @@ function Dashboard() {
             <MemoryModal
                 isOpen={state.modalOpen === 'memory'}
                 onClose={closeModal}
+            />
+            <SelectionMenu
+                onAction={(action, text) => {
+                    const prompt = action === 'explain'
+                        ? `Explain this text in detail: "${text}"`
+                        : action === 'summarize'
+                            ? `Summarize this text: "${text}"`
+                            : `Translate this text to English (or identify the language and translate to English): "${text}"`;
+                    sendMessage(prompt);
+                }}
             />
         </div>
     );
