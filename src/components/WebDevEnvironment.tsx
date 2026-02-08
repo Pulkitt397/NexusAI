@@ -58,16 +58,14 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
     const [currentFiles, setCurrentFiles] = useState<WebDevFile[]>([]);
     const [activeFile, setActiveFile] = useState<string | null>(null);
     const [previewContent, setPreviewContent] = useState('');
-    const [sidebarTab, setSidebarTab] = useState<'chat' | 'architecture'>('chat');
-
-    // Sync sidebar tab with project stage
-    useEffect(() => {
+    // Unified command handler
+    const handleCommand = async (content: string) => {
         if (state.projectStage === 'intent') {
-            setSidebarTab('chat');
+            await handlePipelineStart(content);
         } else {
-            setSidebarTab('architecture');
+            await sendMessage(content);
         }
-    }, [state.projectStage]);
+    };
 
     const handlePipelineStart = async (userPrompt: string) => {
         if (!state.currentProviderId || !state.currentModelId) {
@@ -328,42 +326,14 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                     className="flex flex-col bg-[#09090b] border-r border-white/5 relative z-40 transition-[width] duration-300 ease-in-out"
                     style={{ width: viewMode === 'preview' ? 0 : sidebarWidth }}
                 >
-                    {/* Sidebar Tabs */}
-                    <div className="flex border-b border-white/5 p-1 gap-1">
-                        <button
-                            onClick={() => setSidebarTab('chat')}
-                            className={cn(
-                                "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-[11px] font-bold transition-all",
-                                sidebarTab === 'chat' ? "bg-white/10 text-white" : "text-white/30 hover:text-white/50"
-                            )}
-                        >
-                            <History className="w-3.5 h-3.5" />
-                            History
-                        </button>
-                        <button
-                            onClick={() => setSidebarTab('architecture')}
-                            className={cn(
-                                "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-[11px] font-bold transition-all",
-                                sidebarTab === 'architecture' ? "bg-white/10 text-white" : "text-white/30 hover:text-white/50"
-                            )}
-                        >
-                            <LayoutTemplate className="w-3.5 h-3.5" />
-                            Architecture
-                        </button>
-                    </div>
-
                     <div className="flex-1 overflow-hidden">
-                        {sidebarTab === 'chat' ? (
-                            <AnimatedAIChat {...props} onPipelineStart={handlePipelineStart} />
-                        ) : (
-                            <ArchitectureSidebar
-                                sections={state.sections}
-                                selectedSectionId={state.selectedSectionId}
-                                onSelectSection={selectSection}
-                                onStartBuild={handleStartBuild}
-                                isBuilding={state.projectStage === 'build'}
-                            />
-                        )}
+                        <ArchitectureSidebar
+                            sections={state.sections}
+                            selectedSectionId={state.selectedSectionId}
+                            onSelectSection={selectSection}
+                            onStartBuild={handleStartBuild}
+                            isBuilding={state.projectStage === 'build'}
+                        />
                     </div>
 
                     {/* Resize Handle */}
@@ -434,7 +404,7 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                     {/* CONTEXTUAL ACTION PANEL (BOTTOM CENTER) */}
                     <div className="absolute bottom-6 left-0 right-0 z-50 px-6">
                         <StageActionPanel
-                            onSendMessage={sendMessage}
+                            onSendMessage={handleCommand}
                             selectedSectionTitle={selectedSection?.title}
                         />
                     </div>
