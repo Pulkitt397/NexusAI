@@ -15,7 +15,7 @@ interface PlanViewProps {
 
 export function PlanView({ state }: PlanViewProps) {
     return (
-        <div className="h-full flex flex-col bg-[#0c0c0e] text-white overflow-hidden">
+        <div className="h-full flex flex-col bg-transparent text-white overflow-hidden">
             {/* Header */}
             <div className="p-6 border-b border-white/5">
                 <div className="flex items-center gap-3 mb-2">

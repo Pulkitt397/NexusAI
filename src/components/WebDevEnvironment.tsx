@@ -22,6 +22,7 @@ import {
 import { StageIndicator } from './layout/StageIndicator';
 import { ArchitectureSidebar } from './layout/ArchitectureSidebar';
 import { StageActionPanel } from './layout/StageActionPanel';
+import { WorkspaceBackground } from './layout/WorkspaceBackground';
 
 type ViewMode = 'chat' | 'split' | 'code' | 'preview' | 'plan';
 
@@ -269,10 +270,10 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
     const selectedSection = state.sections.find(s => s.id === state.selectedSectionId);
 
     return (
-        <div className="flex flex-col h-full bg-[#09090b] text-white overflow-hidden font-sans selection:bg-indigo-500/30">
-
+        <div className="flex flex-col h-full bg-[#09090b] text-white overflow-hidden font-sans selection:bg-indigo-500/30 relative">
+            <WorkspaceBackground />
             {/* REMASTER HEADER */}
-            <header className="h-14 shrink-0 border-b border-white/5 bg-[#09090b]/80 backdrop-blur-xl flex items-center justify-between px-4 z-50">
+            <header className="h-14 shrink-0 border-b border-white/5 bg-[#09090b]/80 backdrop-blur-xl flex items-center justify-between px-4 z-[100] relative">
                 <div className="flex items-center gap-4">
                     <button onClick={props.onClose} className="p-2 hover:bg-white/5 rounded-lg transition-colors text-white/40 hover:text-white">
                         <X className="w-5 h-5" />
