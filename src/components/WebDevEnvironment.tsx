@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { runBuilderPipeline, PipelineEvent } from '@/ai/pipeline';
+import { runPlanningPhase, runBuildPhase, PipelineEvent } from '@/ai/pipeline';
 import { useApp } from '@/context';
 import { AnimatedAIChat, AnimatedAIChatProps } from '@/components/ui/animated-ai-chat';
 import { LivePreviewPane } from '@/components/LivePreviewPane';
@@ -46,6 +46,7 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
         setProjectStage,
         updateSections,
         selectSection,
+        setBuilderState,
         sendMessage
     } = useApp();
 
@@ -78,17 +79,22 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
             return;
         }
 
+        showToast("Thinking...", "info");
         setProjectStage('architecture');
         setViewMode('plan');
 
-        await runBuilderPipeline(userPrompt, state.currentProviderId, apiKey, state.currentModelId, (event: PipelineEvent) => {
+        await runPlanningPhase(userPrompt, state.currentProviderId, apiKey, state.currentModelId, (event: PipelineEvent) => {
             // Transform pipeline events to global state updates
             if (event.type === 'STEP_STARTED') {
-                // Update a local or global 'currentStep' if we had one
                 console.log("[Pipeline]", event.payload);
             }
 
+            if (event.type === 'INTENT_GENERATED') {
+                setBuilderState({ siteIntent: event.payload });
+            }
+
             if (event.type === 'ARCHITECTURE_GENERATED') {
+                setBuilderState({ siteArchitecture: event.payload });
                 const sections = event.payload.sections.map((s, idx) => ({
                     id: s.id,
                     title: s.name,
@@ -99,30 +105,80 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                 updateSections(sections);
             }
 
-            if (event.type === 'COMPONENT_GENERATED') {
-                const { sectionId, code } = event.payload;
+            if (event.type === 'DESIGN_GENERATED') {
+                setBuilderState({ designSystem: event.payload });
+            }
 
-                // Update section status
-                const updatedSections = state.sections.map(s =>
-                    s.id === sectionId ? { ...s, status: 'complete' as const } : s
-                );
-                updateSections(updatedSections);
-
-                // Add or update file for this component
-                const fileName = `${sectionId}.tsx`;
-                setCurrentFiles(prev => {
-                    const exists = prev.find(f => f.name === fileName);
-                    if (exists) return prev.map(f => f.name === fileName ? { ...f, content: code } : f);
-                    return [...prev, { name: fileName, language: 'typescript', content: code, path: fileName }];
-                });
-                if (!activeFile) setActiveFile(fileName);
+            if (event.type === 'ASSET_GENERATED') {
+                setBuilderState({ assetPlan: event.payload });
             }
 
             if (event.type === 'COMPLETE') {
-                setProjectStage('build');
-                setViewMode('split');
+                // End of planning phase
+                setProjectStage('architecture'); // Stay in architecture for review
+                showToast("Plan ready for review", "success");
+            }
+
+            if (event.type === 'ERROR') {
+                showToast(event.payload, 'error');
             }
         });
+    };
+
+    const handleStartBuild = async () => {
+        if (!process.env.NEXT_PUBLIC_NEXUS_API_KEY && !state.apiKeys?.google) {
+            showToast("API Key missing", 'error');
+            return;
+        }
+
+        const apiKey = process.env.NEXT_PUBLIC_NEXUS_API_KEY || state.apiKeys?.google || "";
+
+        setProjectStage('build');
+        showToast("Building components...", "info");
+
+        // We need the design system and assets from the previous phase. 
+        // Currently these aren't persisted in global state fully (only sections are).
+        // For now, we will assume the AI can infer or we need to persist them.
+        // TODO: Persist full architecture state.
+        // As a workaround for this refactor, we will rely on the sections we have
+        // and potentially re-generate or assume context if data is missing.
+        // Ideally, runPlanningPhase should save *all* artifacts to state.
+
+        // Let's pass what we have.
+        // Since we didn't update AppState to store DesignSystem/Assets, we might fail here.
+        // FIX: Update AppState to store these or pass dummy for now to get flow working.
+
+        await runBuildPhase(
+            state.sections.map(s => ({ id: s.id, purpose: s.description })), // Minimal section info
+            state.designSystem || {} as any,
+            state.assetPlan || { section_assets: [] } as any,
+            state.currentProviderId,
+            apiKey,
+            state.currentModelId || "",
+            (event: PipelineEvent) => {
+                if (event.type === 'COMPONENT_GENERATED') {
+                    const { sectionId, code } = event.payload;
+                    const updatedSections = state.sections.map(s =>
+                        s.id === sectionId ? { ...s, status: 'complete' as const } : s
+                    );
+                    updateSections(updatedSections);
+
+                    const fileName = `${sectionId}.tsx`;
+                    setCurrentFiles(prev => {
+                        const exists = prev.find(f => f.name === fileName);
+                        if (exists) return prev.map(f => f.name === fileName ? { ...f, content: code } : f);
+                        return [...prev, { name: fileName, language: 'typescript', content: code, path: fileName }];
+                    });
+                    if (!activeFile) setActiveFile(fileName);
+                }
+
+                if (event.type === 'COMPLETE') {
+                    setProjectStage('refine');
+                    setViewMode('split');
+                    showToast("Build complete", "success");
+                }
+            }
+        );
     };
 
     // Auto-hide global sidebar on mount
@@ -299,6 +355,8 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                                 sections={state.sections}
                                 selectedSectionId={state.selectedSectionId}
                                 onSelectSection={selectSection}
+                                onStartBuild={handleStartBuild}
+                                isBuilding={state.projectStage === 'build'}
                             />
                         )}
                     </div>

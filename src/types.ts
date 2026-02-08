@@ -108,6 +108,12 @@ export interface AppState {
     projectStage: ProjectStage;
     sections: ProjectSection[];
     selectedSectionId: string | null;
+
+    // Persisted Artifacts for Builder Pipeline
+    siteIntent?: import('@/types/builderTypes').SiteIntent;
+    siteArchitecture?: import('@/types/builderTypes').SiteArchitecture;
+    designSystem?: import('@/types/builderTypes').DesignSystem;
+    assetPlan?: import('@/types/builderTypes').AssetPlan;
 }
 
 export interface StreamChunk {

@@ -14,7 +14,7 @@ export type PipelineEvent =
     | { type: 'ERROR', payload: string }
     | { type: 'COMPLETE', payload: null };
 
-export async function runBuilderPipeline(
+export async function runPlanningPhase(
     userPrompt: string,
     providerId: string,
     apiKey: string,
@@ -22,7 +22,7 @@ export async function runBuilderPipeline(
     onupdate: (event: PipelineEvent) => void
 ) {
     try {
-        console.log(`[Builder] Starting pipeline with ${providerId}/${modelId}`);
+        console.log(`[Builder] Starting planning phase with ${providerId}/${modelId}`);
         onupdate({ type: 'STEP_STARTED', payload: 'Analyzing your intent...' });
 
         // 1. Intent Reasoning
@@ -51,7 +51,7 @@ export async function runBuilderPipeline(
         onupdate({ type: 'DESIGN_GENERATED', payload: designJson });
         onupdate({ type: 'STEP_STARTED', payload: 'Sourcing high-quality assets...' });
 
-        // 5. Asset Intelligence (New Step)
+        // 5. Asset Intelligence
         const assetPrompt = BUILDER_PROMPTS.ASSET_INTELLIGENCE
             .replace('{{INTENT_JSON}}', JSON.stringify(intentJson, null, 2))
             .replace('{{ARCHITECTURE_JSON}}', JSON.stringify(archJson, null, 2))
@@ -67,18 +67,40 @@ export async function runBuilderPipeline(
             }))
         };
         onupdate({ type: 'ASSET_GENERATED', payload: processedAssets });
+
+        // STOP HERE - Wait for user approval
+        onupdate({ type: 'COMPLETE', payload: null }); // Using COMPLETE to signal end of *this* phase
+
+    } catch (error: any) {
+        console.error('[Builder] Planning Phase Error:', error);
+        onupdate({ type: 'ERROR', payload: error.message || "Planning failed" });
+    }
+}
+
+export async function runBuildPhase(
+    sectionsToBuild: any[], // Ideally typed from SiteArchitecture
+    designSystem: DesignSystem,
+    assets: AssetPlan,
+    providerId: string,
+    apiKey: string,
+    modelId: string,
+    onupdate: (event: PipelineEvent) => void
+) {
+    try {
+        console.log(`[Builder] Starting build phase for ${sectionsToBuild.length} sections`);
         onupdate({ type: 'STEP_STARTED', payload: 'Generating components...' });
 
-        // 6. Component Generation (First 3 sections for prototype speed)
-        const sectionsToBuild = archJson.sections.slice(0, 3);
+        // Slice logic can be handled by caller or here. Let's assume caller sends what needs building.
+        // For MVP prototype speed, let's limit safely if not limited by caller
+        const actualSections = sectionsToBuild.slice(0, 5);
 
-        for (const section of sectionsToBuild) {
+        for (const section of actualSections) {
             // Find assets for this section
-            const sectionAssets = processedAssets.section_assets.find(a => a.sectionId === section.id);
+            const sectionAssets = assets.section_assets.find(a => a.sectionId === section.id);
 
             const componentPrompt = BUILDER_PROMPTS.COMPONENT_GENERATOR
                 .replace('{{SECTION_JSON}}', JSON.stringify(section, null, 2))
-                .replace('{{DESIGN_JSON}}', JSON.stringify(designJson, null, 2))
+                .replace('{{DESIGN_JSON}}', JSON.stringify(designSystem, null, 2))
                 .replace('{{ASSETS_JSON}}', JSON.stringify(sectionAssets || {}, null, 2));
 
             const code = await generateCode(providerId, apiKey, modelId, componentPrompt);
@@ -88,8 +110,8 @@ export async function runBuilderPipeline(
         onupdate({ type: 'COMPLETE', payload: null });
 
     } catch (error: any) {
-        console.error('[Builder] Pipeline Error:', error);
-        onupdate({ type: 'ERROR', payload: error.message || "Pipeline failed" });
+        console.error('[Builder] Build Phase Error:', error);
+        onupdate({ type: 'ERROR', payload: error.message || "Build failed" });
     }
 }
 

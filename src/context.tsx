@@ -45,6 +45,7 @@ interface AppContextType {
     setProjectStage: (stage: AppState['projectStage']) => void;
     updateSections: (sections: AppState['sections']) => void;
     selectSection: (sectionId: string | null) => void;
+    setBuilderState: (updates: Partial<Pick<AppState, 'siteIntent' | 'siteArchitecture' | 'designSystem' | 'assetPlan'>>) => void;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -123,7 +124,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
         streamingContent: '',
         projectStage: 'intent',
         sections: [],
-        selectedSectionId: null
+        selectedSectionId: null,
+        siteIntent: undefined,
+        siteArchitecture: undefined,
+        designSystem: undefined,
+        assetPlan: undefined
     });
 
     const [toasts, setToasts] = useState<Toast[]>([]);
@@ -251,7 +256,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
                     currentModelId: state.currentModelId,
                     projectStage: state.projectStage,
                     sections: state.sections,
-                    selectedSectionId: state.selectedSectionId
+                    selectedSectionId: state.selectedSectionId,
+                    // We don't sync full artifacts to preferences (too large/complex), mostly just status
+                    // ideally these go to a separate 'project' document or stay local for now
                 };
                 await firestoreService.syncPreferences(user.uid, preferences);
                 console.log('[Cloud] Preferences synced');
@@ -794,6 +801,10 @@ Output only the improved prompt text.`;
         setState(prev => ({ ...prev, selectedSectionId: sectionId }));
     }, []);
 
+    const setBuilderState = useCallback((updates: Partial<Pick<AppState, 'siteIntent' | 'siteArchitecture' | 'designSystem' | 'assetPlan'>>) => {
+        setState(prev => ({ ...prev, ...updates }));
+    }, []);
+
     return (
         <AppContext.Provider value={{
             state,
@@ -819,7 +830,8 @@ Output only the improved prompt text.`;
             updateChatCode,
             setProjectStage,
             updateSections,
-            selectSection
+            selectSection,
+            setBuilderState
         }}>
             {children}
             {/* Toast container */}

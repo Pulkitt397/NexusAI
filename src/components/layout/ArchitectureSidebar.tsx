@@ -16,9 +16,11 @@ interface ArchitectureSidebarProps {
     sections: ProjectSection[];
     selectedSectionId: string | null;
     onSelectSection: (id: string | null) => void;
+    onStartBuild?: () => void;
+    isBuilding?: boolean;
 }
 
-export function ArchitectureSidebar({ sections, selectedSectionId, onSelectSection }: ArchitectureSidebarProps) {
+export function ArchitectureSidebar({ sections, selectedSectionId, onSelectSection, onStartBuild, isBuilding }: ArchitectureSidebarProps) {
     return (
         <div className="flex flex-col h-full bg-[#09090b] text-white select-none">
             <div className="h-10 px-4 flex items-center justify-between border-b border-white/5 bg-[#09090b]">
@@ -97,10 +99,12 @@ export function ArchitectureSidebar({ sections, selectedSectionId, onSelectSecti
                 )}
             </div>
 
-            <div className="p-3 border-t border-white/5 bg-[#09090b]/80 backdrop-blur-md">
+            <div className="p-4 border-b border-white/5">
+                <h2 className="text-sm font-semibold mb-2 text-white/70">Structure</h2>
                 <button
-                    disabled={sections.length === 0}
-                    className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-md text-[11px] font-bold shadow-lg shadow-indigo-500/20 transition-all border border-indigo-400/20 flex items-center justify-center gap-2"
+                    onClick={onStartBuild}
+                    disabled={isBuilding || sections.length === 0}
+                    className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 rounded-md text-[11px] font-bold hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-indigo-500/20 border border-indigo-400/20"
                 >
                     Build All Sections
                 </button>
