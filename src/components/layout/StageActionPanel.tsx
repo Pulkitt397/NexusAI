@@ -112,32 +112,30 @@ export function StageActionPanel({ onSendMessage, placeholder, selectedSectionTi
                 </AnimatePresence>
 
                 <form onSubmit={handleSubmit} className="relative flex items-end gap-3 px-3 py-1">
-                    {/* Selectors */}
-                    <div className="flex bg-white/5 rounded-2xl border border-white/5 p-1 mb-1 shadow-inner">
+                    {/* Compact Selectors */}
+                    <div className="flex bg-white/5 rounded-2xl border border-white/5 p-1 mb-1.5 shadow-inner shrink-0 scale-90 origin-left">
                         <button
                             type="button"
                             onClick={() => setIsMenuOpen(isMenuOpen === 'provider' ? null : 'provider')}
                             className={cn(
-                                "flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-black transition-all",
+                                "flex items-center justify-center w-10 h-10 rounded-xl transition-all",
                                 isMenuOpen === 'provider' ? "bg-white text-black" : "text-white/40 hover:text-white/70"
                             )}
+                            title={currentProvider?.name || 'Provider'}
                         >
-                            <Database className="w-3.5 h-3.5" />
-                            <span className="hidden md:inline uppercase tracking-widest">{currentProvider?.name || 'Provider'}</span>
-                            <ChevronDown className="w-3 h-3 opacity-30" />
+                            <Database className="w-4 h-4" />
                         </button>
-                        <div className="w-px h-4 bg-white/10 self-center" />
+                        <div className="w-px h-4 bg-white/10 self-center mx-0.5" />
                         <button
                             type="button"
                             onClick={() => setIsMenuOpen(isMenuOpen === 'model' ? null : 'model')}
                             className={cn(
-                                "flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-black transition-all",
+                                "flex items-center justify-center w-10 h-10 rounded-xl transition-all",
                                 isMenuOpen === 'model' ? "bg-white text-black" : "text-white/40 hover:text-white/70"
                             )}
+                            title={currentModel?.name || 'Model'}
                         >
-                            <Cpu className="w-3.5 h-3.5" />
-                            <span className="hidden md:inline uppercase tracking-widest">{currentModel?.name.split('/').pop() || 'Model'}</span>
-                            <ChevronDown className="w-3 h-3 opacity-30" />
+                            <Cpu className="w-4 h-4" />
                         </button>
                     </div>
 
@@ -151,57 +149,50 @@ export function StageActionPanel({ onSendMessage, placeholder, selectedSectionTi
                                     handleSubmit();
                                 }
                             }}
-                            placeholder={placeholder || (state.projectStage === 'intent' ? "What are we building today?" : "Describe changes or refine architecture...")}
-                            className="w-full bg-transparent border-none focus:ring-0 text-[15px] font-medium text-white placeholder-white/10 resize-none py-4 custom-scrollbar max-h-40"
+                            placeholder={placeholder || (state.projectStage === 'intent' ? "What's the vision for your app?" : "Describe any changes or refinements...")}
+                            className="w-full bg-transparent border-none focus:ring-0 text-[16px] font-medium text-white placeholder-white/20 resize-none py-4 custom-scrollbar max-h-48"
                             rows={1}
                         />
                     </div>
 
-                    <div className="flex items-center gap-3 mb-1.5">
-                        <div className="hidden xl:flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-white/5 text-[9px] text-white/20 border border-white/5 font-black tracking-tighter">
-                            <Command className="w-3 h-3" />
-                            <span>K</span>
-                        </div>
+                    <div className="flex items-center gap-3 mb-2 shrink-0">
                         <button
                             type="submit"
                             disabled={!input.trim()}
                             className={cn(
-                                "w-11 h-11 flex items-center justify-center rounded-2xl transition-all duration-500",
+                                "w-12 h-12 flex items-center justify-center rounded-2xl transition-all duration-500",
                                 input.trim()
-                                    ? "bg-indigo-600 text-white shadow-[0_0_20px_rgba(79,70,229,0.4)] scale-100 rotate-0"
-                                    : "bg-white/5 text-white/10 scale-90 rotate-12 opacity-50"
+                                    ? "bg-indigo-600 text-white shadow-[0_0_20px_rgba(79,70,229,0.4)] scale-100"
+                                    : "bg-white/5 text-white/10 scale-90 opacity-40 shrink-0"
                             )}
                         >
-                            <ArrowUp className={cn("w-5 h-5 transition-transform duration-500", input.trim() ? "translate-y-0" : "translate-y-1")} strokeWidth={4} />
+                            <ArrowUp className={cn("w-6 h-6 transition-transform duration-500", input.trim() ? "translate-y-0" : "translate-y-1")} strokeWidth={4} />
                         </button>
                     </div>
                 </form>
 
-                {/* Aesthetic Footer (Micro-Actions) */}
+                {/* Functional Micro-Actions */}
                 <div className="px-4 pb-2 pt-1 flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
                         {[
-                            { label: 'Polish UI', icon: Sparkles },
-                            { label: 'Responsive', icon: Smartphone },
-                            { label: 'Strategy', icon: Settings2 }
+                            { label: 'Polish UI', icon: Sparkles, action: "Apply a professional, high-end UI polish to this section." },
+                            { label: 'Responsive', icon: Smartphone, action: "Ensure this section looks great on mobile, tablet, and desktop." },
+                            { label: 'Add Logic', icon: Settings2, action: "Implement interactive logic and dynamic behavior for this component." }
                         ].map((action, i) => (
                             <button
                                 key={i}
-                                className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 transition-all text-[10px] font-black text-white/30 hover:text-white/80 whitespace-nowrap group"
+                                onClick={() => setInput(prev => prev ? `${prev} ${action.action}` : action.action)}
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/10 border border-white/5 transition-all text-[10px] font-black text-white/40 hover:text-white/90 whitespace-nowrap group active:scale-95"
                             >
-                                <action.icon className="w-3 h-3 group-hover:scale-110 group-hover:text-indigo-400 transition-all" />
-                                <span className="uppercase tracking-[0.1em]">{action.label}</span>
+                                <action.icon className="w-3.5 h-3.5 group-hover:scale-110 group-hover:text-indigo-400 transition-all" />
+                                <span className="uppercase tracking-[0.15em]">{action.label}</span>
                             </button>
                         ))}
                     </div>
                     <div className="flex-1" />
-                    <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-green-500/5 text-green-500/40 border border-green-500/10">
-                        <motion.div
-                            animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                            className="w-1.5 h-1.5 rounded-full bg-current"
-                        />
-                        <span className="text-[9px] font-black uppercase tracking-widest">Nexus Active</span>
+                    <div className="hidden sm:flex items-center gap-2.5 px-4 py-2 rounded-xl bg-indigo-500/[0.03] text-indigo-400/50 border border-indigo-500/10">
+                        <Terminal className="w-3.5 h-3.5" />
+                        <span className="text-[10px] font-black uppercase tracking-widest leading-none">Nexus Console</span>
                     </div>
                 </div>
             </motion.div>
