@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, CheckCircle2, Circle, Smartphone, Palette, LayoutTemplate } from 'lucide-react';
+import { ChevronDown, CheckCircle2, Circle, Smartphone, Palette, LayoutTemplate, Share2, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { SiteIntent, SiteArchitecture, DesignSystem } from '@/types/builderTypes';
+import { SiteIntent, SiteArchitecture, DesignSystem, UXJourney, AssetPlan } from '@/types/builderTypes';
 
 interface PipelineStageCardProps {
     content: string;
@@ -14,7 +14,7 @@ export function PipelineStageCard({ content }: PipelineStageCardProps) {
 
     try {
         const data = JSON.parse(content);
-        const type = data.type; // 'INTENT', 'ARCHITECTURE', 'DESIGN'
+        const type = data.type; // 'INTENT', 'ARCHITECTURE', 'UX', 'ASSETS', 'DESIGN'
         const payload = data.payload;
 
         if (!type || !payload) return null;
@@ -22,6 +22,8 @@ export function PipelineStageCard({ content }: PipelineStageCardProps) {
         const getIcon = () => {
             if (type === 'INTENT') return <Smartphone className="w-5 h-5 text-blue-400" />;
             if (type === 'ARCHITECTURE') return <LayoutTemplate className="w-5 h-5 text-purple-400" />;
+            if (type === 'UX') return <Share2 className="w-5 h-5 text-orange-400" />;
+            if (type === 'ASSETS') return <ImageIcon className="w-5 h-5 text-green-400" />;
             if (type === 'DESIGN') return <Palette className="w-5 h-5 text-pink-400" />;
             return <Circle className="w-5 h-5 text-gray-400" />;
         };
@@ -29,6 +31,8 @@ export function PipelineStageCard({ content }: PipelineStageCardProps) {
         const getTitle = () => {
             if (type === 'INTENT') return "Intent Identified";
             if (type === 'ARCHITECTURE') return "Architecture Planned";
+            if (type === 'UX') return "UX Flow Designed";
+            if (type === 'ASSETS') return "Assets Sourced";
             if (type === 'DESIGN') return "Design System Generated";
             return "Processing";
         };
@@ -52,6 +56,8 @@ export function PipelineStageCard({ content }: PipelineStageCardProps) {
                             <p className="text-xs text-white/40">
                                 {type === 'INTENT' && "Goal, Audience, Tone"}
                                 {type === 'ARCHITECTURE' && `${(payload as SiteArchitecture).sections?.length || 0} Sections`}
+                                {type === 'UX' && "Strategy, User Goals, Triggers"}
+                                {type === 'ASSETS' && `${(payload as AssetPlan).section_assets?.length || 0} Assets Generated`}
                                 {type === 'DESIGN' && "Colors, Typography, Spacing"}
                             </p>
                         </div>

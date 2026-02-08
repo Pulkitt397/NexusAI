@@ -50,6 +50,12 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
             if (event.type === 'ARCHITECTURE_GENERATED') {
                 addSystemMessage(JSON.stringify({ type: 'ARCHITECTURE', payload: event.payload }));
             }
+            if (event.type === 'UX_GENERATED') {
+                addSystemMessage(JSON.stringify({ type: 'UX', payload: event.payload }));
+            }
+            if (event.type === 'ASSET_GENERATED') {
+                addSystemMessage(JSON.stringify({ type: 'ASSETS', payload: event.payload }));
+            }
             if (event.type === 'DESIGN_GENERATED') {
                 addSystemMessage(JSON.stringify({ type: 'DESIGN', payload: event.payload }));
             }

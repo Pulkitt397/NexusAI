@@ -57,10 +57,31 @@ export interface ComponentSpec {
     content_slots: string[];
 }
 
+export interface UXJourney {
+    overall_strategy: string; // e.g., "Build Trust -> Explain Value -> Convert"
+    steps: {
+        sectionId: string; // Matches architecture.sections[i].id
+        role: 'attention' | 'interest' | 'desire' | 'action' | 'trust' | 'retention';
+        user_goal: string; // What the user wants here (e.g., "Verify pricing")
+        business_goal: string; // What we want (e.g., "Get sign-up")
+        interaction_trigger: string; // e.g., "Scroll to view features", "Click CTA"
+    }[];
+}
+
+export interface AssetPlan {
+    section_assets: {
+        sectionId: string;
+        image_prompts: string[]; // Prompts for Pollinations.ai, e.g., "cyberpunk city skyline neon"
+        icon_keywords: string[]; // Keywords for Lucide icons
+    }[];
+}
+
 export interface BuilderState {
-    stage: 'idle' | 'analyzing' | 'architecting' | 'designing' | 'building' | 'complete' | 'error';
+    stage: 'idle' | 'analyzing' | 'architecting' | 'ux_planning' | 'asset_sourcing' | 'designing' | 'building' | 'complete' | 'error';
     intent: SiteIntent | null;
     architecture: SiteArchitecture | null;
+    uxJourney: UXJourney | null;
+    assets: AssetPlan | null;
     designSystem: DesignSystem | null;
     currentStep: string;
     progress: number; // 0-100

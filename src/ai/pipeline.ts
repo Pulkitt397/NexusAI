@@ -1,11 +1,14 @@
 import { streamChat } from '@/api';
 import { BUILDER_PROMPTS } from './prompts';
-import { SiteIntent, SiteArchitecture, DesignSystem } from '@/types/builderTypes';
+import { SiteIntent, SiteArchitecture, DesignSystem, UXJourney, AssetPlan } from '@/types/builderTypes';
+import { generateImageUrl } from '@/services/assetService';
 
 export type PipelineEvent =
     | { type: 'INTENT_GENERATED', payload: SiteIntent }
     | { type: 'ARCHITECTURE_GENERATED', payload: SiteArchitecture }
+    | { type: 'UX_GENERATED', payload: UXJourney }
     | { type: 'DESIGN_GENERATED', payload: DesignSystem }
+    | { type: 'ASSET_GENERATED', payload: AssetPlan }
     | { type: 'COMPONENT_GENERATED', payload: { sectionId: string, code: string } }
     | { type: 'ERROR', payload: string }
     | { type: 'COMPLETE', payload: null };
@@ -30,18 +33,46 @@ export async function runBuilderPipeline(
         const archJson = await generateJson<SiteArchitecture>(providerId, apiKey, modelId, archPrompt);
         onupdate({ type: 'ARCHITECTURE_GENERATED', payload: archJson });
 
-        // 3. Design System Generation
+        // 3. UX Flow Design
+        const uxPrompt = BUILDER_PROMPTS.UX_FLOW_DESIGNER
+            .replace('{{INTENT_JSON}}', JSON.stringify(intentJson, null, 2))
+            .replace('{{ARCHITECTURE_JSON}}', JSON.stringify(archJson, null, 2));
+        const uxJson = await generateJson<UXJourney>(providerId, apiKey, modelId, uxPrompt);
+        onupdate({ type: 'UX_GENERATED', payload: uxJson });
+
+        // 4. Design System Generation
         const designPrompt = BUILDER_PROMPTS.DESIGN_SYSTEM_GENERATOR.replace('{{INTENT_JSON}}', JSON.stringify(intentJson, null, 2));
         const designJson = await generateJson<DesignSystem>(providerId, apiKey, modelId, designPrompt);
         onupdate({ type: 'DESIGN_GENERATED', payload: designJson });
 
-        // 4. Component Generation (First 2 sections only for prototype speed)
+        // 5. Asset Intelligence (New Step)
+        const assetPrompt = BUILDER_PROMPTS.ASSET_INTELLIGENCE
+            .replace('{{INTENT_JSON}}', JSON.stringify(intentJson, null, 2))
+            .replace('{{ARCHITECTURE_JSON}}', JSON.stringify(archJson, null, 2))
+            .replace('{{DESIGN_JSON}}', JSON.stringify(designJson, null, 2));
+
+        const assetJson = await generateJson<AssetPlan>(providerId, apiKey, modelId, assetPrompt);
+
+        // Post-process assets to generate real URLs
+        const processedAssets: AssetPlan = {
+            section_assets: assetJson.section_assets.map(section => ({
+                ...section,
+                image_prompts: section.image_prompts.map(prompt => generateImageUrl(prompt))
+            }))
+        };
+        onupdate({ type: 'ASSET_GENERATED', payload: processedAssets });
+
+        // 6. Component Generation (First 2 sections only for prototype speed)
         const sectionsToBuild = archJson.sections.slice(0, 2);
 
         for (const section of sectionsToBuild) {
+            // Find assets for this section
+            const sectionAssets = processedAssets.section_assets.find(a => a.sectionId === section.id);
+
             const componentPrompt = BUILDER_PROMPTS.COMPONENT_GENERATOR
                 .replace('{{SECTION_JSON}}', JSON.stringify(section, null, 2))
-                .replace('{{DESIGN_JSON}}', JSON.stringify(designJson, null, 2));
+                .replace('{{DESIGN_JSON}}', JSON.stringify(designJson, null, 2))
+                .replace('{{ASSETS_JSON}}', JSON.stringify(sectionAssets || {}, null, 2));
 
             const code = await generateCode(providerId, apiKey, modelId, componentPrompt);
             onupdate({ type: 'COMPONENT_GENERATED', payload: { sectionId: section.id, code } });
