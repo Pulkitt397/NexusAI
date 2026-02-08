@@ -10,6 +10,7 @@ export type PipelineEvent =
     | { type: 'DESIGN_GENERATED', payload: DesignSystem }
     | { type: 'ASSET_GENERATED', payload: AssetPlan }
     | { type: 'COMPONENT_GENERATED', payload: { sectionId: string, code: string } }
+    | { type: 'STEP_STARTED', payload: string }
     | { type: 'ERROR', payload: string }
     | { type: 'COMPLETE', payload: null };
 
@@ -22,16 +23,19 @@ export async function runBuilderPipeline(
 ) {
     try {
         console.log(`[Builder] Starting pipeline with ${providerId}/${modelId}`);
+        onupdate({ type: 'STEP_STARTED', payload: 'Analyzing your intent...' });
 
         // 1. Intent Reasoning
         const intentPrompt = BUILDER_PROMPTS.INTENT_REASONER + `\n\nUser Request: "${userPrompt}"`;
         const intentJson = await generateJson<SiteIntent>(providerId, apiKey, modelId, intentPrompt);
         onupdate({ type: 'INTENT_GENERATED', payload: intentJson });
+        onupdate({ type: 'STEP_STARTED', payload: 'Architecting your site structure...' });
 
         // 2. Architecture Planning
         const archPrompt = BUILDER_PROMPTS.ARCHITECTURE_PLANNER.replace('{{INTENT_JSON}}', JSON.stringify(intentJson, null, 2));
         const archJson = await generateJson<SiteArchitecture>(providerId, apiKey, modelId, archPrompt);
         onupdate({ type: 'ARCHITECTURE_GENERATED', payload: archJson });
+        onupdate({ type: 'STEP_STARTED', payload: 'Designing user journeys...' });
 
         // 3. UX Flow Design
         const uxPrompt = BUILDER_PROMPTS.UX_FLOW_DESIGNER
@@ -39,11 +43,13 @@ export async function runBuilderPipeline(
             .replace('{{ARCHITECTURE_JSON}}', JSON.stringify(archJson, null, 2));
         const uxJson = await generateJson<UXJourney>(providerId, apiKey, modelId, uxPrompt);
         onupdate({ type: 'UX_GENERATED', payload: uxJson });
+        onupdate({ type: 'STEP_STARTED', payload: 'Creating design system...' });
 
         // 4. Design System Generation
         const designPrompt = BUILDER_PROMPTS.DESIGN_SYSTEM_GENERATOR.replace('{{INTENT_JSON}}', JSON.stringify(intentJson, null, 2));
         const designJson = await generateJson<DesignSystem>(providerId, apiKey, modelId, designPrompt);
         onupdate({ type: 'DESIGN_GENERATED', payload: designJson });
+        onupdate({ type: 'STEP_STARTED', payload: 'Sourcing high-quality assets...' });
 
         // 5. Asset Intelligence (New Step)
         const assetPrompt = BUILDER_PROMPTS.ASSET_INTELLIGENCE
@@ -61,9 +67,10 @@ export async function runBuilderPipeline(
             }))
         };
         onupdate({ type: 'ASSET_GENERATED', payload: processedAssets });
+        onupdate({ type: 'STEP_STARTED', payload: 'Generating components...' });
 
-        // 6. Component Generation (First 2 sections only for prototype speed)
-        const sectionsToBuild = archJson.sections.slice(0, 2);
+        // 6. Component Generation (First 3 sections for prototype speed)
+        const sectionsToBuild = archJson.sections.slice(0, 3);
 
         for (const section of sectionsToBuild) {
             // Find assets for this section

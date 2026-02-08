@@ -1,0 +1,416 @@
+🚀 Nexus AI Remaster — Builder Workspace PRD
+Product UI Architecture & Interaction Blueprint
+1. Product Vision
+1.1 Core Direction
+
+Nexus AI is evolving from a conversational assistant into a builder-first AI workspace focused on generating and refining structured artifacts (websites, apps, layouts).
+
+The UI must communicate:
+
+“You are building a project — not chatting with a bot.”
+
+Conversation becomes a tool, not the center of the experience.
+
+1.2 Design Philosophy
+
+The interface should feel like:
+
+AI architect + IDE + SaaS builder workspace
+
+Key principles:
+
+artifact-first workflow
+
+visible system reasoning
+
+persistent project state
+
+structured iteration
+
+2. Nexus Builder Wireframe Layout
+2.1 Global Layout Skeleton
+Top Workspace Header
+        ↓
+Sidebar (Architecture + Navigation)
+        ↓
+Primary Workspace Canvas
+        ↓
+Contextual Action Panel
+
+2.2 Layout Regions
+Workspace Header
+
+Purpose:
+
+project identity
+
+stage visibility
+
+global controls
+
+Contains:
+
+Project selector
+Pipeline stage indicator
+Model selector
+Deploy/export actions
+
+Sidebar — Architecture Panel
+
+Purpose:
+
+visualize structure
+
+navigation
+
+artifact hierarchy
+
+Displays:
+
+Section tree
+Component hierarchy
+Architecture plan
+Build stages
+
+
+Supports:
+
+expand/collapse
+
+section selection
+
+reorder/regenerate actions
+
+Primary Canvas
+
+Dynamic workspace area:
+
+Modes include:
+
+architecture preview
+
+live artifact preview
+
+component inspection
+
+Never empty — always contextual.
+
+Action Panel
+
+Context-sensitive controls:
+
+Refine section
+Regenerate component
+Adjust style
+Swap assets
+Prompt edits
+
+
+Natural language input lives here, scoped to current context.
+
+3. Stage-Based UI Flow
+
+Nexus operates as a visible pipeline:
+
+Intent → Architecture → Build → Refine → Export
+
+Stage 1 — Intent
+
+Goal:
+
+Define artifact purpose.
+
+UI shows:
+
+builder prompt input
+
+artifact presets
+
+context hints
+
+User outcome:
+
+Clear project direction.
+
+Stage 2 — Architecture
+
+Goal:
+
+Expose system planning.
+
+UI shows:
+
+section hierarchy
+
+UX flow diagram
+
+editable structure
+
+User outcome:
+
+Understanding + approval of plan.
+
+Stage 3 — Build
+
+Goal:
+
+Generate artifact.
+
+UI shows:
+
+live preview
+
+component boundaries
+
+section inspector
+
+User outcome:
+
+Visible artifact creation.
+
+Stage 4 — Refine
+
+Goal:
+
+Iterate intelligently.
+
+UI supports:
+
+localized regeneration
+
+style adjustments
+
+asset swaps
+
+User outcome:
+
+Controlled improvement.
+
+Stage 5 — Export
+
+Goal:
+
+Finalize artifact.
+
+UI supports:
+
+code export
+
+deployment
+
+asset packaging
+
+4. Sidebar Architecture Tree System
+
+Sidebar acts as:
+
+project map + reasoning window
+
+Tree Structure
+Project
+ ├ Hero
+ ├ Features
+ ├ Testimonials
+ ├ Pricing
+ └ Footer
+
+
+Each node includes:
+
+purpose label
+
+status indicator
+
+regeneration controls
+
+Sidebar Capabilities
+
+drag reorder sections
+
+collapse groups
+
+highlight selected preview region
+
+regeneration targeting
+
+5. Builder Interaction Model
+
+Interaction shifts from conversation-driven to artifact-driven.
+
+Core Interaction Types
+Intent Input
+
+User describes goals.
+
+Triggers pipeline.
+
+Artifact Selection
+
+User clicks section/component.
+
+Context becomes scoped.
+
+Local Refinement
+
+Prompt or controls apply only to selected area.
+
+Global Regeneration
+
+Rebuild architecture or theme.
+
+Interaction Rules
+
+every action produces visible change
+
+context always clear
+
+regeneration never destroys unrelated work
+
+6. Lovable → Nexus Evolution Plan
+
+Lovable-style builders provide:
+
+prompt → generate → deploy
+
+
+Nexus expands this to:
+
+prompt → architect → build → inspect → refine → export
+
+Evolution Strategy
+Phase A — Builder Entry Screen
+
+Lovable-style centered prompt.
+
+Fast onboarding.
+
+Phase B — Architecture Exposure
+
+Sidebar + stage pipeline appear post-generation.
+
+User sees reasoning.
+
+Phase C — Deep Workspace
+
+IDE-like controls + modular editing.
+
+Nexus differentiates here.
+
+7. Visual Hierarchy Specification
+
+Visual system should reinforce workflow structure.
+
+Hierarchy Levels
+Primary
+
+Artifact preview + stage context.
+
+Secondary
+
+Architecture/sidebar navigation.
+
+Tertiary
+
+Action controls + refinement tools.
+
+Design Guidelines
+
+whitespace-driven clarity
+
+panel separation
+
+restrained accent color usage
+
+motion for state change, not decoration
+
+Avoid:
+
+chat-centric layouts
+
+visual clutter
+
+gradient dominance
+
+8. Workspace Shell Blueprint
+
+The shell is persistent across stages.
+
+Shell Structure
+Header (global context)
+Sidebar (artifact structure)
+Canvas (stage content)
+Action panel (local controls)
+
+
+Shell ensures:
+
+spatial consistency
+
+predictable navigation
+
+persistent project awareness
+
+State Persistence
+
+Workspace maintains:
+
+artifact history
+
+stage transitions
+
+selected component context
+
+9. UX Goals
+
+Users should always feel:
+
+I know what I’m building
+I see how it’s structured
+I control refinement
+The system is reasoning
+
+No hidden automation.
+
+10. MVP Scope
+
+Initial remaster should support:
+
+builder entry screen
+
+architecture sidebar
+
+stage indicator
+
+preview canvas
+
+section-level refinement
+
+Advanced IDE features can follow.
+
+11. Success Criteria
+
+UI is successful when:
+
+users understand pipeline stages instantly
+
+artifact structure is visible
+
+refinement feels controlled
+
+system reasoning is transparent
+
+workspace feels tool-like, not conversational
+
+Closing Philosophy
+
+Nexus UI must shift from:
+
+chatbot interface
+
+to:
+
+artifact workspace
+
+Conversation remains — but embedded inside a builder context.
+
+This is the foundation for a serious AI creation platform.

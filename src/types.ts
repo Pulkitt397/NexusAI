@@ -39,6 +39,17 @@ export interface WebSearchResult {
     }>;
 }
 
+export type ProjectStage = 'intent' | 'architecture' | 'build' | 'refine' | 'export';
+
+export interface ProjectSection {
+    id: string;
+    title: string;
+    description: string;
+    status: 'pending' | 'generating' | 'complete' | 'error';
+    code?: string;
+    order: number;
+}
+
 export interface Chat {
     id: string;
     title: string;
@@ -46,6 +57,8 @@ export interface Chat {
     modelId: string;
     memoryEnabled: boolean;
     latestCode?: string; // Stored generated website/app code
+    stage?: ProjectStage;
+    sections?: ProjectSection[];
     createdAt: string;
     updatedAt: string;
 }
@@ -90,6 +103,11 @@ export interface AppState {
     isStreaming: boolean;
     isSearching: boolean;
     streamingContent: string;
+
+    // Nexus Builder State
+    projectStage: ProjectStage;
+    sections: ProjectSection[];
+    selectedSectionId: string | null;
 }
 
 export interface StreamChunk {

@@ -41,6 +41,10 @@ interface AppContextType {
     enhancePrompt: (input: string) => Promise<string>;
     addSystemMessage: (content: string) => void;
     updateChatCode: (chatId: string, code: string) => Promise<void>;
+    // Nexus Builder actions
+    setProjectStage: (stage: AppState['projectStage']) => void;
+    updateSections: (sections: AppState['sections']) => void;
+    selectSection: (sectionId: string | null) => void;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -116,7 +120,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         sidebarOpen: true,
         isStreaming: false,
         isSearching: false,
-        streamingContent: ''
+        streamingContent: '',
+        projectStage: 'intent',
+        sections: [],
+        selectedSectionId: null
     });
 
     const [toasts, setToasts] = useState<Toast[]>([]);
@@ -211,7 +218,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
                                 currentProviderId: preferences?.currentProviderId || prev.currentProviderId,
                                 currentModelId: preferences?.currentModelId || prev.currentModelId,
                                 chats: chats || prev.chats,
-                                memories: memories || prev.memories
+                                memories: memories || prev.memories,
+                                projectStage: preferences?.projectStage || 'intent',
+                                sections: preferences?.sections || [],
+                                selectedSectionId: preferences?.selectedSectionId || null
                             };
                         });
                         console.log('[Init] Cloud data merged successfully');
@@ -238,7 +248,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
                     promptMode: state.promptMode,
                     memoryEnabled: state.memoryEnabled,
                     currentProviderId: state.currentProviderId,
-                    currentModelId: state.currentModelId
+                    currentModelId: state.currentModelId,
+                    projectStage: state.projectStage,
+                    sections: state.sections,
+                    selectedSectionId: state.selectedSectionId
                 };
                 await firestoreService.syncPreferences(user.uid, preferences);
                 console.log('[Cloud] Preferences synced');
@@ -396,14 +409,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
             chats: [chat, ...prev.chats],
             currentChatId: chat.id,
             messages: [],
-            view: 'chat'
+            view: 'chat',
+            projectStage: 'intent',
+            sections: [],
+            selectedSectionId: null
         }));
     }, [state.currentProviderId, state.currentModelId, state.memoryEnabled, showToast]);
 
     const selectChat = useCallback(async (chatId: string) => {
         const messages = await db.getMessagesByChat(chatId);
-        setState(prev => ({ ...prev, currentChatId: chatId, messages, view: 'chat' }));
-    }, []);
+        const chat = state.chats.find(c => c.id === chatId);
+        setState(prev => ({
+            ...prev,
+            currentChatId: chatId,
+            messages,
+            view: 'chat',
+            projectStage: chat?.stage || 'intent',
+            sections: chat?.sections || [],
+            selectedSectionId: null
+        }));
+    }, [state.chats]);
 
     const deleteChat = useCallback(async (chatId: string) => {
         await db.deleteChat(chatId);
@@ -745,6 +770,30 @@ Output only the improved prompt text.`;
         }
     }, [state.chats, user]);
 
+    const setProjectStage = useCallback((stage: AppState['projectStage']) => {
+        setState(prev => ({ ...prev, projectStage: stage }));
+        if (state.currentChatId) {
+            const chat = state.chats.find(c => c.id === state.currentChatId);
+            if (chat) {
+                db.saveChat({ ...chat, stage, updatedAt: new Date().toISOString() });
+            }
+        }
+    }, [state.currentChatId, state.chats]);
+
+    const updateSections = useCallback((sections: AppState['sections']) => {
+        setState(prev => ({ ...prev, sections }));
+        if (state.currentChatId) {
+            const chat = state.chats.find(c => c.id === state.currentChatId);
+            if (chat) {
+                db.saveChat({ ...chat, sections, updatedAt: new Date().toISOString() });
+            }
+        }
+    }, [state.currentChatId, state.chats]);
+
+    const selectSection = useCallback((sectionId: string | null) => {
+        setState(prev => ({ ...prev, selectedSectionId: sectionId }));
+    }, []);
+
     return (
         <AppContext.Provider value={{
             state,
@@ -767,7 +816,10 @@ Output only the improved prompt text.`;
             showToast,
             enhancePrompt,
             addSystemMessage,
-            updateChatCode
+            updateChatCode,
+            setProjectStage,
+            updateSections,
+            selectSection
         }}>
             {children}
             {/* Toast container */}

@@ -1,0 +1,375 @@
+1. Objective
+
+Enable Nexus to generate high-quality, elegant websites from a single prompt through a staged reasoning pipeline that:
+
+plans structure before code
+
+selects appropriate UI patterns
+
+pulls contextual imagery/assets
+
+enforces aesthetic rules
+
+builds modular components
+
+allows guided refinement
+
+Goal:
+
+Websites that feel professionally designed — not generic AI templates.
+
+2. Core Philosophy
+
+The system must behave like:
+
+Creative brief intake
+→ UX planning
+→ layout architecture
+→ design system synthesis
+→ asset curation
+→ component generation
+→ refinement loop
+
+
+No single-shot HTML dumping.
+
+3. Website Builder Pipeline
+Stage 1 — Intent Interpretation
+Purpose
+
+Translate prompt into structured brief.
+
+Input
+
+User prompt:
+
+“Build a luxury travel landing page…”
+
+Output schema
+{
+  site_type,
+  audience,
+  tone,
+  conversion_goal,
+  visual_style,
+  complexity,
+  content_focus
+}
+
+Logic
+
+keyword classification
+
+tone inference
+
+UX objective mapping
+
+Stage 2 — UX Architecture Planning
+Purpose
+
+Define website structure.
+
+Output
+section_flow = [
+  Hero,
+  Value Proposition,
+  Features,
+  Social Proof,
+  CTA,
+  Footer
+]
+
+
+Each section includes:
+
+purpose
+layout pattern
+priority
+interaction hints
+
+Rules
+
+flow must match conversion logic
+
+section count appropriate to complexity
+
+Stage 3 — Design System Synthesis
+Purpose
+
+Create visual language.
+
+Output tokens
+typography_scale
+spacing rhythm
+color palette
+elevation system
+interaction states
+
+Aesthetic constraints
+
+Reject:
+
+❌ neon gradient overload
+❌ template color spam
+❌ inconsistent typography
+
+Enforce:
+
+✔ whitespace discipline
+✔ hierarchy clarity
+✔ restrained accents
+✔ premium tone
+
+Stage 4 — UI Template Selection
+Purpose
+
+Choose layout style based on intent.
+
+Templates are categorized:
+
+Editorial luxury
+SaaS minimal
+Portfolio showcase
+Conversion funnel
+Product landing
+
+
+Logic:
+
+tone → template mapping
+
+complexity → layout density
+
+Templates are structure frameworks — not fixed visuals.
+
+Stage 5 — Asset Intelligence Engine
+Purpose
+
+Replace placeholders with contextual visuals.
+
+Pipeline:
+
+section intent
+→ semantic keyword extraction
+→ asset search
+→ relevance ranking
+→ placement
+
+
+Sources:
+
+royalty-free image APIs
+
+curated UI elements
+
+icon libraries
+
+Assets must match:
+
+tone + hierarchy + content
+
+Stage 6 — Component Generation
+
+Each section becomes modular components:
+
+HeroComponent
+FeatureGrid
+TestimonialSection
+CTASection
+FooterLayout
+
+
+Rules:
+
+semantic markup
+
+responsive structure
+
+design token binding
+
+reusable layout
+
+Stage 7 — Assembly & Preview
+
+Build site scaffold:
+
+component tree
+style tokens
+asset integration
+
+
+Preview rendered inside builder canvas.
+
+Stage 8 — Refinement Engine
+
+User can request:
+
+“Make it more premium”
+“Change hero layout”
+“Use editorial typography”
+
+
+System updates:
+
+design tokens
+
+section layout
+
+asset selection
+
+Only affected areas regenerate.
+
+4. Step-by-Step Builder UX Flow
+
+User experience:
+
+Step 1 — Prompt Input
+
+Large builder field:
+
+“What do you want to build?”
+
+Step 2 — Architecture Preview
+
+User sees:
+
+section plan
+
+UX flow
+
+editable structure
+
+Approve → continue.
+
+Step 3 — Generation
+
+Live build:
+
+layout scaffold
+
+asset insertion
+
+styling
+
+Preview appears.
+
+Step 4 — Guided Refinement
+
+Panel options:
+
+Style adjustments
+Layout tweaks
+Asset replacement
+Section regeneration
+
+Step 5 — Export
+
+Download:
+
+project scaffold
+
+assets
+
+deploy-ready output
+
+5. Elegance Enforcement Rules
+
+This is critical — prevents “AI look”.
+
+Global constraints:
+
+Visual discipline
+
+limited accent colors
+
+consistent spacing
+
+typography hierarchy
+
+Layout integrity
+
+balanced whitespace
+
+predictable rhythm
+
+section clarity
+
+Asset restraint
+
+no random stock overload
+
+contextual placement only
+
+If output violates rules → regenerate section.
+
+6. Website Builder Workspace Integration
+
+Within Nexus shell:
+
+Sidebar → section tree
+Canvas → live preview
+Action panel → refinement tools
+Header → pipeline stage indicator
+
+
+Architecture always visible.
+
+7. MVP Scope
+
+Initial release supports:
+
+prompt → architecture planning
+
+template selection
+
+design token synthesis
+
+asset pulling
+
+modular section generation
+
+refinement controls
+
+Advanced animation/interaction later.
+
+8. Success Metrics
+
+Builder success measured by:
+
+perceived design quality
+
+structural clarity
+
+asset relevance
+
+refinement responsiveness
+
+user trust in system planning
+
+9. Future Expansion
+
+multi-page architecture
+
+theme marketplace
+
+animation intelligence
+
+responsive optimization engine
+
+accessibility pass
+
+Final Philosophy
+
+Nexus Website Builder is:
+
+AI architect + designer + builder
+
+not:
+
+prompt → template → done
+
+The system must always:
+
+plan → justify → build → refine.
+
+That’s what produces elegant websites instead of AI clichés.

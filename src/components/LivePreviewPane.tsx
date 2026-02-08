@@ -38,43 +38,55 @@ export function LivePreviewPane({ code, isStreaming }: LivePreviewPaneProps) {
                         <script type="importmap">
                         {
                             "imports": {
-                                "react": "https://esm.sh/react@18",
-                                "react-dom": "https://esm.sh/react-dom@18/client",
+                                "react": "https://esm.sh/react@18.2.0",
+                                "react-dom": "https://esm.sh/react-dom@18.2.0/client",
+                                "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
                                 "framer-motion": "https://esm.sh/framer-motion",
                                 "lucide-react": "https://esm.sh/lucide-react"
                             }
                         }
                         </script>
                         <style>
-                            body { margin: 0; padding: 0; background-color: #030014; color: white; }
+                            body { margin: 0; padding: 0; background-color: #030014; color: white; min-height: 100vh; }
+                            #root { min-height: 100vh; }
                         </style>
                     </head>
                     <body>
                         <div id="root"></div>
-                        <script type="text/babel" data-type="module">
-                            import React, { useState, useEffect } from 'react';
-                            import { createRoot } from 'react-dom';
+                        <script type="text/babel" data-presets="react,typescript" data-type="module">
+                            import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+                            import { createRoot } from 'react-dom/client';
                             import { motion, AnimatePresence } from 'framer-motion';
                             import * as LucideIcons from 'lucide-react';
 
-                            // Helper to use Lucide icons dynamically if the AI uses <IconName />
+                            // Expose icons globally for easier access
                             window.LucideIcons = LucideIcons;
 
                             ${safeCode.replace(/export default function/g, 'function App').replace(/export function/g, 'function')}
 
                             // Render Logic
-                            const root = createRoot(document.getElementById('root'));
-                            // If App is defined, use it, else try to find any declared component or just run the code
-                            if (typeof App !== 'undefined') {
-                                root.render(<App />);
-                            } else {
-                                // Fallback for naked JSX or multiple components
-                                console.warn('No default App component found, attempting to render first discovery');
+                            try {
+                                const root = createRoot(document.getElementById('root'));
+                                if (typeof App !== 'undefined') {
+                                    root.render(<App />);
+                                } else {
+                                    // Try to find the first function starting with a capital letter
+                                    const components = Object.keys(window).filter(key => /^[A-Z]/.test(key) && typeof window[key] === 'function');
+                                    if (components.length > 0) {
+                                        const Comp = window[components[0]];
+                                        root.render(<Comp />);
+                                    } else {
+                                        document.body.innerHTML = '<div style="padding: 20px; color: #ffab00;">Error: No React component found to render. Please ensure you have an App component or a exported function.</div>';
+                                    }
+                                }
+                            } catch (err) {
+                                console.error('Render error:', err);
+                                document.body.innerHTML = '<div style="padding: 20px; color: #ff5252;">Render Error: ' + err.message + '</div>';
                             }
                         </script>
                     </body>
                 </html>
-            `;
+            `.trim();
         }
 
         // If it's a full HTML doc, use it but inject Tailwind
@@ -106,12 +118,7 @@ export function LivePreviewPane({ code, isStreaming }: LivePreviewPaneProps) {
 
     useEffect(() => {
         if (iframeRef.current) {
-            const doc = iframeRef.current.contentDocument;
-            if (doc) {
-                doc.open();
-                doc.write(previewDoc);
-                doc.close();
-            }
+            iframeRef.current.srcdoc = previewDoc;
         }
     }, [previewDoc, key]);
 
@@ -148,7 +155,7 @@ export function LivePreviewPane({ code, isStreaming }: LivePreviewPaneProps) {
                     </div>
                     <div className="h-4 w-px bg-white/10 mx-1" />
                     <span className="text-xs font-mono text-white/40 truncate max-w-[200px]">
-                        index.html
+                        {code.includes('import') ? 'App.tsx' : 'index.html'}
                     </span>
                 </div>
 

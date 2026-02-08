@@ -1,6 +1,6 @@
 import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { firestoreDb } from '@/lib/firebase';
-import type { Chat, Memory } from '@/types';
+import type { Chat, Memory, ProjectStage, ProjectSection } from '@/types';
 
 export interface UserData {
     apiKeys: Record<string, string>; // Moved to top level as requested
@@ -9,6 +9,9 @@ export interface UserData {
         memoryEnabled: boolean;
         currentProviderId: string | null;
         currentModelId: string | null;
+        projectStage?: ProjectStage;
+        sections?: ProjectSection[];
+        selectedSectionId?: string | null;
     };
     chats: Chat[];
     memories: Memory[];
