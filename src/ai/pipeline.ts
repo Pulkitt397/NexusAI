@@ -92,11 +92,8 @@ export async function runBuildPhase(
         console.log(`[Builder] Starting build phase for ${sectionsToBuild.length} sections`);
         onupdate({ type: 'STEP_STARTED', payload: 'Generating components...' });
 
-        // Generate all requested sections
-        const actualSections = sectionsToBuild;
-
-        for (const section of actualSections) {
-            // Find assets for this section
+        // Generate all requested sections concurrently
+        const buildPromises = sectionsToBuild.map(async (section) => {
             const sectionAssets = assets.section_assets.find(a => a.sectionId === section.id);
 
             const componentPrompt = BUILDER_PROMPTS.COMPONENT_GENERATOR
@@ -106,7 +103,10 @@ export async function runBuildPhase(
 
             const code = await generateCode(providerId, apiKey, modelId, componentPrompt);
             onupdate({ type: 'COMPONENT_GENERATED', payload: { sectionId: section.id, code } });
-        }
+            return { sectionId: section.id, success: true };
+        });
+
+        await Promise.all(buildPromises);
 
         onupdate({ type: 'COMPLETE', payload: null });
 
