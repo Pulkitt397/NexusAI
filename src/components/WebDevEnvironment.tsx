@@ -51,15 +51,34 @@ export function WebDevEnvironment({ onClose }: WebDevEnvironmentProps) {
   // Build state
   const [isBuilding, setIsBuilding] = useState(false);
   const [buildProgress, setBuildProgress] = useState(0);
+  const [currentStatus, setCurrentStatus] = useState('Ready');
+  
+  // Input state
+  const [inputValue, setInputValue] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   
   const activeFile = files.find(f => f.id === activeFileId);
   
   // Handle new prompt
   const handleSubmit = async (content: string) => {
-    if (state.projectStage === 'intent') {
-      await startBuildPipeline(content);
-    } else {
-      await sendMessage(content);
+    if (!content.trim() || isSubmitting) return;
+    
+    setIsSubmitting(true);
+    setInputValue('');
+    setCurrentStatus('Processing your request...');
+    
+    try {
+      if (state.projectStage === 'intent') {
+        await startBuildPipeline(content);
+      } else {
+        await sendMessage(content);
+        setCurrentStatus('Ready');
+      }
+    } catch (error) {
+      setCurrentStatus('Error occurred');
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
@@ -78,12 +97,14 @@ export function WebDevEnvironment({ onClose }: WebDevEnvironmentProps) {
     
     setIsBuilding(true);
     setBuildProgress(10);
+    setCurrentStatus('Analyzing your intent...');
     
     await runPlanningPhase(prompt, state.currentProviderId, apiKey, state.currentModelId, (event: PipelineEvent) => {
       switch (event.type) {
         case 'INTENT_GENERATED':
           setBuilderState({ siteIntent: event.payload });
           setBuildProgress(25);
+          setCurrentStatus('Creating architecture plan...');
           break;
         case 'ARCHITECTURE_GENERATED':
           setBuilderState({ siteArchitecture: event.payload });
@@ -96,22 +117,27 @@ export function WebDevEnvironment({ onClose }: WebDevEnvironmentProps) {
           }));
           updateSections(sections);
           setBuildProgress(40);
+          setCurrentStatus('Designing visual system...');
           break;
         case 'DESIGN_GENERATED':
           setBuilderState({ designSystem: event.payload });
           setBuildProgress(60);
+          setCurrentStatus('Planning user experience...');
           break;
         case 'ASSET_GENERATED':
           setBuilderState({ assetPlan: event.payload });
           setBuildProgress(80);
+          setCurrentStatus('Assets collected. Starting build...');
           break;
         case 'COMPLETE':
           setBuildProgress(100);
+          setCurrentStatus('Planning complete. Building components...');
           setTimeout(() => startBuildPhase(), 500);
           break;
         case 'ERROR':
           showToast(event.payload, 'error');
           setIsBuilding(false);
+          setCurrentStatus('Error occurred');
           break;
       }
     });
@@ -124,6 +150,7 @@ export function WebDevEnvironment({ onClose }: WebDevEnvironmentProps) {
     
     setProjectStage('build');
     setBuildProgress(0);
+    setCurrentStatus('Building components...');
     
     await runBuildPhase(
       state.sections.map(s => ({ id: s.id, purpose: s.description })),
@@ -159,7 +186,9 @@ export function WebDevEnvironment({ onClose }: WebDevEnvironmentProps) {
           // Update progress
           const completed = files.filter(f => f.type === 'component').length + 1;
           const total = state.sections.length;
-          setBuildProgress((completed / total) * 100);
+          const progress = (completed / total) * 100;
+          setBuildProgress(progress);
+          setCurrentStatus(`Building section ${completed} of ${total}...`);
           
           // Update section status
           const updatedSections = state.sections.map(s =>
@@ -172,6 +201,7 @@ export function WebDevEnvironment({ onClose }: WebDevEnvironmentProps) {
           setProjectStage('refine');
           setIsBuilding(false);
           setBuildProgress(100);
+          setCurrentStatus('Build complete!');
           showToast('Build complete!', 'success');
         }
       }
@@ -278,10 +308,17 @@ export function WebDevEnvironment({ onClose }: WebDevEnvironmentProps) {
             </div>
             <div>
               <h1 className="text-sm font-semibold text-white">Web Studio</h1>
-              <p className="text-xs text-slate-500">
-                {state.projectStage === 'intent' ? 'Ready to build' : 
-                 state.projectStage === 'architecture' ? 'Planning...' :
-                 state.projectStage === 'build' ? 'Building...' : 'Ready to edit'}
+              <p className="text-xs text-slate-500 flex items-center gap-1.5">
+                {isSubmitting || isBuilding ? (
+                  <>
+                    <Loader2 className="w-3 h-3 animate-spin text-indigo-400" />
+                    <span className="text-indigo-400">{currentStatus}</span>
+                  </>
+                ) : (
+                  state.projectStage === 'intent' ? 'Ready to build' : 
+                  state.projectStage === 'architecture' ? 'Planning...' :
+                  state.projectStage === 'build' ? 'Building...' : 'Ready to edit'
+                )}
               </p>
             </div>
           </div>
@@ -606,44 +643,81 @@ export function WebDevEnvironment({ onClose }: WebDevEnvironmentProps) {
       {/* Footer / Command Bar */}
       <div className="relative z-10 border-t border-slate-800/50 bg-slate-950/80 backdrop-blur-xl p-4">
         <div className="max-w-3xl mx-auto">
-          <div className="relative flex items-end gap-3 bg-slate-900/50 rounded-xl border border-slate-800 p-3">
+          <div className={cn(
+            "relative flex items-end gap-3 bg-slate-900/50 rounded-xl border p-3 transition-all",
+            isSubmitting || isBuilding 
+              ? "border-indigo-500/50 bg-indigo-500/5" 
+              : "border-slate-800"
+          )}>
             <textarea
-              placeholder={state.projectStage === 'intent' 
-                ? "Describe what you want to build..." 
-                : "Ask for changes or improvements..."}
-              className="flex-1 bg-transparent border-none resize-none focus:outline-none text-sm text-slate-200 placeholder:text-slate-500 min-h-[44px] max-h-32"
+              ref={textareaRef}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              disabled={isSubmitting || isBuilding}
+              placeholder={isSubmitting || isBuilding 
+                ? currentStatus 
+                : state.projectStage === 'intent' 
+                  ? "Describe what you want to build..." 
+                  : "Ask for changes or improvements..."}
+              className="flex-1 bg-transparent border-none resize-none focus:outline-none text-sm text-slate-200 placeholder:text-slate-500 min-h-[44px] max-h-32 disabled:opacity-50"
               rows={1}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
+                if (e.key === 'Enter' && !e.shiftKey && !isSubmitting && !isBuilding) {
                   e.preventDefault();
-                  const target = e.target as HTMLTextAreaElement;
-                  if (target.value.trim()) {
-                    handleSubmit(target.value.trim());
-                    target.value = '';
+                  if (inputValue.trim()) {
+                    handleSubmit(inputValue.trim());
                   }
                 }
               }}
             />
             <button
-              onClick={(e) => {
-                const textarea = (e.currentTarget.parentElement?.querySelector('textarea') as HTMLTextAreaElement);
-                if (textarea?.value.trim()) {
-                  handleSubmit(textarea.value.trim());
-                  textarea.value = '';
+              onClick={() => {
+                if (inputValue.trim() && !isSubmitting && !isBuilding) {
+                  handleSubmit(inputValue.trim());
                 }
               }}
-              className="flex items-center justify-center w-10 h-10 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors shrink-0"
+              disabled={isSubmitting || isBuilding || !inputValue.trim()}
+              className={cn(
+                "flex items-center justify-center w-10 h-10 rounded-lg transition-all shrink-0",
+                isSubmitting || isBuilding
+                  ? "bg-indigo-500/20 text-indigo-400 cursor-not-allowed"
+                  : inputValue.trim()
+                    ? "bg-indigo-600 hover:bg-indigo-500 text-white"
+                    : "bg-slate-700 text-slate-500 cursor-not-allowed"
+              )}
             >
-              <ChevronRight className="w-5 h-5" />
+              {isSubmitting || isBuilding ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <ChevronRight className="w-5 h-5" />
+              )}
             </button>
           </div>
-          <div className="flex items-center justify-center gap-4 mt-2 text-xs text-slate-500">
-            <span className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-              Ready
+          <div className="flex items-center justify-center gap-4 mt-2 text-xs">
+            <span className={cn(
+              "flex items-center gap-1.5",
+              isSubmitting || isBuilding ? "text-indigo-400" : "text-slate-500"
+            )}>
+              {isSubmitting || isBuilding ? (
+                <>
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  {currentStatus}
+                </>
+              ) : (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                  Ready
+                </>
+              )}
             </span>
-            <span>Press Enter to send</span>
-            <span>Shift + Enter for new line</span>
+            {!isSubmitting && !isBuilding && (
+              <>
+                <span className="text-slate-600">•</span>
+                <span className="text-slate-500">Press Enter to send</span>
+                <span className="text-slate-600">•</span>
+                <span className="text-slate-500">Shift + Enter for new line</span>
+              </>
+            )}
           </div>
         </div>
       </div>
