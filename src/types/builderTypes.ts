@@ -34,6 +34,7 @@ export interface DesignSystem {
         background: string;
         text: string;
         accent: string;
+        surface: string;
     };
     typography: {
         heading_font: string;

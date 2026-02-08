@@ -83,9 +83,10 @@ export function PlanView({ state }: PlanViewProps) {
                                         <CheckCircle2 className="w-5 h-5" />
                                         <span>Generated successfully</span>
                                         <div className="flex gap-2 ml-4">
-                                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: state.designSystem.color_palette.primary }} />
-                                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: state.designSystem.color_palette.secondary }} />
-                                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: state.designSystem.color_palette.background }} />
+                                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: state.designSystem.color_palette.primary }} title="Primary" />
+                                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: state.designSystem.color_palette.secondary }} title="Secondary" />
+                                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: state.designSystem.color_palette.background }} title="Background" />
+                                            <div className="w-4 h-4 rounded-full border border-white/20" style={{ backgroundColor: state.designSystem.color_palette.surface }} title="Surface" />
                                         </div>
                                     </div>
                                 ) : (

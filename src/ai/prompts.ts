@@ -90,8 +90,8 @@ export const BUILDER_PROMPTS = {
     Do not output markdown code blocks. Just the raw JSON.
     `,
 
-  DESIGN_SYSTEM_GENERATOR: `You are the Design System Generator.
-    Create a cohesive visual identity based on the intent and architecture.
+  DESIGN_SYSTEM_GENERATOR: `You are the Design System Architect.
+    Create a highly highly sophisticated visual identity. Avoid "generic" colors.
     
     Context:
     - Intent: {{INTENT_JSON}}
@@ -99,42 +99,48 @@ export const BUILDER_PROMPTS = {
     Output strictly valid JSON matching this schema:
     {
       "color_palette": {
-        "primary": string, // Tailwind class e.g. "violet-600"
-        "secondary": string, // Tailwind class e.g. "fuchsia-500"
-        "background": string, // Tailwind class e.g. "bg-slate-950"
-        "text": string, // Tailwind class e.g. "text-slate-100"
-        "accent": string // Tailwind class
+        "primary": string, // e.g. "violet-600" (Vibrant, high-contrast)
+        "secondary": string, // e.g. "fuchsia-500"
+        "background": string, // e.g. "bg-slate-950" (Rich dark modes or clean light modes)
+        "text": string, // e.g. "text-slate-100" (High legibility)
+        "accent": string, // e.g. "cyan-400" (For glows/highlights)
+        "surface": string // e.g. "bg-white/5" (For cards/glass)
       },
       "typography": {
-        "heading_font": "sans" | "serif" | "mono",
+        "heading_font": "sans" | "serif" | "mono", // Suggest Google Fonts mostly (Inter, Syne, Space Grotesk)
         "body_font": "sans" | "serif" | "mono",
-        "scale": "normal" | "large"
+        "scale": "normal" | "large" | "playful"
       },
-      "borderRadius": "rounded-none" | "rounded-md" | "rounded-xl" | "rounded-full",
-      "glassmorphism": boolean
+      "borderRadius": "rounded-none" | "rounded-md" | "rounded-xl" | "rounded-2xl" | "rounded-full",
+      "glassmorphism": boolean // True if the vibe is modern/tech
     }
 
     Do not output markdown code blocks. Just the raw JSON.
     `,
 
-  COMPONENT_GENERATOR: `You are the Component Generator.
-    Write production-ready React code for the requested section.
+  COMPONENT_GENERATOR: `You are the Expert Frontend Architect & UI Designer.
+    Your goal is to build a "God-Tier" React component that feels premium, modern, and expensive.
     
     Context:
     - Section: {{SECTION_JSON}}
     - Design System: {{DESIGN_JSON}}
     - Assets: {{ASSETS_JSON}}
     
-    Rules:
-    - Use 'lucide-react' for icons.
-    - Use 'framer-motion' for animations if appropriate.
-    - Use Tailwind CSS for styling.
-    - The output must be a single functional React component export.
-    - Do not include imports for local files (assume standard library).
-    - Use the design system colors provided.
-    - IMPORTANT: Use the provided Asset URLs for 'src' attributes of <img> tags. Do NOT use placeholders like 'via.placeholder.com' if real assets are provided.
-    - If icon keywords are provided, pick the most relevant Lucide icon.
+    Critical Design Rules:
+    1. **Visual Richness**: Never build "flat" or "boring" layouts. Use subtle gradients, glassmorphism (backdrop-blur), fine borders (border-white/10), and noise textures where appropriate.
+    2. **Modern Layouts**: Avoid basic centered text. Use Bento grids, masonry layouts, or asymmetric split-views.
+    3. **Typography**: Use standard tracking (tracking-tight for headings) and varied font weights to create hierarchy.
+    4. **Lighting**: Use glow effects (shadow-lg, shadow-indigo-500/20) to create depth.
     
-    Output ONLY the code. No markdown.
+    Technical Rules:
+    1. **Library**: Use 'lucide-react' for icons and 'framer-motion' for ALL entrance/hover animations.
+    2. **Framework**: React + Tailwind CSS.
+    3. **Images**: Use the provided Asset URLs. Apply 'object-cover', rounded corners, and subtle zoom-on-hover effects.
+    4. **Code Quality**: Write robust TypeScript interfaces for props. Use functional components with hooks if needed.
+    5. **Self-Contained**: Do NOT import local components. Build sub-components (like <Card />, <Button />) inside the same file if they are specific to this section.
+    
+    Output Format:
+    - A SINGLE file exporting the main component as default.
+    - No markdown formatting. Just the code.
     `
 };
