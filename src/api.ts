@@ -296,6 +296,78 @@ export async function* streamZai(apiKey: string, model: string, messages: { role
     yield* parseOpenAISSE(res);
 }
 
+// Ollama Cloud API
+export async function fetchOllamaModels(apiKey: string): Promise<Model[]> {
+    const res = await fetch('https://ollama.com/api/models', {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+    });
+
+    if (!res.ok) throw new Error('Failed to fetch Ollama models');
+    const data = await res.json();
+
+    const modelList = Array.isArray(data) ? data : (data.models || []);
+
+    return modelList.map((m: any) => {
+        const id = typeof m === 'string' ? m : m.name;
+        return {
+            id: id,
+            name: formatModelName(id),
+            contextLength: 4096
+        };
+    });
+}
+
+export async function* streamOllama(apiKey: string, model: string, messages: { role: string, content: string }[], systemPrompt?: string): AsyncGenerator<StreamChunk> {
+    const msgs = systemPrompt ? [{ role: 'system', content: systemPrompt }, ...messages] : messages;
+
+    const res = await fetch('https://ollama.com/api/chat', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model,
+            messages: msgs,
+            stream: true
+        })
+    });
+
+    if (!res.ok) {
+        const error = await res.text();
+        throw new Error(error || 'Ollama Cloud API error');
+    }
+
+    const reader = res.body!.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+            if (line.trim()) {
+                try {
+                    const data = JSON.parse(line);
+                    if (data.message?.content) {
+                        yield { content: data.message.content, done: false };
+                    }
+                    if (data.done) {
+                        yield { content: '', done: true };
+                    }
+                } catch (e) {
+                    console.error('Error parsing Ollama stream:', e);
+                }
+            }
+        }
+    }
+}
+
 // Universal functions
 export async function fetchModels(providerId: string, apiKey: string): Promise<Model[]> {
     switch (providerId) {
@@ -305,6 +377,7 @@ export async function fetchModels(providerId: string, apiKey: string): Promise<M
         case 'huggingface': return fetchHuggingFaceModels(apiKey);
         case 'nvidia': return fetchNvidiaModels(apiKey);
         case 'zai': return fetchZaiModels(apiKey);
+        case 'ollama': return fetchOllamaModels(apiKey);
         default: throw new Error('Unknown provider');
     }
 }
@@ -317,6 +390,7 @@ export async function* streamChat(providerId: string, apiKey: string, model: str
         case 'huggingface': yield* streamHuggingFace(apiKey, model, messages, systemPrompt); break;
         case 'nvidia': yield* streamNvidia(apiKey, model, messages, systemPrompt); break;
         case 'zai': yield* streamZai(apiKey, model, messages, systemPrompt); break;
+        case 'ollama': yield* streamOllama(apiKey, model, messages, systemPrompt); break;
         default: throw new Error('Unknown provider');
     }
 }
