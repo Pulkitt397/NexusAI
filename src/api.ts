@@ -81,7 +81,7 @@ export async function fetchOpenRouterModels(apiKey: string): Promise<Model[]> {
 
     return (data.data || [])
         .filter((m: any) => m.context_length)
-        .slice(0, 50)
+        .slice(0, 150)
         .map((m: any) => ({
             id: m.id,
             name: m.name || formatModelName(m.id),
@@ -117,7 +117,7 @@ export async function fetchHuggingFaceModels(apiKey: string): Promise<Model[]> {
 
     // Fetch all text-generation models that are available for inference (free tier)
     const modelsRes = await fetch(
-        'https://huggingface.co/api/models?pipeline_tag=text-generation&inference=warm&sort=downloads&direction=-1&limit=100',
+        'https://huggingface.co/api/models?pipeline_tag=text-generation&inference=warm&sort=downloads&direction=-1&limit=150',
         { headers: { 'Authorization': `Bearer ${apiKey}` } }
     );
 
@@ -126,7 +126,7 @@ export async function fetchHuggingFaceModels(apiKey: string): Promise<Model[]> {
 
     // Also fetch conversational models
     const chatRes = await fetch(
-        'https://huggingface.co/api/models?pipeline_tag=conversational&inference=warm&sort=downloads&direction=-1&limit=50',
+        'https://huggingface.co/api/models?pipeline_tag=conversational&inference=warm&sort=downloads&direction=-1&limit=100',
         { headers: { 'Authorization': `Bearer ${apiKey}` } }
     );
 
@@ -179,10 +179,25 @@ export async function* streamHuggingFace(apiKey: string, model: string, messages
 
 // NVIDIA Kimi API (OpenAI compatible)
 export async function fetchNvidiaModels(apiKey: string): Promise<Model[]> {
-    // Skip verification for NVIDIA to allow all keys (including trial/restricted keys)
-    // We'll trust the key works for the chat endpoint
+    try {
+        const res = await fetch('/api/nvidia/models', {
+            headers: { 'Authorization': `Bearer ${apiKey}` }
+        });
 
-    // Comprehensive list of NVIDIA NIM models
+        if (res.ok) {
+            const data = await res.json();
+            return (data.data || [])
+                .map((m: any) => ({
+                    id: m.id,
+                    name: formatModelName(m.id),
+                    contextLength: m.context_window || 128000
+                }));
+        }
+    } catch (e) {
+        console.warn('Failed to fetch NVIDIA models distynamically, using fallback', e);
+    }
+
+    // Comprehensive list of NVIDIA NIM models (Fallback)
     const models = [
         { id: 'moonshotai/kimi-k2.5', name: 'Kimi K2.5', description: '1T multimodal MoE', contextLength: 128000 },
         { id: 'meta/llama-3.1-405b-instruct', name: 'Llama 3.1 405B', description: 'Meta Flagship Model', contextLength: 128000 },
@@ -300,18 +315,17 @@ export async function* streamZai(apiKey: string, model: string, messages: { role
 export async function fetchOllamaModels(apiKey: string): Promise<Model[]> {
     // Try via proxy first to bypass CORS
     try {
-        const res = await fetch('/api/ollama/api/models', {
+        const res = await fetch('/api/ollama/api/tags', {
             headers: { 'Authorization': `Bearer ${apiKey}` }
         });
 
         if (res.ok) {
             const data = await res.json();
-            const modelList = Array.isArray(data) ? data : (data.models || []);
+            const modelList = data.models || [];
             return modelList.map((m: any) => {
-                const id = typeof m === 'string' ? m : m.name;
                 return {
-                    id: id,
-                    name: formatModelName(id),
+                    id: m.name,
+                    name: formatModelName(m.name),
                     contextLength: 4096
                 };
             });

@@ -7,7 +7,7 @@ export const PROVIDERS: Provider[] = [
     { id: 'huggingface', name: 'Hugging Face', icon: '/logos/huggingface.svg', color: '#ffcc00', baseUrl: 'https://api-inference.huggingface.co' },
     { id: 'nvidia', name: 'NVIDIA Kimi', icon: '/logos/nvidia.svg', color: '#76b900', baseUrl: 'https://integrate.api.nvidia.com/v1' },
     { id: 'zai', name: 'Zhipu AI', icon: '/logos/zai.svg', color: '#3b82f6', baseUrl: 'https://api.z.ai/api/paas/v4' },
-    { id: 'ollama', name: 'Ollama Cloud', icon: '/logos/ollama.svg', color: '#000000', baseUrl: 'https://ollama.com/api' }
+    { id: 'ollama', name: 'Ollama (Local)', icon: '/logos/ollama.svg', color: '#000000', baseUrl: 'http://localhost:11434/api' }
 ];
 
 export const PROVIDER_LINKS: Record<string, string> = {
