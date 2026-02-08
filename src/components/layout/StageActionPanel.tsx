@@ -75,11 +75,19 @@ export function StageActionPanel({ onSendMessage, placeholder, selectedSectionTi
                                             key={p.id}
                                             onClick={() => { selectProvider(p.id); setIsMenuOpen(null); }}
                                             className={cn(
-                                                "flex items-center gap-3 p-3 rounded-xl transition-all text-left",
+                                                "flex items-center gap-3 p-3 rounded-xl transition-all text-left group",
                                                 state.currentProviderId === p.id ? "bg-indigo-600 text-white" : "hover:bg-white/5 text-white/50"
                                             )}
                                         >
-                                            <Globe className="w-4 h-4 shrink-0" />
+                                            {p.id === 'ollama' ? (
+                                                <div className="w-5 h-5 flex items-center justify-center bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
+                                                    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm-2-11c-.552 0-1 .448-1 1s.448 1 1 1 1-.448 1-1-.448-1-1-1zm4 0c-.552 0-1 .448-1 1s.448 1 1 1 1-.448 1-1-.448-1-1-1zm-2 7c-2.206 0-4-1.794-4-4 0-.276.224-.5.5-.5s.5.224.5.5c0 1.654 1.346 3 3 3s3-1.346 3-3c0-.276.224-.5.5-.5s.5.224.5.5c0 2.206-1.794 4-4 4z" />
+                                                    </svg>
+                                                </div>
+                                            ) : (
+                                                <Globe className="w-4 h-4 shrink-0" />
+                                            )}
                                             <span className="text-xs font-bold truncate">{p.name}</span>
                                         </button>
                                     ))

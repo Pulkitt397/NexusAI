@@ -103,42 +103,58 @@ export function PlanView({ state }: PlanViewProps) {
 
                         {/* Visual Strategy Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="p-5 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
-                                <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                    <Palette className="w-4 h-4 text-pink-400" />
+                            <motion.div
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.2 }}
+                                className="p-5 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md hover:bg-white/[0.06] transition-all hover:border-indigo-500/30 hover:shadow-[0_0_30px_rgba(79,70,229,0.1)] group"
+                            >
+                                <h3 className="text-[10px] font-black text-indigo-400 opacity-60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                                    <Palette className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" />
                                     Visual Identity
                                 </h3>
                                 {state.designSystem ? (
                                     <div className="space-y-4">
                                         <div className="flex gap-3">
-                                            {Object.entries(state.designSystem.color_palette).map(([key, color]) => (
-                                                <div key={key} className="flex flex-col items-center gap-1.5">
-                                                    <div className="w-10 h-10 rounded-xl shadow-lg border border-white/10" style={{ backgroundColor: color as string }} />
-                                                    <span className="text-[9px] text-white/30 font-bold uppercase">{key.charAt(0)}</span>
-                                                </div>
+                                            {Object.entries(state.designSystem.color_palette).map(([key, color], i) => (
+                                                <motion.div
+                                                    key={key}
+                                                    initial={{ scale: 0 }}
+                                                    animate={{ scale: 1 }}
+                                                    transition={{ delay: 0.4 + (i * 0.1) }}
+                                                    className="flex flex-col items-center gap-1.5"
+                                                >
+                                                    <div className="w-10 h-10 rounded-xl shadow-lg border border-white/10 ring-1 ring-white/5" style={{ backgroundColor: color as string }} />
+                                                    <span className="text-[8px] text-white/30 font-black uppercase tracking-tighter">{key.charAt(0)}</span>
+                                                </motion.div>
                                             ))}
                                         </div>
-                                        <div className="text-[11px] text-white/60 bg-white/5 p-3 rounded-lg border border-white/5 leading-relaxed">
-                                            Using <span className="text-white font-bold">{state.designSystem.typography.heading_font}</span> for headings and <span className="text-white font-bold">{state.designSystem.typography.body_font}</span> for body text.
+                                        <div className="text-[11px] text-white/60 bg-white/5 p-3 rounded-xl border border-white/5 leading-relaxed font-medium">
+                                            Using <span className="text-white font-black">{state.designSystem.typography.heading_font}</span> for headings and <span className="text-white font-medium">{state.designSystem.typography.body_font}</span> for body text.
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="flex items-center gap-3 text-white/20 italic text-xs">
-                                        <div className="w-8 h-8 rounded-xl bg-white/5 border border-dashed border-white/10" />
+                                    <div className="flex items-center gap-3 text-white/20 italic text-xs py-2">
+                                        <Loader2 className="w-4 h-4 animate-spin" />
                                         Generating style tokens...
                                     </div>
                                 )}
-                            </div>
+                            </motion.div>
 
-                            <div className="p-5 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
-                                <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                    <Smartphone className="w-4 h-4 text-blue-400" />
+                            <motion.div
+                                initial={{ x: 20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.3 }}
+                                className="p-5 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md hover:bg-white/[0.06] transition-all hover:border-blue-500/30 hover:shadow-[0_0_30px_rgba(59,130,246,0.1)] group"
+                            >
+                                <h3 className="text-[10px] font-black text-blue-400 opacity-60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                                    <Smartphone className="w-3.5 h-3.5 group-hover:-translate-y-1 transition-transform" />
                                     Responsive Strategy
                                 </h3>
-                                <div className="text-[11px] text-white/50 leading-relaxed italic">
+                                <div className="text-[11px] text-white/50 leading-relaxed font-medium">
                                     {state.architecture.responsive_rules || "Awaiting structural analysis to define breakpoints and layout fluidity..."}
                                 </div>
-                            </div>
+                            </motion.div>
                         </div>
                     </div>
                 )}
@@ -160,7 +176,12 @@ function SectionItem({ section, state, index }: { section: SectionSpec, state: B
     const isProcessing = !isComplete && state.stage !== 'idle';
 
     return (
-        <div className="rounded-xl border border-white/10 bg-[#121214] overflow-hidden transition-all hover:border-white/20">
+        <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: index * 0.05 }}
+            className="rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-sm overflow-hidden transition-all hover:border-white/20 hover:shadow-2xl hover:shadow-black/20"
+        >
             {/* Header */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
@@ -234,6 +255,6 @@ function SectionItem({ section, state, index }: { section: SectionSpec, state: B
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </motion.div>
     );
 }
