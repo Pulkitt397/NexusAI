@@ -4,11 +4,13 @@ import { useApp } from '@/context';
 import { AnimatedAIChat, AnimatedAIChatProps } from '@/components/ui/animated-ai-chat';
 import { LivePreviewPane } from '@/components/LivePreviewPane';
 import { CodeEditor } from '@/components/CodeEditor';
+import { PlanView } from '@/components/PlanView';
 import { extractPreviewableCode, buildPreviewDocument } from '@/utils/codeDetection';
 import { cn } from '@/lib/utils';
-import { LayoutPanelLeft, SquareSplitHorizontal, AppWindow, X, FileCode, Play, Plus, Search, GitBranch, CheckCircle2, ChevronRight, FileJson, FileType2 } from 'lucide-react';
+import { LayoutPanelLeft, SquareSplitHorizontal, AppWindow, X, FileCode, Play, Plus, Search, GitBranch, CheckCircle2, ChevronRight, FileJson, FileType2, BrainCircuit } from 'lucide-react';
+import { BuilderState } from '@/types/builderTypes';
 
-type ViewMode = 'chat' | 'split' | 'code' | 'preview';
+type ViewMode = 'chat' | 'split' | 'code' | 'preview' | 'plan';
 
 interface WebDevFile {
     name: string;
@@ -24,12 +26,25 @@ interface WebDevEnvironmentProps extends AnimatedAIChatProps {
 
 export function WebDevEnvironment(props: WebDevEnvironmentProps) {
     const { addSystemMessage, state } = useApp();
-    const [viewMode, setViewMode] = useState<ViewMode>('split');
+    const [viewMode, setViewMode] = useState<ViewMode>('split'); // Default to split
     const [chatWidth, setChatWidth] = useState(450);
     const [isResizing, setIsResizing] = useState(false);
     const [currentFiles, setCurrentFiles] = useState<WebDevFile[]>([]);
     const [activeFile, setActiveFile] = useState<string | null>(null);
     const [previewContent, setPreviewContent] = useState('');
+
+    // Project Brain State
+    const [builderState, setBuilderState] = useState<BuilderState>({
+        stage: 'idle',
+        intent: null,
+        architecture: null,
+        designSystem: null,
+        uxJourney: null,
+        assets: null,
+        currentStep: '',
+        progress: 0,
+        errors: []
+    });
 
     const handlePipelineStart = async (userPrompt: string) => {
         if (!state.currentProviderId || !state.currentModelId) {
@@ -43,21 +58,30 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
             return;
         }
 
+        // Switch to Plan view to show thinking
+        setViewMode('plan');
+        setBuilderState(prev => ({ ...prev, stage: 'analyzing', progress: 5 }));
+
         await runBuilderPipeline(userPrompt, state.currentProviderId, apiKey, state.currentModelId, (event: PipelineEvent) => {
             if (event.type === 'INTENT_GENERATED') {
                 addSystemMessage(JSON.stringify({ type: 'INTENT', payload: event.payload }));
+                setBuilderState(prev => ({ ...prev, intent: event.payload, stage: 'architecting', progress: 20 }));
             }
             if (event.type === 'ARCHITECTURE_GENERATED') {
                 addSystemMessage(JSON.stringify({ type: 'ARCHITECTURE', payload: event.payload }));
+                setBuilderState(prev => ({ ...prev, architecture: event.payload, stage: 'ux_planning', progress: 40 }));
             }
             if (event.type === 'UX_GENERATED') {
                 addSystemMessage(JSON.stringify({ type: 'UX', payload: event.payload }));
+                setBuilderState(prev => ({ ...prev, uxJourney: event.payload, stage: 'asset_sourcing', progress: 55 }));
             }
             if (event.type === 'ASSET_GENERATED') {
                 addSystemMessage(JSON.stringify({ type: 'ASSETS', payload: event.payload }));
+                setBuilderState(prev => ({ ...prev, assets: event.payload, stage: 'designing', progress: 70 }));
             }
             if (event.type === 'DESIGN_GENERATED') {
                 addSystemMessage(JSON.stringify({ type: 'DESIGN', payload: event.payload }));
+                setBuilderState(prev => ({ ...prev, designSystem: event.payload, stage: 'building', progress: 85 }));
             }
             if (event.type === 'COMPONENT_GENERATED') {
                 const { sectionId, code } = event.payload;
@@ -68,13 +92,16 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                     if (exists) return prev.map(f => f.name === fileName ? { ...f, content: code } : f);
                     return [...prev, { name: fileName, language: 'typescript', content: code, path: fileName }];
                 });
-                // Also update preview if it's the first component or main layout?
-                // For now, minimal logic.
                 if (!activeFile) setActiveFile(fileName);
             }
+            if (event.type === 'COMPLETE') {
+                setBuilderState(prev => ({ ...prev, stage: 'complete', progress: 100 }));
+                // Optionally switch back to preview or split code
+                // setViewMode('split'); 
+            }
             if (event.type === 'ERROR') {
-                // state.showToast(event.payload, 'error'); // Need to access toast via hook or pass it
                 console.error(event.payload);
+                setBuilderState(prev => ({ ...prev, stage: 'error', errors: [...prev.errors, event.payload] }));
             }
         });
     };
@@ -177,6 +204,7 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                 {/* Left: View Modes */}
                 <div className="flex items-center gap-1 bg-white/5 p-0.5 rounded-lg border border-white/5">
                     {[
+                        { id: 'plan', icon: BrainCircuit, label: 'Brain' }, // New Plan View
                         { id: 'chat', icon: LayoutPanelLeft, label: 'Chat' },
                         { id: 'split', icon: SquareSplitHorizontal, label: 'Split' },
                         { id: 'code', icon: FileCode, label: 'Code' },
@@ -299,6 +327,13 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                                     <span>{activeFileLang.toUpperCase()}</span>
                                 </div>
                             </div>
+                        </div>
+                    )}
+
+                    {/* If Plan Mode -> Show Brain */}
+                    {viewMode === 'plan' && (
+                        <div className="flex-1 overflow-hidden">
+                            <PlanView state={builderState} />
                         </div>
                     )}
 
