@@ -53,10 +53,10 @@ export const ChatMessage = memo(({ role, content, id, webResult, pdfUrl }: ChatM
             {/* Avatar */}
             <div className="flex flex-col items-center gap-2">
             <div className={cn(
-                "w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-medium tracking-wide shadow-lg ring-2 ring-offset-2 ring-violet-500/40",
+                "w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-medium tracking-wide shadow-lg",
                 !isUser
-                    ? "bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-violet-500/20"
-                    : "bg-white/10 text-white/70 border border-white/5"
+                    ? "bg-gradient-to-br from-indigo-500 to-violet-600 text-white"
+                    : "bg-slate-800 text-slate-300 border border-slate-700"
             )}>
                     {!isUser ? "AI" : "YOU"}
                 </div>
@@ -84,8 +84,8 @@ export const ChatMessage = memo(({ role, content, id, webResult, pdfUrl }: ChatM
             <div className={cn(
                 "rounded-2xl px-5 py-4 text-sm md:text-[15px] leading-relaxed shadow-sm w-fit max-w-full overflow-hidden break-words",
                 isUser
-                    ? "bg-[#27272a] text-white/95 border border-white/5 ml-auto text-right"
-                    : "bg-gradient-to-br from-violet-500/25 to-indigo-500/25 text-white/90 border border-white/10 shadow-md"
+                    ? "bg-slate-800 text-slate-200 border border-slate-700 ml-auto text-right"
+                    : "bg-gradient-to-br from-indigo-500/10 to-violet-500/10 text-slate-200 border border-indigo-500/20 shadow-md"
             )}>
                     {isUser ? (
                         <div className="whitespace-pre-wrap">{content}</div>
@@ -100,14 +100,14 @@ export const ChatMessage = memo(({ role, content, id, webResult, pdfUrl }: ChatM
                         download={`NexusAI_Export_${Date.now()}.pdf`}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white/80 transition-all hover:scale-[1.02] shadow-xl backdrop-blur-md group/pdf"
+                        className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-300 transition-all hover:scale-[1.02] shadow-xl group/pdf"
                     >
                         <div className="w-7 h-7 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 group-hover/pdf:bg-red-500 group-hover/pdf:text-white transition-colors">
                             <FileDown className="w-4 h-4" />
                         </div>
                         <div className="flex flex-col items-start">
                             <span>Ready to download</span>
-                            <span className="text-[10px] text-white/40 font-normal uppercase tracking-widest mt-0.5">NexusAI Export . PDF</span>
+                            <span className="text-[10px] text-slate-500 font-normal uppercase tracking-widest mt-0.5">NexusAI Export . PDF</span>
                         </div>
                     </motion.a>
                 )}
