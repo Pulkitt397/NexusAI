@@ -127,12 +127,15 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
     };
 
     const handleStartBuild = async () => {
-        if (!process.env.NEXT_PUBLIC_NEXUS_API_KEY && !state.apiKeys?.google) {
-            showToast("API Key missing", 'error');
+        const providerId = state.currentProviderId || 'google';
+        const apiKey = state.apiKeys[providerId];
+
+        if (!apiKey && !process.env.NEXT_PUBLIC_NEXUS_API_KEY) {
+            showToast(`API Key missing for ${providerId}`, 'error');
             return;
         }
 
-        const apiKey = process.env.NEXT_PUBLIC_NEXUS_API_KEY || state.apiKeys?.google || "";
+        const activeKey = apiKey || process.env.NEXT_PUBLIC_NEXUS_API_KEY || "";
 
         setProjectStage('build');
         showToast("Building components...", "info");
@@ -153,8 +156,8 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
             state.sections.map(s => ({ id: s.id, purpose: s.description })), // Minimal section info
             state.designSystem || {} as any,
             state.assetPlan || { section_assets: [] } as any,
-            state.currentProviderId || "",
-            apiKey,
+            providerId,
+            activeKey,
             state.currentModelId || "",
             (event: PipelineEvent) => {
                 if (event.type === 'COMPONENT_GENERATED') {
@@ -402,13 +405,15 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                         )}
                     </div>
 
-                    {/* CONTEXTUAL ACTION PANEL (BOTTOM CENTER) */}
-                    <div className="absolute bottom-6 left-0 right-0 z-50 px-6">
-                        <StageActionPanel
-                            onSendMessage={handleCommand}
-                            selectedSectionTitle={selectedSection?.title}
-                        />
-                    </div>
+                    {/* FOOTER ACTION PANEL */}
+                    <footer className="shrink-0 z-40 px-6 py-4 bg-[#09090b]/40 backdrop-blur-sm border-t border-white/5">
+                        <div className="max-w-4xl mx-auto">
+                            <StageActionPanel
+                                onSendMessage={handleCommand}
+                                selectedSectionTitle={selectedSection?.title}
+                            />
+                        </div>
+                    </footer>
                 </div>
             </main>
         </div>

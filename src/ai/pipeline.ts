@@ -90,9 +90,8 @@ export async function runBuildPhase(
         console.log(`[Builder] Starting build phase for ${sectionsToBuild.length} sections`);
         onupdate({ type: 'STEP_STARTED', payload: 'Generating components...' });
 
-        // Slice logic can be handled by caller or here. Let's assume caller sends what needs building.
-        // For MVP prototype speed, let's limit safely if not limited by caller
-        const actualSections = sectionsToBuild.slice(0, 5);
+        // Generate all requested sections
+        const actualSections = sectionsToBuild;
 
         for (const section of actualSections) {
             // Find assets for this section
