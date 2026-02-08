@@ -337,11 +337,11 @@ export async function fetchOllamaModels(apiKey: string): Promise<Model[]> {
     // Fallback list to allow key saving even if fetch fails (CORS/Network/Auth issues)
     // This ensures the user can at least try to use the key
     return [
-        { id: 'llama3.2', name: 'Llama 3.2', contextLength: 128000 },
-        { id: 'llama3.1', name: 'Llama 3.1', contextLength: 128000 },
-        { id: 'mistral', name: 'Mistral', contextLength: 32000 },
-        { id: 'gemma2', name: 'Gemma 2', contextLength: 8192 },
-        { id: 'qwen2.5', name: 'Qwen 2.5', contextLength: 32000 }
+        { id: 'gpt-oss:120b-cloud', name: 'GPT-OSS 120B (Cloud)', contextLength: 128000 },
+        { id: 'llama3.2:3b-cloud', name: 'Llama 3.2 3B (Cloud)', contextLength: 128000 },
+        { id: 'mistral:7b-cloud', name: 'Mistral 7B (Cloud)', contextLength: 32000 },
+        { id: 'gemma2:9b-cloud', name: 'Gemma 2 9B (Cloud)', contextLength: 8192 },
+        { id: 'qwen2.5:7b-cloud', name: 'Qwen 2.5 7B (Cloud)', contextLength: 32000 }
     ];
 }
 
