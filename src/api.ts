@@ -298,29 +298,44 @@ export async function* streamZai(apiKey: string, model: string, messages: { role
 
 // Ollama Cloud API
 export async function fetchOllamaModels(apiKey: string): Promise<Model[]> {
-    const res = await fetch('https://ollama.com/api/models', {
-        headers: { 'Authorization': `Bearer ${apiKey}` }
-    });
+    // Try via proxy first to bypass CORS
+    try {
+        const res = await fetch('/api/ollama/api/models', {
+            headers: { 'Authorization': `Bearer ${apiKey}` }
+        });
 
-    if (!res.ok) throw new Error('Failed to fetch Ollama models');
-    const data = await res.json();
+        if (res.ok) {
+            const data = await res.json();
+            const modelList = Array.isArray(data) ? data : (data.models || []);
+            return modelList.map((m: any) => {
+                const id = typeof m === 'string' ? m : m.name;
+                return {
+                    id: id,
+                    name: formatModelName(id),
+                    contextLength: 4096
+                };
+            });
+        }
+    } catch (e) {
+        console.warn('Ollama proxy fetch failed, falling back to static list', e);
+    }
 
-    const modelList = Array.isArray(data) ? data : (data.models || []);
-
-    return modelList.map((m: any) => {
-        const id = typeof m === 'string' ? m : m.name;
-        return {
-            id: id,
-            name: formatModelName(id),
-            contextLength: 4096
-        };
-    });
+    // Fallback list to allow key saving even if fetch fails (CORS/Network/Auth issues)
+    // This ensures the user can at least try to use the key
+    return [
+        { id: 'llama3.2', name: 'Llama 3.2', contextLength: 128000 },
+        { id: 'llama3.1', name: 'Llama 3.1', contextLength: 128000 },
+        { id: 'mistral', name: 'Mistral', contextLength: 32000 },
+        { id: 'gemma2', name: 'Gemma 2', contextLength: 8192 },
+        { id: 'qwen2.5', name: 'Qwen 2.5', contextLength: 32000 }
+    ];
 }
 
 export async function* streamOllama(apiKey: string, model: string, messages: { role: string, content: string }[], systemPrompt?: string): AsyncGenerator<StreamChunk> {
     const msgs = systemPrompt ? [{ role: 'system', content: systemPrompt }, ...messages] : messages;
 
-    const res = await fetch('https://ollama.com/api/chat', {
+    // Use proxy path
+    const res = await fetch('/api/ollama/api/chat', {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${apiKey}`,
@@ -334,10 +349,34 @@ export async function* streamOllama(apiKey: string, model: string, messages: { r
     });
 
     if (!res.ok) {
-        const error = await res.text();
-        throw new Error(error || 'Ollama Cloud API error');
+        // Try direct call as fallback if proxy fails (e.g. on production deployment without proxy)
+        const directRes = await fetch('https://ollama.com/api/chat', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model,
+                messages: msgs,
+                stream: true
+            })
+        });
+
+        if (!directRes.ok) {
+            const error = await directRes.text().catch(() => 'Unknown error');
+            throw new Error(error || 'Ollama Cloud API error');
+        }
+
+        // If direct call worked (unlikely due to CORS but possible), parse it
+        yield* parseOllamaStream(directRes);
+        return;
     }
 
+    yield* parseOllamaStream(res);
+}
+
+async function* parseOllamaStream(res: Response): AsyncGenerator<StreamChunk> {
     const reader = res.body!.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
