@@ -117,7 +117,12 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
             if (event.type === 'COMPLETE') {
                 // End of planning phase
                 setProjectStage('architecture'); // Stay in architecture for review
-                showToast("Plan ready for review", "success");
+                showToast("Plan ready. Starting build automatically...", "success");
+
+                // AUTOMATION: Start build immediately
+                setTimeout(() => {
+                    handleStartBuild();
+                }, 1500); // Brief delay for user to see the plan
             }
 
             if (event.type === 'ERROR') {
