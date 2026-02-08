@@ -116,26 +116,54 @@ export async function runBuildPhase(
     }
 }
 
-// Helper to generate JSON responses
-async function generateJson<T>(providerId: string, apiKey: string, model: string, prompt: string): Promise<T> {
-    let fullResponse = '';
-    const messages = [{ role: 'user', content: prompt }];
+// Helper to generate JSON responses with retry logic and robust extraction
+async function generateJson<T>(providerId: string, apiKey: string, model: string, prompt: string, retries = 2): Promise<T> {
+    let lastError: any = null;
 
-    try {
-        for await (const chunk of streamChat(providerId, apiKey, model, messages)) {
-            if (chunk.content) fullResponse += chunk.content;
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        let fullResponse = '';
+        const messages = [{ role: 'user', content: prompt }];
+
+        try {
+            for await (const chunk of streamChat(providerId, apiKey, model, messages)) {
+                if (chunk.content) fullResponse += chunk.content;
+            }
+
+            // Robust JSON extraction
+            // 1. Try to find content between ```json and ```
+            let cleanJson = fullResponse.match(/```json\s*([\s\S]*?)\s*```/i)?.[1];
+
+            // 2. Fallback: Content between generic ``` and ```
+            if (!cleanJson) {
+                cleanJson = fullResponse.match(/```\s*([\s\S]*?)\s*```/)?.[1];
+            }
+
+            // 3. Fallback: Find the first { and last }
+            if (!cleanJson) {
+                const startIndex = fullResponse.indexOf('{');
+                const endIndex = fullResponse.lastIndexOf('}');
+                if (startIndex !== -1 && endIndex !== -1) {
+                    cleanJson = fullResponse.substring(startIndex, endIndex + 1);
+                }
+            }
+
+            // 4. Fallback: Use full response if none of the above worked
+            if (!cleanJson) cleanJson = fullResponse;
+
+            return JSON.parse(cleanJson.trim()) as T;
+        } catch (e) {
+            lastError = e;
+            console.error(`[Builder] JSON Attempt ${attempt + 1} failed:`, e);
+            if (attempt < retries) {
+                console.log(`[Builder] Retrying JSON generation...`);
+                // Add a small jittered delay
+                await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+            }
         }
-
-        // Extract JSON from markdown code blocks if present
-        const jsonMatch = fullResponse.match(/```json\n([\s\S]*?)\n```/) || fullResponse.match(/```\n([\s\S]*?)\n```/);
-        const cleanJson = jsonMatch ? jsonMatch[1] : fullResponse;
-
-        return JSON.parse(cleanJson) as T;
-    } catch (e) {
-        console.error("JSON Generation Failed", e);
-        console.error("Raw Response:", fullResponse);
-        throw new Error("Failed to generate structured data.");
     }
+
+    console.error("[Builder] JSON Generation Exhausted", lastError);
+    throw new Error("Failed to generate structured data after multiple attempts.");
 }
 
 // Helper to generate Code responses
