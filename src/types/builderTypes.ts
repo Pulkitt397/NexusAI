@@ -78,7 +78,7 @@ export interface AssetPlan {
 }
 
 export interface BuilderState {
-    stage: 'idle' | 'analyzing' | 'architecting' | 'ux_planning' | 'asset_sourcing' | 'designing' | 'building' | 'complete' | 'error';
+    stage: 'idle' | 'analyzing' | 'architecting' | 'ux_planning' | 'asset_sourcing' | 'designing' | 'building' | 'complete' | 'error' | 'intent' | 'architecture' | 'build' | 'refine' | 'export';
     intent: SiteIntent | null;
     architecture: SiteArchitecture | null;
     uxJourney: UXJourney | null;

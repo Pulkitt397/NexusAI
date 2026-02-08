@@ -50,8 +50,10 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
         sendMessage
     } = useApp();
 
-    const [viewMode, setViewMode] = useState<ViewMode>('split');
-    const [sidebarWidth, setSidebarWidth] = useState(320);
+    const [viewMode, setViewMode] = useState<ViewMode>(
+        state.projectStage === 'intent' || state.projectStage === 'architecture' ? 'plan' : 'split'
+    );
+    const [sidebarWidth, setSidebarWidth] = useState(380);
     const [isResizing, setIsResizing] = useState(false);
     const [currentFiles, setCurrentFiles] = useState<WebDevFile[]>([]);
     const [activeFile, setActiveFile] = useState<string | null>(null);
@@ -169,7 +171,10 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                         if (exists) return prev.map(f => f.name === fileName ? { ...f, content: code } : f);
                         return [...prev, { name: fileName, language: 'typescript', content: code, path: fileName }];
                     });
-                    if (!activeFile) setActiveFile(fileName);
+                    if (!activeFile) {
+                        setActiveFile(fileName);
+                        if (viewMode === 'plan') setViewMode('split');
+                    }
                 }
 
                 if (event.type === 'COMPLETE') {
@@ -392,17 +397,24 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                         {viewMode === 'plan' && (
                             <PlanView state={{
                                 stage: state.projectStage as any,
-                                intent: null as any,
-                                architecture: {
-                                    sections: state.sections.map(s => ({ id: s.id, name: s.title, type: 'generic', purpose: s.description, components: [], priority: 'medium' })),
+                                intent: state.siteIntent || null as any,
+                                architecture: state.siteArchitecture || {
+                                    sections: state.sections.map(s => ({
+                                        id: s.id,
+                                        name: s.title,
+                                        type: 'generic',
+                                        purpose: s.description,
+                                        components: [],
+                                        priority: 'medium'
+                                    })),
                                     layout_strategy: '',
                                     responsive_rules: '',
                                     interaction_notes: '',
                                     navigation_structure: []
-                                },
-                                designSystem: null,
+                                } as any,
+                                designSystem: state.designSystem || null,
                                 uxJourney: null,
-                                assets: null,
+                                assets: state.assetPlan || null,
                                 currentStep: '',
                                 progress: 0,
                                 errors: []

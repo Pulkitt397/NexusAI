@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     CheckCircle2, Circle, Clock, BrainCircuit,
     LayoutTemplate, Smartphone, Palette, Share2, Image as ImageIcon,
-    ChevronRight, ChevronDown
+    ChevronRight, ChevronDown, Loader2
 } from 'lucide-react';
 import { BuilderState, SectionSpec } from '@/types/builderTypes';
 import { cn } from '@/lib/utils';
@@ -44,22 +44,52 @@ export function PlanView({ state }: PlanViewProps) {
             </div>
 
             {/* Scrollable Plan Area */}
-            <div className="flex-1 overflow-y-auto p-6">
-                {!state.architecture ? (
+            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                {state.stage === 'intent' && !state.intent ? (
+                    <div className="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto">
+                        <div className="w-20 h-20 rounded-3xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-6 animate-pulse">
+                            <BrainCircuit className="w-10 h-10 text-indigo-400" />
+                        </div>
+                        <h2 className="text-2xl font-bold mb-3 bg-gradient-to-br from-white to-white/40 bg-clip-text text-transparent">
+                            What are we building today?
+                        </h2>
+                        <p className="text-sm text-white/40 leading-relaxed mb-8">
+                            Describe your vision in the chat to start the builder pipeline. I'll help you architect, design, and build your application from scratch.
+                        </p>
+                        <div className="grid grid-cols-1 gap-3 w-full">
+                            {[
+                                "A premium SaaS landing page",
+                                "A minimalist portfolio site",
+                                "A complex web application dashboard"
+                            ].map((suggestion, i) => (
+                                <div key={i} className="p-3 rounded-xl bg-white/5 border border-white/10 text-xs text-white/60 hover:bg-white/10 hover:border-white/20 transition-all cursor-default text-left flex items-center gap-3">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                                    {suggestion}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ) : !state.architecture ? (
                     <div className="h-full flex flex-col items-center justify-center text-white/30 text-center">
-                        <BrainCircuit className="w-12 h-12 mb-4 opacity-20" />
-                        <p>Waiting for instructions...</p>
-                        <p className="text-xs mt-2">Type a prompt in the Chat to start the Brain.</p>
+                        <Loader2 className="w-12 h-12 mb-4 animate-spin text-indigo-500/40" />
+                        <p className="font-medium text-white/60">Architecting your solution...</p>
+                        <p className="text-xs mt-2 text-white/30">Analyzing intent and mapping site structure.</p>
                     </div>
                 ) : (
-                    <div className="space-y-6">
+                    <div className="space-y-8 max-w-4xl mx-auto">
                         {/* Sections List */}
                         <div>
-                            <h2 className="text-sm font-bold text-white/60 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <LayoutTemplate className="w-4 h-4" />
-                                Site Architecture
-                            </h2>
-                            <div className="space-y-3">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-xs font-bold text-white/40 uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <LayoutTemplate className="w-4 h-4 text-indigo-400" />
+                                    Site Architecture
+                                </h2>
+                                <div className="px-2 py-1 rounded bg-indigo-500/10 text-[10px] font-bold text-indigo-400 border border-indigo-500/20">
+                                    {state.architecture.sections.length} BLOCKS
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
                                 {state.architecture.sections.map((section, idx) => (
                                     <SectionItem
                                         key={section.id}
@@ -71,30 +101,43 @@ export function PlanView({ state }: PlanViewProps) {
                             </div>
                         </div>
 
-                        {/* Design System Status */}
-                        <div>
-                            <h2 className="text-sm font-bold text-white/60 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <Palette className="w-4 h-4" />
-                                Design System
-                            </h2>
-                            <div className="p-4 rounded-xl border border-white/5 bg-white/[0.02]">
+                        {/* Visual Strategy Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="p-5 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                                <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                    <Palette className="w-4 h-4 text-pink-400" />
+                                    Visual Identity
+                                </h3>
                                 {state.designSystem ? (
-                                    <div className="flex items-center gap-2 text-green-400">
-                                        <CheckCircle2 className="w-5 h-5" />
-                                        <span>Generated successfully</span>
-                                        <div className="flex gap-2 ml-4">
-                                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: state.designSystem.color_palette.primary }} title="Primary" />
-                                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: state.designSystem.color_palette.secondary }} title="Secondary" />
-                                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: state.designSystem.color_palette.background }} title="Background" />
-                                            <div className="w-4 h-4 rounded-full border border-white/20" style={{ backgroundColor: state.designSystem.color_palette.surface }} title="Surface" />
+                                    <div className="space-y-4">
+                                        <div className="flex gap-3">
+                                            {Object.entries(state.designSystem.color_palette).map(([key, color]) => (
+                                                <div key={key} className="flex flex-col items-center gap-1.5">
+                                                    <div className="w-10 h-10 rounded-xl shadow-lg border border-white/10" style={{ backgroundColor: color as string }} />
+                                                    <span className="text-[9px] text-white/30 font-bold uppercase">{key.charAt(0)}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="text-[11px] text-white/60 bg-white/5 p-3 rounded-lg border border-white/5 leading-relaxed">
+                                            Using <span className="text-white font-bold">{state.designSystem.typography.heading_font}</span> for headings and <span className="text-white font-bold">{state.designSystem.typography.body_font}</span> for body text.
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="flex items-center gap-2 text-white/30">
-                                        <Circle className="w-5 h-5" />
-                                        <span>Pending design generation...</span>
+                                    <div className="flex items-center gap-3 text-white/20 italic text-xs">
+                                        <div className="w-8 h-8 rounded-xl bg-white/5 border border-dashed border-white/10" />
+                                        Generating style tokens...
                                     </div>
                                 )}
+                            </div>
+
+                            <div className="p-5 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                                <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                    <Smartphone className="w-4 h-4 text-blue-400" />
+                                    Responsive Strategy
+                                </h3>
+                                <div className="text-[11px] text-white/50 leading-relaxed italic">
+                                    {state.architecture.responsive_rules || "Awaiting structural analysis to define breakpoints and layout fluidity..."}
+                                </div>
                             </div>
                         </div>
                     </div>
