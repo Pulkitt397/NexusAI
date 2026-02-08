@@ -16,25 +16,85 @@ export function LivePreviewPane({ code, isStreaming }: LivePreviewPaneProps) {
     // Extract HTML, CSS, JS from the code block if mixed, or assume HTML if single block
     const previewDoc = useMemo(() => {
         if (!code) return '';
-        // Basic protection against infinite loops/alerts
-        const safeCode = code.replace(/alert\(/g, 'console.log("Alert blocked":').replace(/window\.open/g, 'console.log("Popup blocked":');
 
-        // If it's a full HTML doc, use it
+        // Remove <thinking> and <plan> tags for the preview
+        const cleanCode = code.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '').replace(/<plan>[\s\S]*?<\/plan>/gi, '').trim();
+
+        // Basic protection against infinite loops/alerts
+        const safeCode = cleanCode.replace(/alert\(/g, 'console.log("Alert blocked":').replace(/window\.open/g, 'console.log("Popup blocked":');
+
+        // Check if it's potentially React/JSX code
+        const isReact = safeCode.includes('import') || safeCode.includes('export default') || safeCode.includes('useState') || safeCode.includes('useEffect') || safeCode.includes('className=');
+
+        if (isReact) {
+            return `
+                <!DOCTYPE html>
+                <html>
+                    <head>
+                        <meta charset="utf-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1">
+                        <script src="https://cdn.tailwindcss.com"></script>
+                        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+                        <script type="importmap">
+                        {
+                            "imports": {
+                                "react": "https://esm.sh/react@18",
+                                "react-dom": "https://esm.sh/react-dom@18/client",
+                                "framer-motion": "https://esm.sh/framer-motion",
+                                "lucide-react": "https://esm.sh/lucide-react"
+                            }
+                        }
+                        </script>
+                        <style>
+                            body { margin: 0; padding: 0; background-color: #030014; color: white; }
+                        </style>
+                    </head>
+                    <body>
+                        <div id="root"></div>
+                        <script type="text/babel" data-type="module">
+                            import React, { useState, useEffect } from 'react';
+                            import { createRoot } from 'react-dom';
+                            import { motion, AnimatePresence } from 'framer-motion';
+                            import * as LucideIcons from 'lucide-react';
+
+                            // Helper to use Lucide icons dynamically if the AI uses <IconName />
+                            window.LucideIcons = LucideIcons;
+
+                            ${safeCode.replace(/export default function/g, 'function App').replace(/export function/g, 'function')}
+
+                            // Render Logic
+                            const root = createRoot(document.getElementById('root'));
+                            // If App is defined, use it, else try to find any declared component or just run the code
+                            if (typeof App !== 'undefined') {
+                                root.render(<App />);
+                            } else {
+                                // Fallback for naked JSX or multiple components
+                                console.warn('No default App component found, attempting to render first discovery');
+                            }
+                        </script>
+                    </body>
+                </html>
+            `;
+        }
+
+        // If it's a full HTML doc, use it but inject Tailwind
         if (safeCode.includes('<!DOCTYPE html>') || safeCode.includes('<html')) {
+            if (!safeCode.includes('tailwindcss')) {
+                return safeCode.replace('</head>', '<script src="https://cdn.tailwindcss.com"></script></head>');
+            }
             return safeCode;
         }
 
-        // Otherwise, wrap it
+        // Otherwise, wrap it with Tailwind support
         return `
             <!DOCTYPE html>
             <html>
                 <head>
                     <meta charset="utf-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <script src="https://cdn.tailwindcss.com"></script>
                     <style>
-                        body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; }
-                        /* Add some basic reset */
-                        * { box-sizing: border-box; }
+                        body { font-family: system-ui, -apple-system, sans-serif; padding: 0; margin: 0; }
                     </style>
                 </head>
                 <body>

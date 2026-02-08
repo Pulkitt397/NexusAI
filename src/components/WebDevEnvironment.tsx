@@ -7,7 +7,7 @@ import { CodeEditor } from '@/components/CodeEditor';
 import { PlanView } from '@/components/PlanView';
 import { extractPreviewableCode, buildPreviewDocument } from '@/utils/codeDetection';
 import { cn } from '@/lib/utils';
-import { LayoutPanelLeft, SquareSplitHorizontal, AppWindow, X, FileCode, Play, Plus, Search, GitBranch, CheckCircle2, ChevronRight, FileJson, FileType2, BrainCircuit } from 'lucide-react';
+import { LayoutPanelLeft, SquareSplitHorizontal, AppWindow, X, FileCode, Play, Plus, Search, GitBranch, CheckCircle2, ChevronRight, FileJson, FileType2, BrainCircuit, Save } from 'lucide-react';
 import { BuilderState } from '@/types/builderTypes';
 
 type ViewMode = 'chat' | 'split' | 'code' | 'preview' | 'plan';
@@ -25,7 +25,7 @@ interface WebDevEnvironmentProps extends AnimatedAIChatProps {
 }
 
 export function WebDevEnvironment(props: WebDevEnvironmentProps) {
-    const { addSystemMessage, state } = useApp();
+    const { addSystemMessage, state, updateChatCode, showToast } = useApp();
     const [viewMode, setViewMode] = useState<ViewMode>('split'); // Default to split
     const [chatWidth, setChatWidth] = useState(450);
     const [isResizing, setIsResizing] = useState(false);
@@ -173,6 +173,24 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
         }
     };
 
+    const handleSave = async () => {
+        if (!state.currentChatId) return;
+
+        // Use previewContent as the snapshot or the main file
+        const codeToSave = previewContent || activeFileContent;
+        if (!codeToSave) {
+            showToast("No code to save yet", "info");
+            return;
+        }
+
+        try {
+            await updateChatCode(state.currentChatId, codeToSave);
+            showToast("Website saved to history", "success");
+        } catch (err) {
+            showToast("Failed to save website", "error");
+        }
+    };
+
     // Resize Logic
     const startResizing = React.useCallback(() => setIsResizing(true), []);
     const stopResizing = React.useCallback(() => setIsResizing(false), []);
@@ -241,6 +259,13 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2">
+                    <button
+                        onClick={handleSave}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white rounded-md text-xs font-medium transition-all border border-white/10"
+                    >
+                        <Save className="w-3 h-3" />
+                        <span className="hidden sm:inline">Save</span>
+                    </button>
                     <button className="flex items-center gap-1.5 px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md text-xs font-medium shadow-lg shadow-indigo-500/20 transition-all border border-indigo-400/20">
                         <Play className="w-3 h-3 fill-current" />
                         <span className="hidden sm:inline">Run</span>

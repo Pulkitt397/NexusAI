@@ -79,15 +79,22 @@ export function Sidebar({ isMobile, isOpen, onClose }: { isMobile: boolean, isOp
                                             : "text-white/60 hover:bg-white/5 hover:text-white"
                                     )}
                                 >
-                                    <MessageSquare className="w-3.5 h-3.5 opacity-50 shrink-0" />
+                                    {chat.latestCode ? (
+                                        <Code className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                                    ) : (
+                                        <MessageSquare className="w-3.5 h-3.5 opacity-50 shrink-0" />
+                                    )}
                                     <span className="truncate flex-1">{chat.title}</span>
+                                    {chat.latestCode && (
+                                        <span className="text-[9px] bg-indigo-500/10 text-indigo-400 px-1 rounded uppercase font-bold tracking-tighter shrink-0 border border-indigo-500/10">App</span>
+                                    )}
                                     {chat.id === state.currentChatId && (
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 deleteChat(chat.id);
                                             }}
-                                            className="opacity-60 hover:opacity-100 text-white/40 hover:text-red-400 p-1 rounded transition-colors"
+                                            className="opacity-0 group-hover:opacity-100 text-white/40 hover:text-red-400 p-1 rounded transition-all ml-1"
                                         >
                                             <Trash2 className="w-3 h-3" />
                                         </button>

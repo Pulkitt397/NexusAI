@@ -40,6 +40,7 @@ interface AppContextType {
     showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
     enhancePrompt: (input: string) => Promise<string>;
     addSystemMessage: (content: string) => void;
+    updateChatCode: (chatId: string, code: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -725,6 +726,25 @@ Output only the improved prompt text.`;
         }
     }, [state.currentChatId]);
 
+    const updateChatCode = useCallback(async (chatId: string, code: string) => {
+        const chat = state.chats.find(c => c.id === chatId);
+        if (chat) {
+            const updated = { ...chat, latestCode: code, updatedAt: new Date().toISOString() };
+            await db.saveChat(updated);
+            setState(prev => ({
+                ...prev,
+                chats: prev.chats.map(c => c.id === chatId ? updated : c)
+            }));
+
+            if (user) {
+                // Background sync
+                firestoreService.saveUserData(user.uid, {
+                    chats: state.chats.map(c => c.id === chatId ? updated : c)
+                }).catch(err => console.error('[Cloud] Chat code sync failed:', err));
+            }
+        }
+    }, [state.chats, user]);
+
     return (
         <AppContext.Provider value={{
             state,
@@ -746,7 +766,8 @@ Output only the improved prompt text.`;
             closeModal,
             showToast,
             enhancePrompt,
-            addSystemMessage
+            addSystemMessage,
+            updateChatCode
         }}>
             {children}
             {/* Toast container */}

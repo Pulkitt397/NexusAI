@@ -45,6 +45,7 @@ export interface Chat {
     providerId: string;
     modelId: string;
     memoryEnabled: boolean;
+    latestCode?: string; // Stored generated website/app code
     createdAt: string;
     updatedAt: string;
 }
