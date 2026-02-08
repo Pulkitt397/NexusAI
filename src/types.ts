@@ -1,5 +1,6 @@
 // Types for NexusAI Dashboard
 import type { SystemPromptMode } from './systemPrompts';
+import type { SiteIntent, SiteArchitecture, DesignSystem, AssetPlan } from './types/builderTypes';
 
 export interface Provider {
     id: string;
@@ -110,10 +111,10 @@ export interface AppState {
     selectedSectionId: string | null;
 
     // Persisted Artifacts for Builder Pipeline
-    siteIntent?: import('@/types/builderTypes').SiteIntent;
-    siteArchitecture?: import('@/types/builderTypes').SiteArchitecture;
-    designSystem?: import('@/types/builderTypes').DesignSystem;
-    assetPlan?: import('@/types/builderTypes').AssetPlan;
+    siteIntent?: SiteIntent;
+    siteArchitecture?: SiteArchitecture;
+    designSystem?: DesignSystem;
+    assetPlan?: AssetPlan;
 }
 
 export interface StreamChunk {

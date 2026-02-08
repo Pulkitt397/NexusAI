@@ -23,7 +23,14 @@ const initialState: AppState = {
     sidebarOpen: true,
     isStreaming: false,
     isSearching: false,
-    streamingContent: ''
+    streamingContent: '',
+    projectStage: 'intent',
+    sections: [],
+    selectedSectionId: null,
+    siteIntent: undefined,
+    siteArchitecture: undefined,
+    designSystem: undefined,
+    assetPlan: undefined
 };
 
 class Store {

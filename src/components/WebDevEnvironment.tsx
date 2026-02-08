@@ -152,7 +152,7 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
             state.sections.map(s => ({ id: s.id, purpose: s.description })), // Minimal section info
             state.designSystem || {} as any,
             state.assetPlan || { section_assets: [] } as any,
-            state.currentProviderId,
+            state.currentProviderId || "",
             apiKey,
             state.currentModelId || "",
             (event: PipelineEvent) => {
