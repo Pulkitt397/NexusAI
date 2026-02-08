@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useApp } from '@/context';
 import {
     Sparkles, ArrowUp, X, Command, MessageSquare, Wand2, Smartphone,
-    ChevronDown, Cpu, Globe, Database, Settings2
+    ChevronDown, Cpu, Globe, Database, Settings2, Terminal
 } from 'lucide-react';
 
 interface StageActionPanelProps {
