@@ -115,9 +115,44 @@ export async function runBuildPhase(
     }
 }
 
+/**
+ * Attempts to repair common JSON malformations like trailing commas or unquoted keys.
+ */
+function repairJson(str: string): string {
+    return str
+        .replace(/,\s*([\]}])/g, '$1') // Remove trailing commas
+        .replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:\s*/g, '"$2": ') // Ensure quoted keys (best effort)
+        .replace(/'/g, '"'); // Single to double quotes
+}
+
+/**
+ * Extracts the outermost JSON object or array from a string.
+ */
+function extractJson(str: string): string | null {
+    // Try standard code block extraction first
+    const codeBlockMatch = str.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+    if (codeBlockMatch) return codeBlockMatch[1].trim();
+
+    // Find the first { or [ and the corresponding last } or ]
+    const firstBrace = str.indexOf('{');
+    const firstBracket = str.indexOf('[');
+    const startIdx = (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) ? firstBrace : firstBracket;
+
+    if (startIdx === -1) return null;
+
+    const lastBrace = str.lastIndexOf('}');
+    const lastBracket = str.lastIndexOf(']');
+    const endIdx = (lastBrace !== -1 && (lastBracket === -1 || lastBrace > lastBracket)) ? lastBrace : lastBracket;
+
+    if (endIdx === -1 || endIdx < startIdx) return null;
+
+    return str.substring(startIdx, endIdx + 1).trim();
+}
+
 // Helper to generate JSON responses with retry logic and robust extraction
 async function generateJson<T>(providerId: string, apiKey: string, model: string, prompt: string, retries = 2): Promise<T> {
     let lastError: any = null;
+    let lastResponse = '';
 
     for (let attempt = 0; attempt <= retries; attempt++) {
         let fullResponse = '';
@@ -128,41 +163,32 @@ async function generateJson<T>(providerId: string, apiKey: string, model: string
                 if (chunk.content) fullResponse += chunk.content;
             }
 
-            // Robust JSON extraction
-            // 1. Try to find content between ```json and ```
-            let cleanJson = fullResponse.match(/```json\s*([\s\S]*?)\s*```/i)?.[1];
+            lastResponse = fullResponse;
+            let cleanJson = extractJson(fullResponse);
 
-            // 2. Fallback: Content between generic ``` and ```
             if (!cleanJson) {
-                cleanJson = fullResponse.match(/```\s*([\s\S]*?)\s*```/)?.[1];
+                throw new Error("No JSON structure found in response");
             }
 
-            // 3. Fallback: Find the first { and last }
-            if (!cleanJson) {
-                const startIndex = fullResponse.indexOf('{');
-                const endIndex = fullResponse.lastIndexOf('}');
-                if (startIndex !== -1 && endIndex !== -1) {
-                    cleanJson = fullResponse.substring(startIndex, endIndex + 1);
-                }
+            try {
+                return JSON.parse(cleanJson) as T;
+            } catch (initialError) {
+                // Try manual repair
+                const repaired = repairJson(cleanJson);
+                return JSON.parse(repaired) as T;
             }
-
-            // 4. Fallback: Use full response if none of the above worked
-            if (!cleanJson) cleanJson = fullResponse;
-
-            return JSON.parse(cleanJson.trim()) as T;
         } catch (e) {
             lastError = e;
             console.error(`[Builder] JSON Attempt ${attempt + 1} failed:`, e);
             if (attempt < retries) {
-                console.log(`[Builder] Retrying JSON generation...`);
-                // Add a small jittered delay
-                await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+                console.log(`[Builder] Retrying JSON generation... (Attempt ${attempt + 2})`);
+                await new Promise(r => setTimeout(r, 1000 * (attempt + 1))); // Increased delay
             }
         }
     }
 
-    console.error("[Builder] JSON Generation Exhausted", lastError);
-    throw new Error("Failed to generate structured data after multiple attempts.");
+    console.error("[Builder] JSON Generation Exhausted. Final Response:", lastResponse);
+    throw new Error(`Failed to generate structured data after ${retries + 1} attempts. Please try again or use a different model.`);
 }
 
 // Helper to generate Code responses
