@@ -1,0 +1,16 @@
+{
+    "rewrites": [
+        {
+            "source": "/api/nvidia/:path*",
+            "destination": "https://integrate.api.nvidia.com/v1/:path*"
+        },
+        {
+            "source": "/api/ollama/:path*",
+            "destination": "https://ollama.com/:path*"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
+}
