@@ -362,7 +362,13 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                         {viewMode === 'split' && (
                             <div className="h-full flex flex-col">
                                 <div className="flex-1 relative">
-                                    <CodeEditor code={activeFileContent} language={activeFileLang} onChange={handleCodeChange} />
+                                    <CodeEditor
+                                        code={activeFileContent}
+                                        language={activeFileLang}
+                                        filename={activeFile || 'index.tsx'}
+                                        isStreaming={state.projectStage === 'build'}
+                                        onChange={handleCodeChange}
+                                    />
                                 </div>
                                 <div className="h-8 bg-[#09090b] border-t border-white/5 flex items-center justify-between px-3 text-[10px] text-white/30 uppercase tracking-widest font-bold">
                                     <div className="flex items-center gap-2">

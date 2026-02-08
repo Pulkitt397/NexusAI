@@ -8,10 +8,12 @@ import { motion } from 'framer-motion';
 interface CodeEditorProps {
     code: string;
     language: string;
+    filename?: string;
+    isStreaming?: boolean;
     onChange: (newCode: string) => void;
 }
 
-export function CodeEditor({ code, language, onChange }: CodeEditorProps) {
+export function CodeEditor({ code, language, filename = 'index.tsx', isStreaming, onChange }: CodeEditorProps) {
     const [copied, setCopied] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const preRef = useRef<HTMLDivElement>(null);
@@ -33,11 +35,18 @@ export function CodeEditor({ code, language, onChange }: CodeEditorProps) {
     return (
         <div className="flex flex-col h-full bg-[#1e1e1e] text-gray-300 font-mono text-sm relative overflow-hidden rounded-lg border border-white/10 shadow-2xl">
             {/* Toolbar */}
-            <div className="flex items-center justify-between px-4 py-2 bg-[#252526] border-b border-white/5 select-none">
-                <div className="flex items-center gap-2">
-                    <FileCode className="w-4 h-4 text-blue-400" />
-                    <span className="text-xs text-blue-300 font-medium tracking-wide">index.html</span>
-                    <span className="text-[10px] text-white/30 ml-2">UTF-8</span>
+            <div className="flex items-center justify-between px-4 py-2 bg-[#252526] border-b border-white/5 select-none transition-colors duration-500">
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                        <FileCode className={cn("w-4 h-4", isStreaming ? "text-indigo-400 animate-pulse" : "text-blue-400")} />
+                        <span className="text-xs text-white/70 font-bold tracking-tight">{filename}</span>
+                    </div>
+                    {isStreaming && (
+                        <div className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/20 animate-pulse">
+                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                            <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Writing...</span>
+                        </div>
+                    )}
                 </div>
                 <div className="flex items-center gap-3">
                     <button
