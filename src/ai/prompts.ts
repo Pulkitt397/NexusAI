@@ -15,7 +15,7 @@ export const BUILDER_PROMPTS = {
       "features": string[]
     }
     
-    Do not output markdown code blocks. Just the raw JSON.
+    Do not output markdown code blocks. NO CONVERSATIONAL TEXT. NO EXPLANATIONS. OUTPUT ONLY THE RAW JSON OBJECT.
     `,
 
   ARCHITECTURE_PLANNER: `You are the Architecture Planner Agent.
@@ -38,7 +38,7 @@ export const BUILDER_PROMPTS = {
       ]
     }
     
-    Do not output markdown code blocks. Just the raw JSON.
+    Do not output markdown code blocks. NO CONVERSATIONAL TEXT. NO EXPLANATIONS. OUTPUT ONLY THE RAW JSON OBJECT.
     `,
 
   UX_FLOW_DESIGNER: `You are the UX Flow Designer Agent.
@@ -63,7 +63,7 @@ export const BUILDER_PROMPTS = {
       ]
     }
 
-    Do not output markdown code blocks. Just the raw JSON.
+    Do not output markdown code blocks. NO CONVERSATIONAL TEXT. NO EXPLANATIONS. OUTPUT ONLY THE RAW JSON OBJECT.
     `,
 
   ASSET_INTELLIGENCE: `You are the Asset Intelligence Agent.
@@ -87,7 +87,7 @@ export const BUILDER_PROMPTS = {
       ]
     }
 
-    Do not output markdown code blocks. Just the raw JSON.
+    Do not output markdown code blocks. NO CONVERSATIONAL TEXT. NO EXPLANATIONS. OUTPUT ONLY THE RAW JSON OBJECT.
     `,
 
   DESIGN_SYSTEM_GENERATOR: `You are the Design System Architect.
