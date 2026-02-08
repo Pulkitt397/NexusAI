@@ -29,35 +29,37 @@ export async function runPlanningPhase(
         const intentPrompt = BUILDER_PROMPTS.INTENT_REASONER + `\n\nUser Request: "${userPrompt}"`;
         const intentJson = await generateJson<SiteIntent>(providerId, apiKey, modelId, intentPrompt);
         onupdate({ type: 'INTENT_GENERATED', payload: intentJson });
-        onupdate({ type: 'STEP_STARTED', payload: 'Architecting your site structure...' });
+        onupdate({ type: 'STEP_STARTED', payload: 'Architecting structure & defining design system...' });
 
-        // 2. Architecture Planning
+        // 2 & 3. Parallel Architecture and Design System (Both only depend on Intent)
         const archPrompt = BUILDER_PROMPTS.ARCHITECTURE_PLANNER.replace('{{INTENT_JSON}}', JSON.stringify(intentJson, null, 2));
-        const archJson = await generateJson<SiteArchitecture>(providerId, apiKey, modelId, archPrompt);
-        onupdate({ type: 'ARCHITECTURE_GENERATED', payload: archJson });
-        onupdate({ type: 'STEP_STARTED', payload: 'Designing user journeys...' });
+        const designPrompt = BUILDER_PROMPTS.DESIGN_SYSTEM_GENERATOR.replace('{{INTENT_JSON}}', JSON.stringify(intentJson, null, 2));
 
-        // 3. UX Flow Design
+        const [archJson, designJson] = await Promise.all([
+            generateJson<SiteArchitecture>(providerId, apiKey, modelId, archPrompt),
+            generateJson<DesignSystem>(providerId, apiKey, modelId, designPrompt)
+        ]);
+
+        onupdate({ type: 'ARCHITECTURE_GENERATED', payload: archJson });
+        onupdate({ type: 'DESIGN_GENERATED', payload: designJson });
+        onupdate({ type: 'STEP_STARTED', payload: 'Designing user journeys & sourcing assets...' });
+
+        // 4 & 5. Parallel UX Flow and Asset Intelligence (Both depend on Arch/Design)
         const uxPrompt = BUILDER_PROMPTS.UX_FLOW_DESIGNER
             .replace('{{INTENT_JSON}}', JSON.stringify(intentJson, null, 2))
             .replace('{{ARCHITECTURE_JSON}}', JSON.stringify(archJson, null, 2));
-        const uxJson = await generateJson<UXJourney>(providerId, apiKey, modelId, uxPrompt);
-        onupdate({ type: 'UX_GENERATED', payload: uxJson });
-        onupdate({ type: 'STEP_STARTED', payload: 'Creating design system...' });
 
-        // 4. Design System Generation
-        const designPrompt = BUILDER_PROMPTS.DESIGN_SYSTEM_GENERATOR.replace('{{INTENT_JSON}}', JSON.stringify(intentJson, null, 2));
-        const designJson = await generateJson<DesignSystem>(providerId, apiKey, modelId, designPrompt);
-        onupdate({ type: 'DESIGN_GENERATED', payload: designJson });
-        onupdate({ type: 'STEP_STARTED', payload: 'Sourcing high-quality assets...' });
-
-        // 5. Asset Intelligence
         const assetPrompt = BUILDER_PROMPTS.ASSET_INTELLIGENCE
             .replace('{{INTENT_JSON}}', JSON.stringify(intentJson, null, 2))
             .replace('{{ARCHITECTURE_JSON}}', JSON.stringify(archJson, null, 2))
             .replace('{{DESIGN_JSON}}', JSON.stringify(designJson, null, 2));
 
-        const assetJson = await generateJson<AssetPlan>(providerId, apiKey, modelId, assetPrompt);
+        const [uxJson, assetJson] = await Promise.all([
+            generateJson<UXJourney>(providerId, apiKey, modelId, uxPrompt),
+            generateJson<AssetPlan>(providerId, apiKey, modelId, assetPrompt)
+        ]);
+
+        onupdate({ type: 'UX_GENERATED', payload: uxJson });
 
         // Post-process assets to generate real URLs
         const processedAssets: AssetPlan = {
@@ -69,7 +71,7 @@ export async function runPlanningPhase(
         onupdate({ type: 'ASSET_GENERATED', payload: processedAssets });
 
         // STOP HERE - Wait for user approval
-        onupdate({ type: 'COMPLETE', payload: null }); // Using COMPLETE to signal end of *this* phase
+        onupdate({ type: 'COMPLETE', payload: null });
 
     } catch (error: any) {
         console.error('[Builder] Planning Phase Error:', error);
