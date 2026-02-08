@@ -18,7 +18,6 @@ export default defineConfig({
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api\/nvidia/, ''),
                 secure: false
-                secure: false
             },
             '/api/ollama': {
                 target: 'https://ollama.com',
