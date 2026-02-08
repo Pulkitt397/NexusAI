@@ -6,7 +6,8 @@ export const PROVIDERS: Provider[] = [
     { id: 'openrouter', name: 'OpenRouter', icon: '/logos/openrouter.svg', color: '#8b5cf6', baseUrl: 'https://openrouter.ai/api/v1' },
     { id: 'huggingface', name: 'Hugging Face', icon: '/logos/huggingface.svg', color: '#ffcc00', baseUrl: 'https://api-inference.huggingface.co' },
     { id: 'nvidia', name: 'NVIDIA Kimi', icon: '/logos/nvidia.svg', color: '#76b900', baseUrl: 'https://integrate.api.nvidia.com/v1' },
-    { id: 'zai', name: 'Zhipu AI', icon: '/logos/zai.svg', color: '#3b82f6', baseUrl: 'https://api.z.ai/api/paas/v4' }
+    { id: 'zai', name: 'Zhipu AI', icon: '/logos/zai.svg', color: '#3b82f6', baseUrl: 'https://api.z.ai/api/paas/v4' },
+    { id: 'ollama', name: 'Ollama Cloud', icon: '/logos/ollama.svg', color: '#000000', baseUrl: 'https://ollama.com/api' }
 ];
 
 export const PROVIDER_LINKS: Record<string, string> = {
@@ -15,7 +16,8 @@ export const PROVIDER_LINKS: Record<string, string> = {
     openrouter: 'https://openrouter.ai/keys',
     huggingface: 'https://huggingface.co/settings/tokens',
     nvidia: 'https://build.nvidia.com/explore/discover',
-    zai: 'https://open.bigmodel.cn/usercenter/apikeys'
+    zai: 'https://open.bigmodel.cn/usercenter/apikeys',
+    ollama: 'https://ollama.com'
 };
 
 // Best models per provider (in priority order)
@@ -56,5 +58,11 @@ export const PREFERRED_MODELS: Record<string, string[]> = {
         'glm-4-0520',
         'glm-4-air',
         'glm-4-flash'
+    ],
+    ollama: [
+        'llama3.2',
+        'llama3.1',
+        'mistral',
+        'gemma2'
     ]
 };
