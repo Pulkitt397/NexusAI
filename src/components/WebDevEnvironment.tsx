@@ -167,6 +167,10 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
             (event: PipelineEvent) => {
                 if (event.type === 'COMPONENT_GENERATED') {
                     const { sectionId, code } = event.payload;
+
+                    // AUTOMATION: Switch to Code view on first generation
+                    if (viewMode === 'plan') setViewMode('split');
+
                     const updatedSections = state.sections.map(s =>
                         s.id === sectionId ? { ...s, status: 'complete' as const } : s
                     );
@@ -295,7 +299,7 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
                         {[
-                            { id: 'plan', icon: LayoutTemplate, label: 'Architecture' },
+                            { id: 'plan', icon: LayoutTemplate, label: 'Plan' },
                             { id: 'split', icon: SquareSplitHorizontal, label: 'Code' },
                             { id: 'preview', icon: AppWindow, label: 'Preview' }
                         ].map((mode) => (

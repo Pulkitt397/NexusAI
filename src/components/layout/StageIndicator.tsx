@@ -10,10 +10,9 @@ interface StageIndicatorProps {
 
 const STAGES: { id: ProjectStage; label: string }[] = [
     { id: 'intent', label: 'Intent' },
-    { id: 'architecture', label: 'Architecture' },
-    { id: 'build', label: 'Build' },
-    { id: 'refine', label: 'Refine' },
-    { id: 'export', label: 'Export' }
+    { id: 'architecture', label: 'Planning' },
+    { id: 'build', label: 'Building' },
+    { id: 'refine', label: 'Review' }
 ];
 
 export function StageIndicator({ currentStage }: StageIndicatorProps) {
