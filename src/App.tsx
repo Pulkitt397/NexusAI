@@ -115,28 +115,8 @@ export default function App() {
                 {/* 4. Canvas (Chat or WebDev) */}
                 <main className="flex-1 relative overflow-hidden bg-[#09090b]">
                     {isWebDevMode ? (
-                        <WebDevEnvironment
+                    <WebDevEnvironment
                             onClose={() => setIsWebDevMode(false)}
-                            onSendMessage={sendMessage}
-                            isStreaming={state.isStreaming}
-                            streamingContent={state.streamingContent}
-                            messages={formattedMessages}
-                            onOpenMemory={() => openModal('memory')}
-                            onOpenSettings={() => openModal('apiKey')}
-                            memoryCount={enabledMemoryCount}
-                            currentModel={currentModel?.name || null}
-                            onEnhance={enhancePrompt}
-                            searchMode={state.searchMode}
-                            onSetSearchMode={setSearchMode}
-                            isSearching={state.isSearching}
-                            availableModels={state.availableModels}
-                            currentModelId={state.currentModelId}
-                            onSelectModel={selectModel}
-                            providers={state.providers}
-                            currentProviderId={state.currentProviderId}
-                            onSelectProvider={selectProvider}
-                            placeholder="Coding in WebDev Mode..."
-                            onToggleSidebar={(isOpen) => setIsSidebarOpen(isOpen)}
                         />
                     ) : (
                         <div className="h-full flex flex-col">
