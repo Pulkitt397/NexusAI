@@ -1,0 +1,365 @@
+Nexus AI — Professional SaaS UI Redesign PRD
+1. Product Vision
+Objective
+
+Transform Nexus AI from a landing-style workspace into a professional SaaS AI development environment that feels:
+
+purposeful
+
+responsive
+
+structured
+
+scalable
+
+The UI should communicate:
+
+“This is a serious AI workspace for builders.”
+
+Not a demo. Not a landing page. A tool.
+
+2. Core UX Principles
+
+All design decisions must follow:
+
+Clarity First
+
+Users should instantly understand:
+
+what mode they are in
+
+what action is primary
+
+where to go next
+
+Progressive Disclosure
+
+Advanced features should appear contextual — not overwhelming.
+
+Workspace Mental Model
+
+Interface should feel like:
+
+IDE + AI assistant + SaaS dashboard hybrid
+
+Feedback Everywhere
+
+Every user action must produce:
+
+hover feedback
+
+state change
+
+loading feedback
+
+confirmation signals
+
+Static UI = perceived broken UI.
+
+3. Information Architecture
+Primary Modes
+
+The application should clearly separate into:
+
+Chat Workspace
+
+AI interaction
+
+conversation context
+
+tools access
+
+WebDev Studio
+
+code editor
+
+preview panel
+
+deployment actions
+
+Settings & Memory
+
+system configuration
+
+memory management
+
+Each mode must display:
+
+active state indicator
+
+contextual toolbar
+
+mode-specific controls
+
+4. Layout System
+Global Layout Structure
+Sidebar Navigation
+    ↓
+Context Header
+    ↓
+Primary Workspace Canvas
+    ↓
+Persistent Input / Action Bar
+
+Sidebar
+
+Purpose:
+
+navigation anchor
+
+workspace switching
+
+session history
+
+Rules:
+
+collapsible
+
+icon + label hierarchy
+
+strong active state
+
+scroll isolation
+
+Workspace Canvas
+
+Must support:
+
+centered onboarding states
+
+split layouts (editor/preview)
+
+dynamic resizing
+
+contextual overlays
+
+Never leave empty blank states.
+
+5. Visual Design System
+Theme Direction
+
+Modern SaaS dark workspace:
+
+deep neutral background
+
+controlled accent gradients
+
+layered elevation
+
+Color Roles
+
+background tiers (3 levels)
+
+accent color for primary actions
+
+semantic colors for system states
+
+Avoid:
+
+excessive glow
+
+visual noise
+
+competing accents
+
+Typography
+
+Hierarchy:
+
+hero / section headings
+
+workspace labels
+
+body text
+
+metadata
+
+Readable, restrained, consistent.
+
+6. Component Standards
+
+Every interactive element must include:
+
+Buttons
+
+States:
+
+default
+
+hover
+
+active
+
+disabled
+
+loading
+
+Primary actions must visually dominate.
+
+Panels
+
+subtle elevation
+
+soft borders
+
+depth layering
+
+Editor/Workspace Elements
+
+visual containment
+
+clear boundaries
+
+focus highlighting
+
+7. Interaction Model
+Feedback Rules
+
+Every action must trigger:
+
+visual acknowledgment
+
+transition animation
+
+state change indication
+
+Examples:
+
+tab switching → smooth slide transition
+
+deployment → progress indicator
+
+editor focus → highlight boundary
+
+Motion Guidelines
+
+Micro-interactions should:
+
+be subtle
+
+feel responsive
+
+communicate hierarchy
+
+No decorative animation without purpose.
+
+8. Empty & Onboarding States
+
+Blank states must guide action:
+
+Examples:
+
+Chat workspace:
+
+“Start a new conversation…”
+
+WebDev studio:
+
+“Create or paste code to begin…”
+
+Include:
+
+contextual hints
+
+example actions
+
+soft visual anchors
+
+Never show empty white/black space.
+
+9. Workspace Ergonomics
+Chat Mode
+
+scroll containment
+
+input anchored bottom
+
+message grouping
+
+tool access inline
+
+Dev Studio
+
+split layout toggles
+
+resizable panels
+
+persistent editor focus
+
+contextual action bar
+
+10. SaaS Polish Requirements
+
+To feel professional:
+
+consistent spacing grid
+
+predictable component behavior
+
+visual hierarchy clarity
+
+keyboard focus states
+
+accessibility contrast standards
+
+performance-conscious animations
+
+11. Accessibility & Responsiveness
+
+UI must support:
+
+keyboard navigation
+
+readable contrast
+
+adaptive layout scaling
+
+touch-friendly interaction zones
+
+No desktop-only assumptions.
+
+12. Desired Emotional Tone
+
+The UI should feel:
+
+confident
+
+modern
+
+purposeful
+
+developer-oriented
+
+premium SaaS
+
+Avoid:
+
+gimmicky effects
+
+flashy gradients everywhere
+
+clutter
+
+13. Success Criteria
+
+Redesign is successful when:
+
+users understand workflow instantly
+
+actions feel responsive
+
+workspace feels structured
+
+navigation is effortless
+
+visual identity feels cohesive
+
+tool feels production-ready
+
+14. AI Prompt Version (Condensed)
+
+If you want a direct generator prompt:
+
+Prompt:
+
+Design a professional SaaS AI workspace interface combining an AI chat system and a web development studio. Use a modern dark theme with layered depth, clear navigation hierarchy, and strong primary action emphasis. Include a collapsible sidebar, contextual headers, split workspace panels, and responsive interaction feedback. The UI must feel like an IDE + AI assistant hybrid with subtle motion, accessible contrast, consistent spacing, and purposeful visual hierarchy. Avoid clutter, excessive glow, or decorative animation. Every interactive element must have clear hover and active states. Empty states should guide users with onboarding cues. The result should feel premium, scalable, and developer-focused.

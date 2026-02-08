@@ -52,12 +52,12 @@ export const ChatMessage = memo(({ role, content, id, webResult, pdfUrl }: ChatM
         >
             {/* Avatar */}
             <div className="flex flex-col items-center gap-2">
-                <div className={cn(
-                    "w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-medium tracking-wide shadow-lg",
-                    !isUser
-                        ? "bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-violet-500/20"
-                        : "bg-white/10 text-white/70 border border-white/5"
-                )}>
+            <div className={cn(
+                "w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-medium tracking-wide shadow-lg ring-2 ring-offset-2 ring-violet-500/40",
+                !isUser
+                    ? "bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-violet-500/20"
+                    : "bg-white/10 text-white/70 border border-white/5"
+            )}>
                     {!isUser ? "AI" : "YOU"}
                 </div>
                 {!isUser && (

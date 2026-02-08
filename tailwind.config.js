@@ -13,6 +13,12 @@ export default {
                 ring: "hsl(var(--ring))",
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
+
+                // SaaS Layer System
+                "layer-1": "var(--bg-layer-1)", // Deepest (Main App)
+                "layer-2": "var(--bg-layer-2)", // Panel (Sidebar, Modals)
+                "layer-3": "var(--bg-layer-3)", // Surface (Cards, Inputs)
+
                 primary: {
                     DEFAULT: "hsl(var(--primary))",
                     foreground: "hsl(var(--primary-foreground))",

@@ -14,9 +14,6 @@ export function LivePreviewPane({ code, isStreaming }: LivePreviewPaneProps) {
     const [deviceMode, setDeviceMode] = React.useState<'desktop' | 'mobile'>('desktop');
 
     // Extract HTML, CSS, JS from the code block if mixed, or assume HTML if single block
-    // For now, we'll assume the LLM generates a single HTML file or we wrap it.
-    // robust extraction logic handled in buildPreviewDocument in utils, but we can do it here too.
-
     const previewDoc = useMemo(() => {
         if (!code) return '';
         // Basic protection against infinite loops/alerts
@@ -65,28 +62,28 @@ export function LivePreviewPane({ code, isStreaming }: LivePreviewPaneProps) {
     return (
         <div className="h-full flex flex-col bg-[#0f0f12] border-l border-white/10">
             {/* Toolbar */}
-            <div className="h-12 flex items-center justify-between px-4 border-b border-white/5 bg-[#1a1a1c]/50 backdrop-blur-sm">
+            <div className="h-10 shrink-0 flex items-center justify-between px-3 border-b border-white/5 bg-[#09090b] select-none">
                 <div className="flex items-center gap-2">
-                    <div className="flex bg-black/20 rounded-lg p-0.5 border border-white/5">
+                    <div className="flex items-center gap-1 bg-white/5 p-0.5 rounded-lg border border-white/5">
                         <button
                             onClick={() => setDeviceMode('desktop')}
                             className={cn(
-                                "p-1.5 rounded-md transition-all",
-                                deviceMode === 'desktop' ? "bg-white/10 text-white shadow-sm" : "text-white/40 hover:text-white/60"
+                                "p-1 rounded-md transition-all",
+                                deviceMode === 'desktop' ? "bg-[#27272a] text-white shadow-sm ring-1 ring-black/20" : "text-white/40 hover:text-white/60"
                             )}
                             title="Desktop View"
                         >
-                            <Monitor className="w-4 h-4" />
+                            <Monitor className="w-3.5 h-3.5" />
                         </button>
                         <button
                             onClick={() => setDeviceMode('mobile')}
                             className={cn(
-                                "p-1.5 rounded-md transition-all",
-                                deviceMode === 'mobile' ? "bg-white/10 text-white shadow-sm" : "text-white/40 hover:text-white/60"
+                                "p-1 rounded-md transition-all",
+                                deviceMode === 'mobile' ? "bg-[#27272a] text-white shadow-sm ring-1 ring-black/20" : "text-white/40 hover:text-white/60"
                             )}
                             title="Mobile View"
                         >
-                            <Smartphone className="w-4 h-4" />
+                            <Smartphone className="w-3.5 h-3.5" />
                         </button>
                     </div>
                     <div className="h-4 w-px bg-white/10 mx-1" />

@@ -268,37 +268,7 @@ export function AnimatedAIChat({
 
     return (
         <div className="flex flex-col h-full w-full bg-transparent text-white selection:bg-violet-500/30 overflow-hidden">
-            {/* Ambient Background */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden">
-                <motion.div
-                    animate={{
-                        scale: [1, 1.2, 1],
-                        rotate: [0, 90, 0],
-                        x: [-50, 50, -50],
-                        y: [-50, 50, -50],
-                    }}
-                    transition={{
-                        duration: 20,
-                        repeat: Infinity,
-                        ease: "linear"
-                    }}
-                    className="absolute top-[-20%] left-[-20%] w-[800px] h-[800px] bg-violet-600/10 rounded-full blur-[120px] mix-blend-screen opacity-50"
-                />
-                <motion.div
-                    animate={{
-                        scale: [1.2, 1, 1.2],
-                        rotate: [0, -90, 0],
-                        x: [50, -50, 50],
-                        y: [50, -50, 50],
-                    }}
-                    transition={{
-                        duration: 25,
-                        repeat: Infinity,
-                        ease: "linear"
-                    }}
-                    className="absolute bottom-[-20%] right-[-20%] w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-[120px] mix-blend-screen opacity-30"
-                />
-            </div>
+            {/* Ambient Background - REMOVED for cleaner SaaS look */}
 
             {/* 1. Scrollable Content Area (Flex Grow) */}
             <div className="flex-1 min-h-0 relative z-10">
@@ -307,35 +277,31 @@ export function AnimatedAIChat({
                     {messages.length === 0 && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-20 pointer-events-none">
                             <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="pointer-events-auto"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="pointer-events-auto max-w-md w-full"
                             >
-                                <motion.div
-                                    animate={{
-                                        boxShadow: ["0 0 0px rgba(139, 92, 246, 0)", "0 0 40px rgba(139, 92, 246, 0.2)", "0 0 0px rgba(139, 92, 246, 0)"],
-                                    }}
-                                    transition={{ duration: 4, repeat: Infinity }}
-                                    className="w-24 h-24 rounded-3xl bg-gradient-to-tr from-violet-500/20 to-indigo-500/20 border border-white/10 flex items-center justify-center mb-8 shadow-2xl backdrop-blur-xl mx-auto relative group"
-                                >
-                                    <Sparkles className="w-12 h-12 text-white/80 group-hover:text-white transition-colors" />
-                                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-violet-500 to-indigo-500 opacity-0 group-hover:opacity-10 blur-xl transition-opacity" />
-                                </motion.div>
-                                <h1 className="text-6xl font-black tracking-tight text-white mb-6 bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/40 drop-shadow-2xl">
-                                    Nexus AI
+                                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-2xl">
+                                    <div className="w-8 h-8 text-white/80">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                                    </div>
+                                </div>
+
+                                <h1 className="text-2xl font-semibold text-white/90 mb-2">
+                                    Ready to build?
                                 </h1>
-                                <p className="text-white/40 max-w-lg mx-auto text-lg leading-relaxed mb-10 font-medium font-sans">
-                                    The next-generation workspace for <span className="text-violet-300">builders</span>, <span className="text-indigo-300">creators</span>, and <span className="text-cyan-300">visionaries</span>.
+                                <p className="text-white/40 text-sm mb-8 leading-relaxed">
+                                    Select a model or start typing to begin your session.
                                 </p>
 
-                                <div className="flex gap-4 justify-center">
-                                    <button onClick={onOpenMemory} className="flex items-center gap-3 px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-sm font-semibold text-white/80 transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] group">
-                                        <Brain className="w-5 h-5 text-violet-400 group-hover:text-violet-300 transition-colors" />
-                                        <span>Memory Base</span>
+                                <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
+                                    <button onClick={onOpenMemory} className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 transition-all text-xs font-medium text-white/70 hover:text-white">
+                                        <Brain className="w-4 h-4 opacity-70" />
+                                        <span>Memory</span>
                                     </button>
-                                    <button onClick={onOpenSettings} className="flex items-center gap-3 px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-sm font-semibold text-white/80 transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] group">
-                                        <Settings className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 transition-colors" />
-                                        <span>System Config</span>
+                                    <button onClick={onOpenSettings} className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 transition-all text-xs font-medium text-white/70 hover:text-white">
+                                        <Settings className="w-4 h-4 opacity-70" />
+                                        <span>Settings</span>
                                     </button>
                                 </div>
                             </motion.div>
