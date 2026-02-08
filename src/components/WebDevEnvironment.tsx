@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { runBuilderPipeline, PipelineEvent } from '@/ai/pipeline';
+import { useApp } from '@/context';
 import { AnimatedAIChat, AnimatedAIChatProps } from '@/components/ui/animated-ai-chat';
 import { LivePreviewPane } from '@/components/LivePreviewPane';
 import { CodeEditor } from '@/components/CodeEditor';
@@ -21,12 +23,55 @@ interface WebDevEnvironmentProps extends AnimatedAIChatProps {
 }
 
 export function WebDevEnvironment(props: WebDevEnvironmentProps) {
+    const { addSystemMessage, state } = useApp();
     const [viewMode, setViewMode] = useState<ViewMode>('split');
     const [chatWidth, setChatWidth] = useState(450);
     const [isResizing, setIsResizing] = useState(false);
     const [currentFiles, setCurrentFiles] = useState<WebDevFile[]>([]);
     const [activeFile, setActiveFile] = useState<string | null>(null);
     const [previewContent, setPreviewContent] = useState('');
+
+    const handlePipelineStart = async (userPrompt: string) => {
+        if (!state.currentProviderId || !state.currentModelId) {
+            alert("Please select a provider and model first.");
+            return;
+        }
+
+        const apiKey = state.apiKeys[state.currentProviderId];
+        if (!apiKey) {
+            alert("No API Key found.");
+            return;
+        }
+
+        await runBuilderPipeline(userPrompt, state.currentProviderId, apiKey, state.currentModelId, (event: PipelineEvent) => {
+            if (event.type === 'INTENT_GENERATED') {
+                addSystemMessage(JSON.stringify({ type: 'INTENT', payload: event.payload }));
+            }
+            if (event.type === 'ARCHITECTURE_GENERATED') {
+                addSystemMessage(JSON.stringify({ type: 'ARCHITECTURE', payload: event.payload }));
+            }
+            if (event.type === 'DESIGN_GENERATED') {
+                addSystemMessage(JSON.stringify({ type: 'DESIGN', payload: event.payload }));
+            }
+            if (event.type === 'COMPONENT_GENERATED') {
+                const { sectionId, code } = event.payload;
+                // Add or update file for this component
+                const fileName = `${sectionId}.tsx`; // Simplified naming
+                setCurrentFiles(prev => {
+                    const exists = prev.find(f => f.name === fileName);
+                    if (exists) return prev.map(f => f.name === fileName ? { ...f, content: code } : f);
+                    return [...prev, { name: fileName, language: 'typescript', content: code, path: fileName }];
+                });
+                // Also update preview if it's the first component or main layout?
+                // For now, minimal logic.
+                if (!activeFile) setActiveFile(fileName);
+            }
+            if (event.type === 'ERROR') {
+                // state.showToast(event.payload, 'error'); // Need to access toast via hook or pass it
+                console.error(event.payload);
+            }
+        });
+    };
 
     // Auto-hide sidebar on mount
     useEffect(() => {
@@ -186,7 +231,7 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                     }}
                 >
                     <div className="flex-1 min-w-[320px]">
-                        <AnimatedAIChat {...props} />
+                        <AnimatedAIChat {...props} onPipelineStart={handlePipelineStart} />
                     </div>
                 </div>
 

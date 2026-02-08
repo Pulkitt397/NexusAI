@@ -22,6 +22,7 @@ import { ChatMessage } from "./ChatMessage";
 import { Virtuoso, type VirtuosoHandle, type Components } from 'react-virtuoso';
 
 import { WebSearchResult, SearchMode, Model, Provider } from "@/types";
+import { PipelineStageCard } from "./PipelineStageCard";
 
 interface MessageItem {
     role: string;
@@ -152,6 +153,7 @@ export interface AnimatedAIChatProps {
     providers: Provider[];
     currentProviderId: string | null;
     onSelectProvider: (providerId: string) => Promise<void>;
+    onPipelineStart?: (prompt: string) => Promise<void>;
 }
 
 export function AnimatedAIChat({
@@ -173,7 +175,8 @@ export function AnimatedAIChat({
     onSelectModel,
     providers,
     currentProviderId,
-    onSelectProvider
+    onSelectProvider,
+    onPipelineStart
 }: AnimatedAIChatProps) {
     const [value, setValue] = useState("");
     const [isFocused, setIsFocused] = useState(false);
@@ -326,14 +329,19 @@ export function AnimatedAIChat({
                         increaseViewportBy={{ top: 200, bottom: 200 }}
                         itemContent={(index, msg) => (
                             <div className="px-4 md:px-0 max-w-3xl mx-auto py-2">
-                                <ChatMessage
-                                    key={msg.id}
-                                    role={msg.role}
-                                    content={msg.content}
-                                    id={msg.id}
-                                    webResult={msg.webResult}
-                                    pdfUrl={msg.pdfUrl}
-                                />
+                                {/* Special handling for 'system' role messages that carry pipeline data */}
+                                {msg.role === 'system' && msg.content.startsWith('{') ? (
+                                    <PipelineStageCard content={msg.content} />
+                                ) : (
+                                    <ChatMessage
+                                        key={msg.id}
+                                        role={msg.role}
+                                        content={msg.content}
+                                        id={msg.id}
+                                        webResult={msg.webResult}
+                                        pdfUrl={msg.pdfUrl}
+                                    />
+                                )}
                             </div>
                         )}
                         components={virtuosoComponents}
@@ -483,6 +491,27 @@ export function AnimatedAIChat({
                             >
                                 <Globe className="w-4 h-4" />
                             </button>
+
+                            {/* Construction / Build Mode Toggle (New) */}
+                            {onPipelineStart && (
+                                <button
+                                    onClick={() => {
+                                        // Toggle logic or just direct action if it's a specific mode
+                                        // For now, let's just use it as a trigger indicator or have a separate state
+                                        // Actually, let's keep it simple. If text starts with "Build", we trigger pipeline?
+                                        // No, explicit button is better.
+                                        // Let's add a "Build" button that replaces Send if in Build Mode.
+                                        alert("To use Builder: Type your request and click Send. The system will auto-detect 'Build' intent or we can force it here. (Feature coming)");
+                                    }}
+                                    className={cn(
+                                        "p-2 rounded-full transition-colors hidden", // Hidden for now until fully wired
+                                        "text-white/40 hover:text-white/70 hover:bg-white/5"
+                                    )}
+                                    title="Builder Mode"
+                                >
+                                    <div className="w-4 h-4">🔨</div>
+                                </button>
+                            )}
                         </div>
 
                         {/* Center: Auto-resizing Input */}

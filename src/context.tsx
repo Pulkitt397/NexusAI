@@ -39,6 +39,7 @@ interface AppContextType {
     closeModal: () => void;
     showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
     enhancePrompt: (input: string) => Promise<string>;
+    addSystemMessage: (content: string) => void;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -708,6 +709,22 @@ Output only the improved prompt text.`;
         setState(prev => ({ ...prev, modalOpen: 'none' }));
     }, []);
 
+    const addSystemMessage = useCallback((content: string) => {
+        const msg: Message = {
+            id: db.generateId(),
+            chatId: state.currentChatId || 'temp',
+            role: 'system',
+            content,
+            createdAt: new Date().toISOString()
+        };
+
+        setState(prev => ({ ...prev, messages: [...prev.messages, msg] }));
+
+        if (state.currentChatId) {
+            db.saveMessage(msg);
+        }
+    }, [state.currentChatId]);
+
     return (
         <AppContext.Provider value={{
             state,
@@ -728,7 +745,8 @@ Output only the improved prompt text.`;
             openModal,
             closeModal,
             showToast,
-            enhancePrompt
+            enhancePrompt,
+            addSystemMessage
         }}>
             {children}
             {/* Toast container */}

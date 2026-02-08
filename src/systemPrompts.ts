@@ -4,10 +4,10 @@
 export type SystemPromptMode = 'standard' | 'compact' | 'developer' | 'coder';
 
 export const SYSTEM_PROMPTS: Record<SystemPromptMode, string> = {
-    // ========================================
-    // STANDARD MODE - Full comprehensive prompt
-    // ========================================
-    standard: `You are Nexus AI. 
+   // ========================================
+   // STANDARD MODE - Full comprehensive prompt
+   // ========================================
+   standard: `You are Nexus AI. 
     
     INVARIANT:
     - Never generate files, PDFs, download buttons, or runnable artifacts unless explicitly requested by the user. (User intent is the ONLY permission).
@@ -45,10 +45,10 @@ export const SYSTEM_PROMPTS: Record<SystemPromptMode, string> = {
     - UI text must feel premium and product-grade.
     `,
 
-    // ========================================
-    // COMPACT MODE - Lightweight, fast responses
-    // ========================================
-    compact: `You are a precise, efficient AI assistant.
+   // ========================================
+   // COMPACT MODE - Lightweight, fast responses
+   // ========================================
+   compact: `You are a precise, efficient AI assistant.
     
     INVARIANT:
     - Never generate files, PDFs, or runnable artifacts unless explicitly requested.
@@ -59,10 +59,10 @@ export const SYSTEM_PROMPTS: Record<SystemPromptMode, string> = {
     ARTIFACT RULE: Capability ≠ Permission. Respond in plain chat unless "export", "download", or "PDF" is specifically requested.
     `,
 
-    // ========================================
-    // DEVELOPER MODE - Coding & architecture focused
-    // ========================================
-    developer: `You are an expert software engineer assistant.
+   // ========================================
+   // DEVELOPER MODE - Coding & architecture focused
+   // ========================================
+   developer: `You are an expert software engineer assistant.
     
     INVARIANT:
     - Never generate proactive artifacts, PDFs, or files without explicit intent.
@@ -80,10 +80,10 @@ export const SYSTEM_PROMPTS: Record<SystemPromptMode, string> = {
 - copy-paste ready code. No hallucinated APIs.
 `,
 
-    // ========================================
-    // CODER MODE - Vite + React + Tailwind stack-aware (OPTIMIZED)
-    // ========================================
-    coder: \`You are Nexus AI, a World-Class Frontend Architect and UI/UX Designer.
+   // ========================================
+   // CODER MODE - Vite + React + Tailwind stack-aware (OPTIMIZED)
+   // ========================================
+   coder: `You are Nexus AI, a World-Class Frontend Architect and UI/UX Designer.
     
     INVARIANT:
     - IDENTITY RULE: You are Nexus AI. 
@@ -138,25 +138,25 @@ export const SYSTEM_PROMPTS: Record<SystemPromptMode, string> = {
     ## ARTIFACT POLICY
     - User asks: "dogs vs cats" -> CORRECT: Text/Table. INCORRECT: HTML/PDF.
     - Only trigger "create an app" or "export" flows if explicitly named.
-    \`
+    `
 
 };
 
 export const PROMPT_MODE_LABELS: Record<SystemPromptMode, { name: string; description: string }> = {
-    standard: {
-        name: 'Standard',
-        description: 'Full comprehensive assistant'
-    },
-    compact: {
-        name: 'Compact',
-        description: 'Fast, lightweight responses'
-    },
-    developer: {
-        name: 'Developer',
-        description: 'Coding & architecture focus'
-    },
-    coder: {
-        name: 'Coder',
-        description: 'Vite + React + Tailwind optimized'
-    }
+   standard: {
+      name: 'Standard',
+      description: 'Full comprehensive assistant'
+   },
+   compact: {
+      name: 'Compact',
+      description: 'Fast, lightweight responses'
+   },
+   developer: {
+      name: 'Developer',
+      description: 'Coding & architecture focus'
+   },
+   coder: {
+      name: 'Coder',
+      description: 'Vite + React + Tailwind optimized'
+   }
 };

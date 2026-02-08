@@ -1,0 +1,402 @@
+﻿🚀 Nexus AI — AI Website Builder
+Full Product PRD (Architecture + Pipeline + UX + Implementation)
+________________
+
+
+1. Product Definition
+1.1 Product Vision
+Nexus AI is an AI front-end architect and builder pipeline that converts natural language prompts into production-grade websites through staged reasoning, planning, asset intelligence, and component generation.
+The system simulates:
+designer → UX architect → design system creator → frontend engineer → reviewer
+instead of naive HTML generation.
+________________
+
+
+1.2 Core Value Proposition
+“Generate real websites — not AI templates.”
+Key differentiators:
+* structured reasoning pipeline
+
+* design system synthesis
+
+* asset-aware generation
+
+* modular component architecture
+
+* iterative refinement
+
+________________
+
+
+2. System Architecture Overview
+2.1 Pipeline Philosophy
+All generation is staged.
+User Prompt
+ → Intent Reasoner
+ → Site Architecture Planner
+ → Design System Generator
+ → Asset Intelligence Layer
+ → Component Generator
+ → Code Assembler
+ → QA Evaluator
+ → Preview Renderer
+
+
+Each stage outputs structured JSON → feeds next stage.
+No monolithic AI output.
+________________
+
+
+3. Prompt → Architecture Schema
+3.1 Input Normalization Schema
+User prompt is transformed into:
+{
+  "goal": "",
+  "audience": "",
+  "tone": "",
+  "primary_action": "",
+  "site_type": "",
+  "complexity_level": "",
+  "content_requirements": [],
+  "visual_preferences": []
+}
+
+
+This ensures downstream determinism.
+________________
+
+
+3.2 Architecture Plan Schema
+Planner outputs:
+{
+  "sections": [
+    {
+      "name": "Hero",
+      "purpose": "",
+      "components": [],
+      "priority": "high"
+    }
+  ],
+  "layout_strategy": "",
+  "responsive_rules": "",
+  "interaction_notes": ""
+}
+
+
+________________
+
+
+4. LLM Pipeline Prompts
+Each agent has a narrowly scoped prompt.
+________________
+
+
+4.1 Intent Reasoner Prompt
+Goal:
+Convert user language → structured site intent.
+Prompt skeleton:
+Analyze the website request. Extract audience, goals, tone, user journey, and required sections. Output JSON only. Do not generate code.
+________________
+
+
+4.2 Architecture Planner Prompt
+Given intent JSON, design section hierarchy, UX flow, and layout logic. Emphasize clarity and conversion. Output structured architecture plan.
+________________
+
+
+4.3 Design System Prompt
+Generate cohesive design tokens: typography scale, spacing rhythm, palette, component styling rules. Avoid generic gradients.
+________________
+
+
+4.4 Component Generator Prompt
+For each section, produce modular, semantic, maintainable frontend components aligned with the design system.
+________________
+
+
+4.5 QA Evaluator Prompt
+Evaluate structure, consistency, responsiveness, and UX clarity. Suggest corrections or regenerate weak components.
+________________
+
+
+5. Builder Flow UX
+5.1 Primary Flow
+Prompt input
+ → reasoning preview
+ → architecture visualization
+ → generation progress
+ → live preview
+ → refinement controls
+
+
+________________
+
+
+5.2 Workspace Modes
+Mode A — Architect View
+   * section tree
+
+   * editable intent
+
+   * layout preview
+
+Mode B — Builder View
+      * live preview
+
+      * component inspector
+
+      * regeneration controls
+
+Mode C — Code View
+         * structured component files
+
+         * editable modules
+
+________________
+
+
+6. Component Generator Logic
+6.1 Component Principles
+Components must be:
+            * reusable
+
+            * semantic
+
+            * style-token-driven
+
+            * responsive
+
+Each component includes:
+{
+  "structure": "",
+  "props": [],
+  "styling": "",
+  "interaction": ""
+}
+
+
+________________
+
+
+6.2 Assembly Rules
+               * section → component group
+
+               * consistent spacing system
+
+               * hierarchy enforcement
+
+               * no inline styling chaos
+
+________________
+
+
+7. Asset Intelligence Layer
+7.1 Asset Objectives
+Replace placeholders with contextual assets.
+________________
+
+
+7.2 Asset Pipeline
+section context
+ → semantic keyword extraction
+ → asset API query
+ → ranking + filtering
+ → placement mapping
+
+
+Sources:
+                  * image APIs
+
+                  * icon libraries
+
+                  * vector sets
+
+________________
+
+
+7.3 Placement Rules
+Assets must support:
+                     * section purpose
+
+                     * emotional tone
+
+                     * visual rhythm
+
+Never decorative filler.
+________________
+
+
+8. Reasoning System Template
+Each stage must log reasoning:
+{
+  "decision": "",
+  "justification": "",
+  "alternatives": [],
+  "confidence": ""
+}
+
+
+This enables:
+                        * explainability
+
+                        * debugging
+
+                        * regeneration logic
+
+________________
+
+
+9. AI Evaluation System
+Evaluation dimensions:
+                           * layout coherence
+
+                           * visual consistency
+
+                           * accessibility
+
+                           * responsiveness
+
+                           * UX clarity
+
+Scores drive:
+                              * regeneration triggers
+
+                              * refinement suggestions
+
+________________
+
+
+10. UI Builder Interaction Flow
+User actions:
+Generate
+Prompt → staged build
+Refine
+“More premium” → design system revision
+Section Edit
+Regenerate specific section only
+Asset Swap
+Re-query asset layer
+Theme Adjust
+Palette + typography refresh
+________________
+
+
+11. MVP Implementation Plan
+Phase 1 — Architecture Engine
+                                 * prompt parser
+
+                                 * section planner
+
+                                 * JSON pipeline
+
+Phase 2 — Component Generator
+                                    * modular UI scaffold
+
+                                    * preview renderer
+
+Phase 3 — Design System Engine
+                                       * token synthesis
+
+                                       * styling injection
+
+Phase 4 — Asset Layer
+                                          * image integration
+
+                                          * placement logic
+
+Phase 5 — Evaluation Loop
+                                             * QA scoring
+
+                                             * regeneration hooks
+
+________________
+
+
+12. Tech Stack Blueprint
+Frontend
+                                                * React / Next.js
+
+                                                * Tailwind (token-driven)
+
+                                                * Monaco editor
+
+Backend
+                                                   * Node orchestration server
+
+                                                   * agent pipeline manager
+
+AI Layer
+                                                      * staged LLM calls
+
+                                                      * JSON schema enforcement
+
+Asset Layer
+                                                         * external API connectors
+
+                                                         * ranking middleware
+
+Storage
+                                                            * project JSON
+
+                                                            * component files
+
+________________
+
+
+13. Preview & Rendering Engine
+                                                               * sandbox iframe renderer
+
+                                                               * hot reload pipeline
+
+                                                               * error capture + fallback regeneration
+
+________________
+
+
+14. Quality & Constraints
+System must enforce:
+                                                                  * responsive grid logic
+
+                                                                  * spacing consistency
+
+                                                                  * semantic markup
+
+                                                                  * accessibility baseline
+
+________________
+
+
+15. Success Metrics
+                                                                     * perceived design quality
+
+                                                                     * generation consistency
+
+                                                                     * editability
+
+                                                                     * user iteration speed
+
+                                                                     * component reuse rate
+
+________________
+
+
+16. Long-Term Extensions
+                                                                        * template library
+
+                                                                        * deploy pipeline
+
+                                                                        * CMS integration
+
+                                                                        * collaborative editing
+
+                                                                        * theme marketplace
+
+________________
+
+
+Closing Philosophy
+This product is not:
+AI that writes HTML.
+It is:
+AI that designs and builds structured frontends.
+Pipeline reasoning is the moat.
