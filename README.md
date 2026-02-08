@@ -1,107 +1,91 @@
-# ✦ NexusAI
+# ✦ Nexus AI: The Remaster
 
-### The Next-Generation AI Coding Assistant & WebDev Studio
-
-NexusAI is a powerful, full-stack AI coding assistant designed to streamline your development workflow. It combines intelligent chat capabilities with a dedicated **WebDev Studio**, transforming your browser into a premium, IDE-like environment for instant web application generation.
+### From Chat Assistant to Builder-First Workspace
+Nexus AI is a premium, full-stack AI development environment designed to transform high-level intent into production-ready web applications. It represents a paradigm shift from simple "chat-and-code" to a structured **Builder-First Workspace**.
 
 ---
 
-## 🚀 Key Features
+## 📜 The Journey of Nexus AI
 
-### 💻 WebDev Studio (New!)
-Experience a complete IDE within your browser:
-- **Full-Screen Editor**: Distraction-free coding environment with auto-hiding sidebar.
-- **Multi-File Generation**: Automatically structures projects into `index.html`, `styles.css`, and `script.js` (or React components).
-- **Live Preview**: Instantly render and interact with your generated code.
-- **File Explorer**: Create, edit, and navigate files seamlessly.
-- **Premium UI Engine**: The AI is fine-tuned to generate "Apple-quality" designs with glassmorphism, modern typography, and smooth animations.
+### 🟢 Phase 1: The Inception (Nexus AI Classic)
+Nexus started as a powerful conversational interface for AI models, providing a centralized hub for OpenAI, Gemini, and Anthropic. It introduced the **Artifacts System**, allowing users to generate and download single-file web experiments directly from chat.
 
-### 🤖 Intelligent Chat Assistant
-- **Multi-Model Support**: Switch between top-tier AI models (OpenAI, Gemini, Anthropic, etc.).
-- **Smart Context**: Remembers conversation history and adapts to your coding style.
-- **System Personas**: 
-  - **Standard**: General-purpose assistant.
-  - **Coder**: Expert frontend architect optimized for React, Vite, and Tailwind.
-  - **Developer**: Focuses on architecture and clean code.
+### 🔵 Phase 2: WebDev Studio (The Expansion)
+Recognizing the need for a deeper dev experience, we launched **WebDev Studio**. This introduced a dedicated workspace with a full-screen editor, multi-file project structures, and a real-time live preview engine. It was about making the AI-generated code tangible and interactive.
 
-### 🛠️ Advanced Tooling
-- **Artifacts System**: Generate downloadable files and full projects on demand.
-- **Voice Mode**: (Experimental) Voice interaction support.
-- **Memory Management**: Long-term memory for project-specific context.
+### 🟣 Phase 3: The Remaster (Builder-First Workspace)
+The **Nexus Remaster** is our most significant update yet. We’ve moved beyond the chat-box. Nexus is now a **Builder-First** environment:
+- **Professional Pipeline**: Introduces a collaborative **Plan -> Review -> Build** workflow.
+- **Architecture Intelligence**: AI now architects the entire site structure before writing a single line of code, allowing for user review and adjustment.
+- **Stage-Based Management**: A structured journey through **Intent, Architecture, Build, and Refinement**.
+- **Contextual Awareness**: The UI dynamically adapts to the current development stage, providing the right tools at the right time.
+
+---
+
+## 🚀 Key Features of the Remaster
+
+### 🏗️ Architecture Review Pipeline (New!)
+No more "black box" generation.
+- **Plan Phase**: AI analyzes your intent and proposes a hierarchical architecture, design system, and asset plan.
+- **User Review**: You review the proposed plan in the **Architecture Sidebar** before committing to the build.
+- **Build Phase**: High-fidelity React components are generated based on the approved architecture.
+
+### 💻 WebDev environment
+A premium, dark-mode IDE experience:
+- **Live Preview Engine**: Correctly renders complex React apps with support for `lucide-react`, `framer-motion`, and `shadcn`-style components.
+- **Glassmorphic UI**: A state-of-the-art interface designed for focus and productivity.
+- **Contextual Action Panel**: Targeted AI iteration based on the currently selected section or project stage.
+
+### 🤖 Nexus Brain & Multi-Model
+- **Expert Personas**: Specialized modes for Coder, Architect, and Standard assistance.
+- **Unified API**: Seamlessly switch between the latest models while maintaining project context.
+- **Cloud Persistence**: Full project state, architecture plans, and code are saved and synced.
 
 ---
 
 ## 🛠️ Tech Stack
 
-Built with a modern, performance-first stack:
+Built for the future of web development:
 - **Frontend**: React 19, TypeScript, Vite
 - **Styling**: Tailwind CSS v4, Framer Motion
 - **Icons**: Lucide React
-- **Backend/Services**: Node.js, Firebase (for auth/database)
+- **Persistence**: Firebase (Firestore/Auth) + Local IndexedDB
+- **Backend**: Node.js Proxy for secure API handling
 
 ---
 
-## 📦 Installation
+## 📦 Getting Started
 
-1. **Clone the repository**
+1. **Clone the Repo**
    ```bash
-   git clone https://github.com/yourusername/NexusAI.git
+   git clone https://github.com/Pulkitt397/NexusAI.git
    cd NexusAI
    ```
 
-2. **Install dependencies**
+2. **Install & Setup**
    ```bash
    npm install
    ```
 
-3. **Configure Environment**
-   - Create a `.env` file if necessary (refer to `.env.example` if available).
-   - Ensure you have valid API keys for the AI providers you wish to use.
+3. **Launch the Engine**
+   - Start Server: `npm run server`
+   - Start Dev: `npm run dev`
+
+Open `http://localhost:5173` to enter the workspace.
 
 ---
 
-## 🚦 Usage
+## 🎨 Professional Layout Guide
 
-NexusAI requires both the frontend and backend to be running.
-
-### 1. Start the Backend Server
-In a terminal, run:
-```bash
-npm run server
-```
-
-### 2. Start the Frontend Application
-In a **new** terminal window, run:
-```bash
-npm run dev
-```
-
-Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal).
-
----
-
-## 🎨 WebDev Studio Guide
-
-1. Click the **WebDev Studio** button in the sidebar (or top header).
-2. Enter a prompt like:
-   > "Build a landing page for a sci-fi game called 'Void Walker' with a neon purple theme and parallax scrolling."
-3. Watch as NexusAI generates the file structure and code in real-time.
-4. Use the **Editor** tab to modify code and the **Preview** tab to see changes instantly.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+- **Flow Tab**: Brainstorm and define your site's intent.
+- **Architecture Tab**: Review and trigger section-by-section builds.
+- **Code Tab**: Deep-dive into the generated TypeScript/JSX files.
+- **Preview Tab**: Full-screen, interactive live view of your application.
 
 ---
 
 ## 📄 License
-
 Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+*Generated with 💜 by the Nexus AI Team.*
