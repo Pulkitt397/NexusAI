@@ -1,3 +1,4 @@
+// Nexus Remaster: Deployment Trigger - High Fidelity Pipeline Update
 import React, { useState, useEffect, useCallback } from 'react';
 import { runPlanningPhase, runBuildPhase, PipelineEvent } from '@/ai/pipeline';
 import { useApp } from '@/context';
