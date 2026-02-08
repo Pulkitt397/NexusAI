@@ -128,6 +128,7 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
 
             if (event.type === 'ERROR') {
                 showToast(event.payload, 'error');
+                setProjectStage('intent'); // Reset to allow retry
             }
         });
     };
@@ -218,6 +219,13 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
                 }));
                 setCurrentFiles(newFiles);
 
+                // UNSTICK LOGIC: If we have files but aren't in build/refine/preview, promote the state
+                if (state.projectStage === 'architecture' || state.projectStage === 'intent') {
+                    setProjectStage('refine');
+                    if (viewMode === 'plan') setViewMode('split');
+                    showToast("Code detected. Transitioning to preview...", "info");
+                }
+
                 if (!activeFile || !newFiles.find(f => f.name === activeFile)) {
                     const main = newFiles.find(f => f.name === 'index.html' || f.name === 'App.tsx') || newFiles[0];
                     setActiveFile(main.name);
@@ -227,6 +235,9 @@ export function WebDevEnvironment(props: WebDevEnvironmentProps) {
             if (extracted.hasPreviewableContent) {
                 const doc = buildPreviewDocument(extracted);
                 setPreviewContent(doc);
+
+                // If we are in plan mode but have a preview, switch
+                if (viewMode === 'plan') setViewMode('preview');
             }
         }
     }, [props.messages, activeFile]);
