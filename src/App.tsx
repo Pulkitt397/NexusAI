@@ -6,8 +6,7 @@ import { SettingsModal } from '@/components/SettingsModal';
 import { MemoryModal } from '@/components/MemoryModal';
 import { PROMPT_MODE_LABELS } from '@/systemPrompts';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useAuth } from '@/context/AuthContext';
-import { LoginPage } from '@/components/LoginPage';
+
 import { SelectionMenu } from '@/components/ui/SelectionMenu';
 import { WebDevEnvironment } from '@/components/WebDevEnvironment';
 
@@ -60,24 +59,7 @@ export default function App() {
     }));
     const enabledMemoryCount = state.memories.filter(m => m.enabled).length;
 
-    // AUTH GUARD
-    const { user, loading } = useAuth();
 
-    if (loading) {
-        return (
-            <div className="h-screen bg-[#09090b] flex items-center justify-center text-white">
-                <div className="animate-pulse flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center">
-                        <span className="text-2xl text-indigo-400">N</span>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (!user) {
-        return <LoginPage />;
-    }
 
     return (
         <div className="flex h-screen w-screen overflow-hidden bg-[#09090b] text-white font-sans antialiased selection:bg-indigo-500/30">
