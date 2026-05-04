@@ -4,36 +4,26 @@
 @theme {
     /* Base Colors - SaaS Dark Mode */
     --color-background: #09090b;
-    /* Zinc 950 */
     --color-foreground: #fafafa;
-    /* Zinc 50 */
 
     /* Layer System */
     --bg-layer-1: #09090b;
-    /* Main App Background */
     --bg-layer-2: #18181b;
-    /* Sidebar/Panels (Zinc 900) */
     --bg-layer-3: #27272a;
-    /* Inputs/Cards (Zinc 800) */
 
     --color-primary: #6366f1;
-    /* Indigo 500 */
     --color-primary-foreground: #ffffff;
 
     --color-secondary: #27272a;
-    /* Zinc 800 */
     --color-secondary-foreground: #a1a1aa;
-    /* Zinc 400 */
 
     --color-muted: #27272a;
     --color-muted-foreground: #71717a;
-    /* Zinc 500 */
 
     --color-accent: #6366f1;
     --color-accent-foreground: #ffffff;
 
     --color-border: #27272a;
-    /* Zinc 800 */
     --color-input: #27272a;
 
     --radius: 0.5rem;
@@ -67,7 +57,6 @@ body {
 /* Glassmorphism Utilities */
 .glass {
     background: rgba(255, 255, 255, 0.03);
-    /* More subtle */
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -99,19 +88,46 @@ body {
     background: var(--color-muted-foreground);
 }
 
-/* Animations - Simplified */
+/* Animations */
 @keyframes fade-in-up {
     from {
         opacity: 0;
         transform: translateY(10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes glow-pulse {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(99, 102, 241, 0.5);
+    }
+}
+
 .animate-in {
     animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+.animate-glow {
+    animation: glow-pulse 2s ease-in-out infinite;
 }

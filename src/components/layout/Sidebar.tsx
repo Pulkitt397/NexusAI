@@ -29,21 +29,26 @@ export function Sidebar({ isMobile, isOpen, onClose }: { isMobile: boolean, isOp
         <motion.aside
             initial={false}
             animate={{
-                width: isMobile ? 280 : (isOpen ? 260 : 0),
+                width: isMobile ? 280 : (isOpen ? 280 : 0),
                 x: isMobile && !isOpen ? -280 : 0,
                 opacity: !isMobile && !isOpen ? 0 : 1
             }}
             transition={{ type: "spring", bounce: 0, duration: 0.3 }}
             className={cn(
-                "h-full border-r border-white/5 flex flex-col bg-[#18181b] shrink-0 overflow-hidden z-20", // Hardcoded bg-layer-2 equivalent if CSS vars fail
+                "h-full border-r border-white/5 flex flex-col bg-[#0c0c0e] shrink-0 overflow-hidden z-20",
                 isMobile ? "fixed inset-y-0 left-0 shadow-2xl" : "relative"
             )}
         >
             {/* Header / Logo */}
             <div className="h-14 flex items-center px-4 border-b border-white/5 bg-[#09090b]">
-                <div className="flex items-center gap-2 font-semibold text-white/90">
-                    <div className="w-6 h-6 rounded bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs font-bold">N</div>
-                    <span className="tracking-tight">Nexus AI</span>
+                <div className="flex items-center gap-2.5 font-semibold text-white">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+                        <span className="font-bold text-sm">N</span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="tracking-tight text-sm">Nexus AI</span>
+                        <span className="text-[10px] text-white/30 -mt-0.5">v2.0</span>
+                    </div>
                 </div>
             </div>
 
@@ -51,42 +56,42 @@ export function Sidebar({ isMobile, isOpen, onClose }: { isMobile: boolean, isOp
             <div className="p-3 space-y-2">
                 <button
                     onClick={createChat}
-                    className="w-full flex items-center gap-2 px-3 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 hover:text-indigo-300 rounded-md text-sm font-medium transition-colors border border-indigo-500/20"
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white rounded-xl text-sm font-medium transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 border-0"
                 >
                     <Plus className="w-4 h-4" />
                     New Chat
                 </button>
             </div>
 
-            {/* Navigation / Context */}
+{/* Navigation / Context */}
             <div className="flex-1 overflow-y-auto px-3 py-2 space-y-6">
 
                 {/* Recent Chats */}
                 <div>
-                    <h3 className="text-xs font-bold text-white/20 px-2 mb-2 uppercase tracking-wider">Workspace</h3>
-                    <div className="space-y-0.5">
+                    <h3 className="text-[10px] font-semibold text-white/30 px-2 mb-3 uppercase tracking-widest">Workspace</h3>
+                    <div className="space-y-1">
                         {state.chats.length === 0 ? (
-                            <div className="text-xs text-white/30 px-2 italic py-2">No active sessions</div>
+                            <div className="text-xs text-white/20 px-2 italic py-2">No active sessions</div>
                         ) : (
                             state.chats.map(chat => (
                                 <div
                                     key={chat.id}
                                     onClick={() => selectChat(chat.id)}
                                     className={cn(
-                                        "group w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-all cursor-pointer",
+                                        "group w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all cursor-pointer",
                                         chat.id === state.currentChatId
-                                            ? "bg-[#27272a] text-white font-medium shadow-sm"
-                                            : "text-white/60 hover:bg-white/5 hover:text-white"
+                                            ? "bg-white/10 text-white border border-white/10"
+                                            : "text-white/50 hover:bg-white/5 hover:text-white"
                                     )}
                                 >
                                     {chat.latestCode ? (
                                         <Code className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
                                     ) : (
-                                        <MessageSquare className="w-3.5 h-3.5 opacity-50 shrink-0" />
+                                        <MessageSquare className="w-3.5 h-3.5 text-white/30 shrink-0" />
                                     )}
-                                    <span className="truncate flex-1">{chat.title}</span>
+                                    <span className="truncate flex-1 text-sm">{chat.title}</span>
                                     {chat.latestCode && (
-                                        <span className="text-[9px] bg-indigo-500/10 text-indigo-400 px-1 rounded uppercase font-bold tracking-tighter shrink-0 border border-indigo-500/10">App</span>
+                                        <span className="text-[9px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded font-bold tracking-tighter shrink-0 border border-indigo-500/20">App</span>
                                     )}
                                     {chat.id === state.currentChatId && (
                                         <button
@@ -94,7 +99,7 @@ export function Sidebar({ isMobile, isOpen, onClose }: { isMobile: boolean, isOp
                                                 e.stopPropagation();
                                                 deleteChat(chat.id);
                                             }}
-                                            className="opacity-0 group-hover:opacity-100 text-white/40 hover:text-red-400 p-1 rounded transition-all ml-1"
+                                            className="opacity-0 group-hover:opacity-100 text-white/30 hover:text-red-400 p-1 rounded transition-all ml-1 hover:bg-white/5"
                                         >
                                             <Trash2 className="w-3 h-3" />
                                         </button>
@@ -107,29 +112,29 @@ export function Sidebar({ isMobile, isOpen, onClose }: { isMobile: boolean, isOp
             </div>
 
             {/* Footer / Settings */}
-            <div className="p-3 border-t border-white/5 space-y-1 bg-[#18181b]">
+            <div className="p-3 border-t border-white/5 space-y-1 bg-[#0c0c0e]">
                 <button
                     onClick={() => openModal('memory')}
-                    className="w-full flex items-center gap-2 px-2 py-1.5 text-white/60 hover:text-white hover:bg-white/5 rounded-md text-sm transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-white/50 hover:text-white hover:bg-white/5 rounded-lg text-sm transition-colors group"
                 >
-                    <Brain className="w-4 h-4 opacity-70" />
+                    <Brain className="w-4 h-4 text-indigo-400 group-hover:text-white" />
                     <span>Memory</span>
-                    {enabledMemoryCount > 0 && <span className="ml-auto text-[10px] bg-indigo-500/20 text-indigo-400 px-1.5 rounded-full">{enabledMemoryCount}</span>}
+                    {enabledMemoryCount > 0 && <span className="ml-auto text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded-full">{enabledMemoryCount}</span>}
                 </button>
 
                 <button
                     onClick={() => openModal('apiKey')}
-                    className="w-full flex items-center gap-2 px-2 py-1.5 text-white/60 hover:text-white hover:bg-white/5 rounded-md text-sm transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-white/50 hover:text-white hover:bg-white/5 rounded-lg text-sm transition-colors group"
                 >
-                    <Settings className="w-4 h-4 opacity-70" />
+                    <Settings className="w-4 h-4 text-violet-400 group-hover:text-white" />
                     <span>Settings</span>
                 </button>
 
                 <button
                     onClick={logout}
-                    className="w-full flex items-center gap-2 px-2 py-1.5 text-white/60 hover:text-red-400 hover:bg-red-500/10 rounded-md text-sm transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-white/50 hover:text-red-400 hover:bg-red-500/10 rounded-lg text-sm transition-colors"
                 >
-                    <LogOut className="w-4 h-4 opacity-70" />
+                    <LogOut className="w-4 h-4" />
                     <span>Sign Out</span>
                 </button>
             </div>

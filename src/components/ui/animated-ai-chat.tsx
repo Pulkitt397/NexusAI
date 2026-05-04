@@ -107,15 +107,15 @@ const StreamingFooter = ({ context }: { context?: ChatContext }) => {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex gap-4 md:gap-6 py-4"
             >
-                <div className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-medium tracking-wide bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-500/20 mt-1">
+                <div className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-medium tracking-wide bg-gradient-to-tr from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/20 mt-1">
                     AI
                 </div>
-                <div className="max-w-[85%] md:max-w-[80%] rounded-2xl glass-panel px-5 py-4 text-sm md:text-[15px] leading-relaxed border border-white/5 text-white/90 min-h-[60px]">
+                <div className="max-w-[85%] md:max-w-[80%] rounded-2xl px-5 py-4 text-sm md:text-[15px] leading-relaxed bg-[#27272a]/60 border border-white/5 text-white/90 min-h-[60px]">
                     {streamingContent ? (
                         <MessageContent content={streamingContent} isStreaming={true} />
                     ) : (
                         <div className="flex items-center gap-2 text-white/40 h-full py-1">
-                            <LoaderIcon className={cn("w-4 h-4 animate-spin", context?.isSearching ? "text-cyan-400" : "text-violet-400")} />
+                            <LoaderIcon className={cn("w-4 h-4 animate-spin", context?.isSearching ? "text-cyan-400" : "text-indigo-400")} />
                             <span className="text-xs font-medium tracking-wide">
                                 {context?.isSearching ? 'Searching web...' : 'Thinking...'}
                             </span>
@@ -270,12 +270,15 @@ export function AnimatedAIChat({
     };
 
     return (
-        <div className="flex flex-col h-full w-full bg-slate-950 text-white selection:bg-indigo-500/30 overflow-hidden">
+        <div className="flex flex-col h-full w-full bg-[#09090b] text-white selection:bg-indigo-500/30 overflow-hidden">
             {/* Modern Gradient Background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" />
-                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/4" />
-                <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-violet-500/5 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/4" />
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#09090b] via-[#18181b] to-[#09090b]" />
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-indigo-500/[0.08] rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4" />
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-violet-500/[0.06] rounded-full blur-[100px] translate-y-1/2 -translate-x-1/4" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/[0.03] rounded-full blur-[150px]" />
+                {/* Subtle grid pattern overlay */}
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black_40%,transparent_100%)]" />
             </div>
 
             {/* 1. Scrollable Content Area (Flex Grow) */}
@@ -285,32 +288,58 @@ export function AnimatedAIChat({
                     {messages.length === 0 && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-20 pointer-events-none">
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
+                                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                                 className="pointer-events-auto max-w-md w-full"
                             >
-                                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-2xl shadow-indigo-500/20">
-                                    <div className="w-8 h-8 text-white">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                                <div className="relative w-20 h-20 mx-auto mb-6">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-3xl rotate-6 opacity-80 animate-pulse" />
+                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-indigo-500/30">
+                                        <div className="w-10 h-10 text-white">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <h1 className="text-2xl font-semibold text-white mb-2">
-                                    Welcome to Nexus AI
+                                <h1 className="text-3xl font-bold text-white mb-3 tracking-tight">
+                                    Welcome to <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Nexus AI</span>
                                 </h1>
-                                <p className="text-slate-400 text-sm mb-8 leading-relaxed">
-                                    Select a model or start typing to begin your session.
+                                <p className="text-white/50 text-sm mb-8 leading-relaxed max-w-sm mx-auto">
+                                    Your intelligent AI companion. Select a model or start typing to begin.
                                 </p>
 
                                 <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
-                                    <button onClick={onOpenMemory} className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all text-xs font-medium text-slate-300 hover:text-white">
-                                        <Brain className="w-4 h-4" />
+                                    <button onClick={onOpenMemory} className="flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all text-sm font-medium text-white/80 hover:text-white hover:border-white/20 group">
+                                        <Brain className="w-4 h-4 text-indigo-400 group-hover:text-indigo-300" />
                                         <span>Memory</span>
                                     </button>
-                                    <button onClick={onOpenSettings} className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all text-xs font-medium text-slate-300 hover:text-white">
-                                        <Settings className="w-4 h-4" />
+                                    <button onClick={onOpenSettings} className="flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all text-sm font-medium text-white/80 hover:text-white hover:border-white/20 group">
+                                        <Settings className="w-4 h-4 text-violet-400 group-hover:text-violet-300" />
                                         <span>Settings</span>
                                     </button>
+                                </div>
+
+                                {/* Feature highlights */}
+                                <div className="mt-10 grid grid-cols-3 gap-4 max-w-sm mx-auto">
+                                    <div className="text-center">
+                                        <div className="w-8 h-8 mx-auto mb-2 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                                            <Globe className="w-4 h-4" />
+                                        </div>
+                                        <p className="text-xs text-white/40">Web Search</p>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="w-8 h-8 mx-auto mb-2 rounded-lg bg-violet-500/10 flex items-center justify-center text-violet-400">
+                                            <Sparkles className="w-4 h-4" />
+                                        </div>
+                                        <p className="text-xs text-white/40">Enhance</p>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="w-8 h-8 mx-auto mb-2 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
+                                            <Brain className="w-4 h-4" />
+                                        </div>
+                                        <p className="text-xs text-white/40">Memory</p>
+                                    </div>
                                 </div>
                             </motion.div>
                         </div>
@@ -368,7 +397,7 @@ export function AnimatedAIChat({
                                 });
                                 setIsAtBottom(true);
                             }}
-                            className="absolute bottom-4 right-4 z-30 p-2.5 rounded-full bg-violet-600/90 text-white shadow-xl shadow-violet-500/20 backdrop-blur-md hover:bg-violet-700 transition-colors border border-white/10"
+                            className="absolute bottom-4 right-4 z-30 p-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-xl shadow-indigo-500/20 backdrop-blur-md hover:scale-110 hover:shadow-indigo-500/40 transition-all border border-white/10"
                         >
                             <ArrowDown className="w-5 h-5" />
                         </motion.button>
@@ -377,11 +406,13 @@ export function AnimatedAIChat({
             </div>
 
             {/* 2. Super Input Bar (Sticky Bottom) */}
-            <div className="shrink-0 z-20 bg-slate-950/80 backdrop-blur-xl border-t border-slate-800/50 pb-[env(safe-area-inset-bottom)]">
+            <div className="shrink-0 z-20 bg-[#09090b]/80 backdrop-blur-2xl border-t border-white/[0.08] pb-[env(safe-area-inset-bottom)]">
                 <div className="max-w-3xl mx-auto px-4 py-4">
                     <div className={cn(
                         "relative flex items-end gap-3 p-3 rounded-2xl transition-all duration-300 border",
-                        isFocused ? "bg-slate-800/50 border-indigo-500/30 shadow-lg shadow-indigo-500/10" : "bg-slate-900/50 border-slate-800 hover:border-slate-700"
+                        isFocused 
+                            ? "bg-[#27272a]/60 border-indigo-500/30 shadow-lg shadow-indigo-500/10" 
+                            : "bg-[#18181b]/60 border-white/5 hover:border-white/10"
                     )}>
 
                         {/* Left: Provider & Model Selector & Search Toggle */}
@@ -393,7 +424,7 @@ export function AnimatedAIChat({
                                         setShowProviderSelector(!showProviderSelector);
                                         setShowModelSelector(false);
                                     }}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-slate-700/50 text-xs font-medium text-slate-400 hover:text-white transition-colors"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-white/5 text-xs font-medium text-white/40 hover:text-white transition-colors"
                                     title="Select Provider"
                                 >
                                     <span className="max-w-[80px] truncate flex items-center justify-center">
@@ -413,8 +444,7 @@ export function AnimatedAIChat({
                                                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                                 exit={{ opacity: 0, scale: 0.95 }}
-                                                // Updated height to accommodate images
-                                                className="absolute bottom-full left-0 mb-2 w-48 bg-[#1a1a1c] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1"
+                                                className="absolute bottom-full left-0 mb-2 w-52 bg-[#18181b] border border-white/10 rounded-xl shadow-2xl shadow-black/40 z-50 overflow-hidden py-1"
                                             >
                                                 {providers.map(p => (
                                                     <button
@@ -424,8 +454,8 @@ export function AnimatedAIChat({
                                                             setShowProviderSelector(false);
                                                         }}
                                                         className={cn(
-                                                            "w-full text-left px-3 py-2 text-xs font-medium transition-colors hover:bg-white/5 flex items-center gap-2",
-                                                            currentProviderId === p.id ? "text-violet-400 bg-violet-500/10" : "text-white/70"
+                                                            "w-full text-left px-3 py-2.5 text-xs font-medium transition-colors hover:bg-white/5 flex items-center gap-2",
+                                                            currentProviderId === p.id ? "text-indigo-400 bg-indigo-500/10" : "text-white/60"
                                                         )}
                                                     >
                                                         <img src={p.icon} alt={p.name} className="w-4 h-4 object-contain" />
@@ -445,7 +475,7 @@ export function AnimatedAIChat({
                                         setShowModelSelector(!showModelSelector);
                                         setShowProviderSelector(false);
                                     }}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-slate-700/50 text-xs font-medium text-slate-400 hover:text-white transition-colors"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-white/5 text-xs font-medium text-white/40 hover:text-white transition-colors"
                                     title="Select Model"
                                 >
                                     <span className="max-w-[80px] truncate">
@@ -462,7 +492,7 @@ export function AnimatedAIChat({
                                                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                                 exit={{ opacity: 0, scale: 0.95 }}
-                                                className="absolute bottom-full left-0 mb-2 w-64 max-h-64 bg-[#1a1a1c] border border-white/10 rounded-xl shadow-2xl z-50 overflow-y-auto py-1 scrollbar-hide"
+                                                className="absolute bottom-full left-0 mb-2 w-72 max-h-72 bg-[#18181b] border border-white/10 rounded-xl shadow-2xl shadow-black/40 z-50 overflow-y-auto py-1"
                                             >
                                                 {availableModels.map(model => (
                                                     <button
@@ -472,8 +502,8 @@ export function AnimatedAIChat({
                                                             setShowModelSelector(false);
                                                         }}
                                                         className={cn(
-                                                            "w-full text-left px-3 py-2 text-xs font-medium transition-colors hover:bg-white/5",
-                                                            currentModelId === model.id ? "text-violet-400 bg-violet-500/10" : "text-white/70"
+                                                            "w-full text-left px-3 py-2.5 text-xs font-medium transition-colors hover:bg-white/5",
+                                                            currentModelId === model.id ? "text-indigo-400 bg-indigo-500/10" : "text-white/60"
                                                         )}
                                                     >
                                                         {model.name}
@@ -532,7 +562,7 @@ export function AnimatedAIChat({
                                 onFocus={() => setIsFocused(true)}
                                 onBlur={() => setIsFocused(false)}
                                 placeholder={placeholder}
-                                className="w-full bg-transparent border-none focus:outline-none focus:ring-0 text-slate-200 text-[15px] placeholder:text-slate-500 resize-none scrollbar-hide leading-relaxed"
+                                className="w-full bg-transparent border-none focus:outline-none focus:ring-0 text-white text-[15px] placeholder:text-white/30 resize-none scrollbar-hide leading-relaxed"
                                 style={{ height: 24, maxHeight: 120 }}
                                 rows={1}
                             />
@@ -540,12 +570,12 @@ export function AnimatedAIChat({
 
                         {/* Right: Actions */}
                         <div className="flex items-center gap-1 pb-1">
-                            {/* Enhance */}
+                            {/* Enhanced */}
                             {value.trim().length > 0 && onEnhance && (
                                 <button
                                     onClick={handleEnhance}
                                     disabled={isEnhancing || isStreaming}
-                                    className="p-2 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-slate-700/50 transition-colors"
+                                    className="p-2 rounded-lg text-white/40 hover:text-indigo-400 hover:bg-white/5 transition-colors"
                                 >
                                     <Sparkles className={cn("w-4 h-4", isEnhancing && "animate-pulse text-indigo-400")} />
                                 </button>
@@ -555,7 +585,7 @@ export function AnimatedAIChat({
                             {!value.trim() && (
                                 <button
                                     onClick={handleMicClick}
-                                    className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors"
+                                    className="p-2 rounded-lg text-white/40 hover:text-white hover:bg-white/5 transition-colors"
                                 >
                                     <Mic className="w-4 h-4" />
                                 </button>
@@ -566,10 +596,10 @@ export function AnimatedAIChat({
                                 onClick={handleSend}
                                 disabled={!value.trim() || isStreaming}
                                 className={cn(
-                                    "p-2 rounded-lg transition-all duration-200",
+                                    "p-2.5 rounded-xl transition-all duration-200",
                                     value.trim() && !isStreaming
-                                        ? "bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 hover:scale-105"
-                                        : "bg-slate-800 text-slate-500 cursor-not-allowed"
+                                        ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/20 hover:scale-105 hover:shadow-indigo-500/30"
+                                        : "bg-white/5 text-white/20 cursor-not-allowed"
                                 )}
                             >
                                 {isStreaming ? <LoaderIcon className="w-4 h-4 animate-spin" /> : <SendIcon className="w-4 h-4" />}
@@ -577,8 +607,8 @@ export function AnimatedAIChat({
                         </div>
                     </div>
                     {/* Helper Text / Mode Indicator */}
-                    <div className="text-[10px] text-center text-slate-500 mt-1.5 font-medium tracking-wide">
-                        {searchMode === 'web' ? 'Searching the web for answers' : 'AI mode active'}
+                    <div className="text-[10px] text-center text-white/30 mt-2 font-medium tracking-wide">
+                        {searchMode === 'web' ? <span className="flex items-center justify-center gap-1.5"><Globe className="w-3 h-3" /> Searching the web for answers</span> : <span className="flex items-center justify-center gap-1.5"><Sparkles className="w-3 h-3" /> AI mode active</span>}
                     </div>
                 </div>
             </div>
