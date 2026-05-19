@@ -1,9 +1,11 @@
 // Main App Component
 import React, { useEffect, useState } from 'react';
 import { useApp } from '@/context';
+import { useAuth } from '@/context/AuthContext';
 import { AnimatedAIChat } from '@/components/ui/animated-ai-chat';
 import { SettingsModal } from '@/components/SettingsModal';
 import { MemoryModal } from '@/components/MemoryModal';
+import { AuthPage } from '@/components/AuthPage';
 import { PROMPT_MODE_LABELS } from '@/systemPrompts';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -15,6 +17,7 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { WorkspaceHeader } from '@/components/layout/WorkspaceHeader';
 
 export default function App() {
+    const { user, loading: authLoading } = useAuth();
     const {
         state,
         sendMessage,
@@ -47,6 +50,26 @@ export default function App() {
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+
+    // Show auth page if not logged in
+    if (authLoading) {
+        return (
+            <div className="min-h-screen w-screen bg-[#09090b] flex items-center justify-center">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex flex-col items-center gap-4"
+                >
+                    <div className="w-10 h-10 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+                    <p className="text-white/40 text-sm">Loading...</p>
+                </motion.div>
+            </div>
+        );
+    }
+
+    if (!user) {
+        return <AuthPage />;
+    }
 
     // Derived Data
     const currentProvider = state.providers.find(p => p.id === state.currentProviderId);

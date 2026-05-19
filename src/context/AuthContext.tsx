@@ -7,6 +7,7 @@ import {
     User,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
+    updateProfile,
 } from 'firebase/auth';
 
 interface AuthContextType {
@@ -14,7 +15,7 @@ interface AuthContextType {
     loading: boolean;
     signInWithGoogle: () => Promise<void>;
     signInWithEmail: (email: string, password: string) => Promise<void>;
-    signUpWithEmail: (email: string, password: string) => Promise<void>;
+    signUpWithEmail: (email: string, password: string, name?: string) => Promise<void>;
     logout: () => Promise<void>;
 }
 
@@ -60,9 +61,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const signUpWithEmail = async (email: string, password: string) => {
+    const signUpWithEmail = async (email: string, password: string, name?: string) => {
         try {
-            await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            if (name && userCredential.user) {
+                await updateProfile(userCredential.user, { displayName: name });
+                setUser(auth.currentUser);
+            }
         } catch (error) {
             console.error("Error signing up with email", error);
             throw error;
