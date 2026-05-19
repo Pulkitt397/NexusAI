@@ -189,15 +189,21 @@ export function WebDevEnvironment({ onClose }: WebDevEnvironmentProps) {
     setBuildSteps(state.sections.map(s => ({ label: `Building ${s.title}`, status: 'pending' as const })));
     addConsole('system', `Building ${state.sections.length} components...`);
 
-    const sectionsWithNames = state.sections.map(s => ({
-      id: s.id,
-      name: s.title,
-      purpose: s.description,
-    }));
+    const sectionsWithNames = state.sections.map(s => {
+      const archSection = (state.siteArchitecture as any)?.sections?.find((as: any) => as.id === s.id);
+      return {
+        id: s.id,
+        name: s.title,
+        type: archSection?.type || 'generic',
+        purpose: s.description,
+        components: archSection?.components || [],
+        priority: archSection?.priority || 'medium',
+      };
+    });
 
     await runBuildPhase(
       sectionsWithNames,
-      (state as any).siteArchitecture || { sections: [] },
+      state.designSystem || {} as any,
       state.assetPlan || { section_assets: [] },
       providerId,
       apiKey,

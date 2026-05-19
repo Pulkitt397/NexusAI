@@ -91,6 +91,8 @@ export default function App() {
                 isMobile={isMobile}
                 isOpen={isSidebarOpen}
                 onClose={() => setIsSidebarOpen(false)}
+                isWebDevMode={isWebDevMode}
+                setWebDevMode={setIsWebDevMode}
             />
 
             {/* Mobile Backdrop */}

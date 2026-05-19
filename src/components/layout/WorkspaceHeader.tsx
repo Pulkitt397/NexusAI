@@ -2,7 +2,7 @@
 import { useApp } from '@/context';
 import { PROMPT_MODE_LABELS, type SystemPromptMode } from '@/systemPrompts';
 import { cn } from '@/lib/utils';
-import { ChevronRight, LayoutTemplate, SquareTerminal, AppWindow, Cpu } from 'lucide-react';
+import { ChevronRight, LayoutTemplate, SquareTerminal, AppWindow, Cpu, Sparkles } from 'lucide-react';
 
 export function WorkspaceHeader({
     isSidebarOpen,
@@ -19,7 +19,7 @@ export function WorkspaceHeader({
     const currentModel = state.availableModels.find(m => m.id === state.currentModelId);
 
     return (
-        <header className="h-14 border-b border-white/5 bg-[#09090b] flex items-center justify-between px-4 sticky top-0 z-30">
+        <header className="h-12 border-b border-white/5 bg-[#09090b] flex items-center justify-between px-4 sticky top-0 z-30">
             {/* Left: Breadcrumbs / Context */}
             <div className="flex items-center gap-3">
                 <button
@@ -42,10 +42,10 @@ export function WorkspaceHeader({
                     <ChevronRight className="w-3 h-3 opacity-30" />
                     <span className={cn(
                         "flex items-center gap-1.5 font-medium px-2 py-1 rounded",
-                        isWebDevMode ? "bg-emerald-500/10 text-emerald-400" : "bg-indigo-500/10 text-indigo-400"
+                        isWebDevMode ? "bg-violet-500/10 text-violet-400" : "bg-indigo-500/10 text-indigo-400"
                     )}>
-                        {isWebDevMode ? <LayoutTemplate className="w-3.5 h-3.5" /> : <SquareTerminal className="w-3.5 h-3.5" />}
-                        {isWebDevMode ? "WebDev Studio" : "Chat Agent"}
+                        {isWebDevMode ? <LayoutTemplate className="w-3.5 h-3.5" /> : <Sparkles className="w-3.5 h-3.5" />}
+                        {isWebDevMode ? "Nexus Studio" : "Chat"}
                     </span>
                 </div>
             </div>
@@ -62,7 +62,7 @@ export function WorkspaceHeader({
                                 : "text-white/40 hover:text-white/60"
                         )}
                     >
-                        <SquareTerminal className="w-3.5 h-3.5" />
+                        <Sparkles className="w-3.5 h-3.5" />
                         Chat
                     </button>
                     <button
@@ -75,7 +75,7 @@ export function WorkspaceHeader({
                         )}
                     >
                         <LayoutTemplate className="w-3.5 h-3.5" />
-                        Dev Mode
+                        Studio
                     </button>
                 </div>
 

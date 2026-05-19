@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Plus, Trash2, ChevronDown, LogOut, Code, Settings, Brain } from 'lucide-react';
+import { MessageSquare, Plus, Trash2, ChevronDown, LogOut, Code, Settings, Brain, Sparkles } from 'lucide-react';
 import { useApp } from '@/context';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 
-export function Sidebar({ isMobile, isOpen, onClose }: { isMobile: boolean, isOpen: boolean, onClose: () => void }) {
+export function Sidebar({ isMobile, isOpen, onClose, isWebDevMode, setWebDevMode }: {
+    isMobile: boolean,
+    isOpen: boolean,
+    onClose: () => void,
+    isWebDevMode: boolean,
+    setWebDevMode: (v: boolean) => void
+}) {
     const {
         state,
         createChat,
@@ -75,11 +81,23 @@ export function Sidebar({ isMobile, isOpen, onClose }: { isMobile: boolean, isOp
             {/* Main Actions */}
             <div className="p-3 space-y-2">
                 <button
-                    onClick={createChat}
+                    onClick={() => { setWebDevMode(false); createChat(); }}
                     className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white rounded-xl text-sm font-medium transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 border-0"
                 >
                     <Plus className="w-4 h-4" />
                     New Chat
+                </button>
+                <button
+                    onClick={() => setWebDevMode(!isWebDevMode)}
+                    className={cn(
+                        "w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all border",
+                        isWebDevMode
+                            ? "bg-violet-500/10 text-violet-400 border-violet-500/20"
+                            : "bg-white/5 text-white/50 hover:text-white hover:bg-white/10 border-white/10"
+                    )}
+                >
+                    <Code className="w-4 h-4" />
+                    {isWebDevMode ? 'Exit Studio' : 'Open Studio'}
                 </button>
             </div>
 
@@ -111,8 +129,17 @@ export function Sidebar({ isMobile, isOpen, onClose }: { isMobile: boolean, isOp
                                     )}
                                     <span className="truncate flex-1 text-sm">{chat.title}</span>
                                     {chat.latestCode && (
-                                        <span className="text-[9px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded font-bold tracking-tighter shrink-0 border border-indigo-500/20">App</span>
-                                    )}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setWebDevMode(true);
+                                            selectChat(chat.id);
+                                        }}
+                                        className="text-[9px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded font-bold tracking-tighter shrink-0 border border-indigo-500/20 hover:bg-indigo-500/30 transition-colors cursor-pointer"
+                                    >
+                                        Open
+                                    </button>
+                                )}
                                     {chat.id === state.currentChatId && (
                                         <button
                                             onClick={(e) => {
