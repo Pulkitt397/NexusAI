@@ -40,17 +40,34 @@ export function Sidebar({ isMobile, isOpen, onClose }: { isMobile: boolean, isOp
             )}
         >
             {/* Header / Logo */}
-            <div className="h-14 flex items-center px-4 border-b border-white/5 bg-[#09090b]">
-                <div className="flex items-center gap-2.5 font-semibold text-white">
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 relative overflow-hidden">
-                        <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            <div className="h-16 flex items-center px-4 border-b border-white/5 bg-[#09090b]">
+                <div className="flex items-center gap-3 font-semibold text-white">
+                    <div className="w-10 h-10 relative">
+                        <svg viewBox="0 0 48 48" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="nexusGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor="#818cf8" />
+                                    <stop offset="50%" stopColor="#a78bfa" />
+                                    <stop offset="100%" stopColor="#c084fc" />
+                                </linearGradient>
+                                <linearGradient id="nexusGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+                                    <stop offset="0%" stopColor="#6366f1" />
+                                    <stop offset="100%" stopColor="#8b5cf6" />
+                                </linearGradient>
+                            </defs>
+                            <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#nexusGrad2)" opacity="0.15" />
+                            <rect x="2" y="2" width="44" height="44" rx="12" stroke="url(#nexusGrad1)" strokeWidth="1.5" fill="none" opacity="0.5" />
+                            <path d="M16 32V16L24 26L32 16V32" stroke="url(#nexusGrad1)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                            <circle cx="16" cy="32" r="2" fill="#818cf8" />
+                            <circle cx="32" cy="32" r="2" fill="#c084fc" />
+                            <circle cx="24" cy="26" r="1.5" fill="#a78bfa" />
+                            <circle cx="16" cy="16" r="2" fill="#6366f1" />
+                            <circle cx="32" cy="16" r="2" fill="#8b5cf6" />
                         </svg>
-                        <div className="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="tracking-tight text-sm">Nexus</span>
-                        <span className="text-[10px] text-white/30 -mt-0.5">Intelligent Workspace</span>
+                        <span className="text-base font-bold tracking-tight bg-gradient-to-r from-indigo-300 via-violet-300 to-purple-300 bg-clip-text text-transparent">Nexus</span>
+                        <span className="text-[10px] text-white/30 -mt-0.5 font-medium">Intelligent Workspace</span>
                     </div>
                 </div>
             </div>

@@ -227,18 +227,45 @@ export function AuthPage() {
                     transition={{ delay: 0.2 }}
                 >
                     <motion.div
-                        className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-white/10 mb-4 relative overflow-hidden"
+                        className="inline-flex items-center justify-center w-24 h-24 rounded-3xl relative overflow-hidden mb-5"
                         whileHover={{ scale: 1.05 }}
                         transition={{ type: "spring", stiffness: 400 }}
                     >
-                        <Sparkles className="w-8 h-8 text-indigo-400" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-violet-500/20 to-purple-500/20 rounded-3xl border border-white/10" />
                         <motion.div
-                            className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"
+                            className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"
                             animate={{ opacity: [0.3, 0.6, 0.3] }}
                             transition={{ duration: 3, repeat: Infinity }}
                         />
+                        <svg viewBox="0 0 96 96" className="w-14 h-14 relative z-10" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="nexusAuthGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor="#818cf8" />
+                                    <stop offset="50%" stopColor="#a78bfa" />
+                                    <stop offset="100%" stopColor="#c084fc" />
+                                </linearGradient>
+                                <linearGradient id="nexusAuthGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+                                    <stop offset="0%" stopColor="#6366f1" />
+                                    <stop offset="100%" stopColor="#8b5cf6" />
+                                </linearGradient>
+                                <filter id="glow">
+                                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                                    <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                                </filter>
+                            </defs>
+                            <path d="M28 68V28L48 52L68 28V68" stroke="url(#nexusAuthGrad1)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" filter="url(#glow)" />
+                            <circle cx="28" cy="68" r="3" fill="#818cf8" />
+                            <circle cx="68" cy="68" r="3" fill="#c084fc" />
+                            <circle cx="48" cy="52" r="2.5" fill="#a78bfa" />
+                            <circle cx="28" cy="28" r="3" fill="#6366f1" />
+                            <circle cx="68" cy="28" r="3" fill="#8b5cf6" />
+                            <line x1="28" y1="68" x2="48" y2="52" stroke="url(#nexusAuthGrad2)" strokeWidth="1.5" opacity="0.4" />
+                            <line x1="68" y1="68" x2="48" y2="52" stroke="url(#nexusAuthGrad2)" strokeWidth="1.5" opacity="0.4" />
+                            <line x1="28" y1="28" x2="48" y2="52" stroke="url(#nexusAuthGrad2)" strokeWidth="1.5" opacity="0.4" />
+                            <line x1="68" y1="28" x2="48" y2="52" stroke="url(#nexusAuthGrad2)" strokeWidth="1.5" opacity="0.4" />
+                        </svg>
                     </motion.div>
-                    <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">
+                    <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">
                         Nexus
                     </h1>
                     <p className="text-white/40 mt-2 text-sm">

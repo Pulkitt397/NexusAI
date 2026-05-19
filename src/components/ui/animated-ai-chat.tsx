@@ -293,21 +293,43 @@ export function AnimatedAIChat({
                                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                                 className="pointer-events-auto max-w-md w-full"
                             >
-                                <div className="relative w-20 h-20 mx-auto mb-6">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-3xl rotate-6 opacity-80 animate-pulse" />
-                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-indigo-500/30">
-                                        <svg viewBox="0 0 24 24" className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                                            <path d="M2 17l10 5 10-5"/>
-                                            <path d="M2 12l10 5 10-5"/>
+                                <div className="relative w-28 h-28 mx-auto mb-8">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-[2rem] rotate-6 opacity-60 blur-sm animate-pulse" />
+                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/90 to-violet-600/90 rounded-[2rem] flex items-center justify-center shadow-2xl shadow-indigo-500/30 border border-white/10">
+                                        <svg viewBox="0 0 96 96" className="w-16 h-16" xmlns="http://www.w3.org/2000/svg">
+                                            <defs>
+                                                <linearGradient id="nexusWelcomeGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                    <stop offset="0%" stopColor="#c7d2fe" />
+                                                    <stop offset="50%" stopColor="#ddd6fe" />
+                                                    <stop offset="100%" stopColor="#e9d5ff" />
+                                                </linearGradient>
+                                                <linearGradient id="nexusWelcomeGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+                                                    <stop offset="0%" stopColor="#a5b4fc" />
+                                                    <stop offset="100%" stopColor="#c4b5fd" />
+                                                </linearGradient>
+                                                <filter id="welcomeGlow">
+                                                    <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+                                                    <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                                                </filter>
+                                            </defs>
+                                            <path d="M28 68V28L48 52L68 28V68" stroke="url(#nexusWelcomeGrad1)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" filter="url(#welcomeGlow)" />
+                                            <circle cx="28" cy="68" r="3" fill="#c7d2fe" />
+                                            <circle cx="68" cy="68" r="3" fill="#e9d5ff" />
+                                            <circle cx="48" cy="52" r="2.5" fill="#ddd6fe" />
+                                            <circle cx="28" cy="28" r="3" fill="#a5b4fc" />
+                                            <circle cx="68" cy="28" r="3" fill="#c4b5fd" />
+                                            <line x1="28" y1="68" x2="48" y2="52" stroke="url(#nexusWelcomeGrad2)" strokeWidth="1.5" opacity="0.5" />
+                                            <line x1="68" y1="68" x2="48" y2="52" stroke="url(#nexusWelcomeGrad2)" strokeWidth="1.5" opacity="0.5" />
+                                            <line x1="28" y1="28" x2="48" y2="52" stroke="url(#nexusWelcomeGrad2)" strokeWidth="1.5" opacity="0.5" />
+                                            <line x1="68" y1="28" x2="48" y2="52" stroke="url(#nexusWelcomeGrad2)" strokeWidth="1.5" opacity="0.5" />
                                         </svg>
                                     </div>
                                 </div>
 
-                                <h1 className="text-3xl font-bold text-white mb-3 tracking-tight">
-                                    Welcome to <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Nexus</span>
+                                <h1 className="text-4xl font-bold text-white mb-3 tracking-tight">
+                                    Welcome to <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent">Nexus</span>
                                 </h1>
-                                <p className="text-white/50 text-sm mb-8 leading-relaxed max-w-sm mx-auto">
+                                <p className="text-white/50 text-base mb-10 leading-relaxed max-w-sm mx-auto">
                                     Your intelligent AI workspace. Select a model or start typing to begin.
                                 </p>
 
