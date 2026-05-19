@@ -51,10 +51,12 @@ export default async function handler(req) {
     headers.delete('host');
     
     try {
+        const isBodyMethod = req.method !== 'GET' && req.method !== 'HEAD';
         const res = await fetch(targetUrl.toString(), {
             method: req.method,
             headers,
-            body: req.method !== 'GET' && req.method !== 'HEAD' ? req.body : undefined,
+            body: isBodyMethod ? req.body : undefined,
+            ...(isBodyMethod ? { duplex: 'half' } : {}),
         });
 
         // Copy and stream headers/body back to client
