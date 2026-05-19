@@ -192,7 +192,7 @@ export function StageActionPanel({ onSendMessage, placeholder, selectedSectionTi
                     <div className="flex-1" />
                     <div className="hidden sm:flex items-center gap-2.5 px-4 py-2 rounded-xl bg-indigo-500/[0.03] text-indigo-400/50 border border-indigo-500/10">
                         <Terminal className="w-3.5 h-3.5" />
-                        <span className="text-[10px] font-black uppercase tracking-widest leading-none">Nexus Console</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest leading-none">Nexus Terminal</span>
                     </div>
                 </div>
             </motion.div>

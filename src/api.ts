@@ -12,7 +12,7 @@ export async function fetchGeminiModels(apiKey: string): Promise<Model[]> {
     const data = await res.json();
 
     return (data.models || [])
-        .filter((m: any) => m.supportedGenerationMethods?.includes('generateContent') && m.name.toLowerCase().includes('gemini'))
+        .filter((m: any) => m.supportedGenerationMethods?.includes('generateContent') && (m.name.toLowerCase().includes('gemini') || m.name.toLowerCase().includes('gemma')))
         .map((m: any) => ({
             id: m.name.replace('models/', ''),
             name: formatModelName(m.name.replace('models/', '')),
@@ -50,8 +50,21 @@ export async function* streamGemini(apiKey: string, model: string, messages: { r
         throw new Error('Conversation cannot be empty');
     }
 
-    const body: any = { contents, generationConfig: { temperature: 0.7, maxOutputTokens: 8192 } };
-    if (systemPrompt) body.systemInstruction = { parts: [{ text: systemPrompt }] };
+    const isGemma = model.toLowerCase().includes('gemma');
+
+    // Prepend system prompt to the first user message for Gemma models
+    if (systemPrompt && isGemma) {
+        if (contents.length > 0 && contents[0].role === 'user') {
+            contents[0].parts[0].text = `[System Instructions]\n${systemPrompt}\n\n[User Message]\n${contents[0].parts[0].text}`;
+        }
+    }
+
+    const maxTokens = isGemma ? 4096 : 8192;
+    const body: any = { contents, generationConfig: { temperature: 0.7, maxOutputTokens: maxTokens } };
+    
+    if (systemPrompt && !isGemma) {
+        body.systemInstruction = { parts: [{ text: systemPrompt }] };
+    }
 
     const res = await fetch(`/api/gemini/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`, {
         method: 'POST',
@@ -132,7 +145,7 @@ export async function* streamOpenRouter(apiKey: string, model: string, messages:
             'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
             'HTTP-Referer': window.location.origin,
-            'X-Title': 'NexusAI'
+            'X-Title': 'Nexus'
         },
         body: JSON.stringify({ model, messages: msgs, stream: true, max_tokens: 4096 })
     });
@@ -553,6 +566,8 @@ function formatModelName(id: string): string {
         'gemini-2.0-flash-exp': 'Gemini 2.0 Flash',
         'gemini-1.5-flash': 'Gemini 1.5 Flash',
         'gemini-1.5-pro': 'Gemini 1.5 Pro',
+        'gemma-4-31b-it': 'Gemma 4 31B It',
+        'gemma-4-26b-a4b-it': 'Gemma 4 26B A4B It',
         'deepseek-r1-distill-llama-70b': 'DeepSeek R1 70B',
         'llama-3.3-70b-versatile': 'Llama 3.3 70B',
         'mixtral-8x7b-32768': 'Mixtral 8x7B'

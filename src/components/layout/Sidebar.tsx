@@ -42,12 +42,15 @@ export function Sidebar({ isMobile, isOpen, onClose }: { isMobile: boolean, isOp
             {/* Header / Logo */}
             <div className="h-14 flex items-center px-4 border-b border-white/5 bg-[#09090b]">
                 <div className="flex items-center gap-2.5 font-semibold text-white">
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
-                        <span className="font-bold text-sm">N</span>
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 relative overflow-hidden">
+                        <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <div className="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="tracking-tight text-sm">Nexus AI</span>
-                        <span className="text-[10px] text-white/30 -mt-0.5">v2.0</span>
+                        <span className="tracking-tight text-sm">Nexus</span>
+                        <span className="text-[10px] text-white/30 -mt-0.5">Intelligent Workspace</span>
                     </div>
                 </div>
             </div>

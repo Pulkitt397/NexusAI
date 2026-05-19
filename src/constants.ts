@@ -26,7 +26,9 @@ export const PREFERRED_MODELS: Record<string, string[]> = {
         'gemini-1.5-flash',        // User requested "Flash 2.5" (likely 1.5 Flash as it is the free tier standard)
         'gemini-1.5-flash-latest',
         'gemini-2.0-flash-exp',
-        'gemini-1.5-pro'
+        'gemini-1.5-pro',
+        'gemma-4-31b-it',
+        'gemma-4-26b-a4b-it'
     ],
     groq: [
         'deepseek-r1-distill-llama-70b', // User requested "GPT OSS 120B" (DeepSeek R1 70B is the closest match)

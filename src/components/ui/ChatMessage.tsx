@@ -97,7 +97,7 @@ export const ChatMessage = memo(({ role, content, id, webResult, pdfUrl }: ChatM
                 {pdfUrl && !isUser && (
                     <motion.a
                         href={pdfUrl}
-                        download={`NexusAI_Export_${Date.now()}.pdf`}
+                        download={`Nexus_Export_${Date.now()}.pdf`}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white/80 hover:text-white transition-all hover:scale-[1.02] shadow-xl group/pdf"
@@ -107,7 +107,7 @@ export const ChatMessage = memo(({ role, content, id, webResult, pdfUrl }: ChatM
                         </div>
                         <div className="flex flex-col items-start">
                             <span>Ready to download</span>
-                            <span className="text-[10px] text-white/30 font-normal uppercase tracking-widest mt-0.5">NexusAI Export . PDF</span>
+                            <span className="text-[10px] text-white/30 font-normal uppercase tracking-widest mt-0.5">Nexus Export . PDF</span>
                         </div>
                     </motion.a>
                 )}

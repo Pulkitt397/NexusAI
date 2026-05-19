@@ -239,7 +239,7 @@ export function AuthPage() {
                         />
                     </motion.div>
                     <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">
-                        Nexus AI
+                        Nexus
                     </h1>
                     <p className="text-white/40 mt-2 text-sm">
                         {mode === 'login' ? 'Welcome back! Sign in to continue' : 'Create your account to get started'}

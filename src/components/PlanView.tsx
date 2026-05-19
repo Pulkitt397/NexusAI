@@ -27,7 +27,7 @@ export function PlanView({ state }: PlanViewProps) {
                         </div>
                         <div>
                             <h1 className="text-2xl font-black tracking-tight bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent">
-                                Nexus Core Plan
+                                Nexus Blueprint
                             </h1>
                             <p className="text-[11px] font-bold text-white/30 uppercase tracking-[0.2em]">Autonomous Agent Memory & Strategy</p>
                         </div>

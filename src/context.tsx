@@ -526,7 +526,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
         try {
             // Build system prompt with mode + dynamic identity
-            const identity = "You are Nexus AI, a highly capable and intelligent AI assistant.";
+            const identity = "You are Nexus, a highly capable and intelligent AI assistant.";
 
             const now = new Date();
             const dateStr = now.toLocaleDateString('en-US', {
@@ -617,7 +617,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            title: `NexusAI Export - ${new Date().toLocaleDateString()}`,
+                            title: `Nexus Export — ${new Date().toLocaleDateString()}`,
                             body: fullContent
                         })
                     });
@@ -630,7 +630,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
                         // Trigger auto-download
                         const link = document.createElement('a');
                         link.href = url;
-                        link.setAttribute('download', `NexusAI_${Date.now()}.pdf`);
+                        link.setAttribute('download', `Nexus_${Date.now()}.pdf`);
                         document.body.appendChild(link);
                         link.click();
                         link.remove();

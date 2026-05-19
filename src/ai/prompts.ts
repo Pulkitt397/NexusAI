@@ -2,7 +2,7 @@
 // System Prompts for Nucleus Builder Agents
 
 export const BUILDER_PROMPTS = {
-  INTENT_REASONER: `You are the Intent Reasoner Agent for Nexus AI.
+  INTENT_REASONER: `You are the Intent Reasoner Agent for Nexus.
     Your goal is to analyze the user's request and extract specific structural intent for a website.
     
     Output strictly valid JSON matching this schema:

@@ -165,7 +165,7 @@ export function AnimatedAIChat({
     onOpenSettings,
     memoryCount,
     currentModel, // Display name
-    placeholder = "Message NexusAI...",
+    placeholder = "Message Nexus...",
     onEnhance,
     searchMode,
     onSetSearchMode,
@@ -296,17 +296,19 @@ export function AnimatedAIChat({
                                 <div className="relative w-20 h-20 mx-auto mb-6">
                                     <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-3xl rotate-6 opacity-80 animate-pulse" />
                                     <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-indigo-500/30">
-                                        <div className="w-10 h-10 text-white">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
-                                        </div>
+                                        <svg viewBox="0 0 24 24" className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                            <path d="M2 17l10 5 10-5"/>
+                                            <path d="M2 12l10 5 10-5"/>
+                                        </svg>
                                     </div>
                                 </div>
 
                                 <h1 className="text-3xl font-bold text-white mb-3 tracking-tight">
-                                    Welcome to <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Nexus AI</span>
+                                    Welcome to <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Nexus</span>
                                 </h1>
                                 <p className="text-white/50 text-sm mb-8 leading-relaxed max-w-sm mx-auto">
-                                    Your intelligent AI companion. Select a model or start typing to begin.
+                                    Your intelligent AI workspace. Select a model or start typing to begin.
                                 </p>
 
                                 <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">

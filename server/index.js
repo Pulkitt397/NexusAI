@@ -114,7 +114,7 @@ app.post('/api/generate-pdf', async (req, res) => {
         const pdfBytes = await pdfDoc.save();
 
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=NexusAI_${Date.now()}.pdf`);
+        res.setHeader('Content-Disposition', `attachment; filename=Nexus_${Date.now()}.pdf`);
         res.send(Buffer.from(pdfBytes));
 
         console.log(`[PDF] Generated: ${title}`);

@@ -236,7 +236,7 @@ export function LoginPage() {
                                     transition={{ delay: 0.2 }}
                                     className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80"
                                 >
-                                    Welcome to Nexus AI
+                                    Welcome to Nexus
                                 </motion.h1>
 
                                 <motion.p
