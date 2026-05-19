@@ -1,57 +1,45 @@
 import { WebSearchResult } from '@/types';
 
-const DDG_API_URL = 'https://api.duckduckgo.com/';
+const SEARX_API_URL = 'https://searx.be/search';
 
 /**
- * Searches DuckDuckGo Instant Answer API and normalizes the response.
+ * Searches the SearXNG metasearch engine (searx.be) and normalizes organic results.
  * Acts as the "Backend" logic for web search.
  */
 export async function searchWeb(query: string): Promise<WebSearchResult> {
     try {
-        const url = new URL(DDG_API_URL);
+        const url = new URL(SEARX_API_URL);
         url.searchParams.append('q', query);
         url.searchParams.append('format', 'json');
-        url.searchParams.append('no_redirect', '1');
-        url.searchParams.append('no_html', '1');
-        url.searchParams.append('t', 'nexusai'); // App identifier
 
-        // Note: Direct browser calls to DDG API might face CORS issues.
-        // In a real production app with a backend, we'd proxy this.
-        // For this CSR app, we'll try direct fetch. If it fails, we catch it.
         const response = await fetch(url.toString());
 
         if (!response.ok) {
-            throw new Error(`DuckDuckGo API error: ${response.statusText}`);
+            throw new Error(`SearXNG API error: ${response.statusText}`);
         }
 
         const data = await response.json();
 
-        // Normalize Data
-
         // 1. Title
-        const title = data.Heading || query;
+        const title = `Search Results for "${query}"`;
 
-        // 2. Summary (Abstract or Answer)
-        let summary = data.Answer || data.Abstract || data.AbstractText || '';
-
-        // 3. Source
-        const source = data.AbstractSource || (data.Answer ? 'DuckDuckGo Answer' : 'DuckDuckGo');
-
-        // 4. Related Links
+        // 2. Summary (Assemble organic result snippets)
+        let summary = '';
         const related: Array<{ text: string; url: string }> = [];
-        if (data.RelatedTopics && Array.isArray(data.RelatedTopics)) {
-            data.RelatedTopics.forEach((topic: any) => {
-                if (topic.Text && topic.FirstURL) {
+
+        if (data.results && Array.isArray(data.results) && data.results.length > 0) {
+            // Merge top 3 organic results to build a detailed summary for the LLM
+            const topResults = data.results.slice(0, 3);
+            summary = topResults
+                .map((res: any, idx: number) => `[Source ${idx + 1}] "${res.title}": ${res.content || res.snippet || ''}`)
+                .join('\n\n');
+
+            // Populate related links
+            data.results.forEach((res: any) => {
+                if (res.title && res.url) {
                     related.push({
-                        text: topic.Text,
-                        url: topic.FirstURL
-                    });
-                } else if (topic.Topics && Array.isArray(topic.Topics)) {
-                    // Handle nested topics
-                    topic.Topics.forEach((subTopic: any) => {
-                        if (subTopic.Text && subTopic.FirstURL) {
-                            related.push({ text: subTopic.Text, url: subTopic.FirstURL });
-                        }
+                        text: res.title,
+                        url: res.url
                     });
                 }
             });
@@ -59,19 +47,14 @@ export async function searchWeb(query: string): Promise<WebSearchResult> {
 
         // Fallback Logic
         if (!summary) {
-            // If no abstract, try to use the first related topic as summary
-            if (related.length > 0) {
-                summary = related[0].text;
-            } else {
-                summary = "The search query did not yield a direct summary. Please rely on authoritative internal knowledge while acknowledging the current temporal grounding if provided.";
-            }
+            summary = "No real-time search results or organic summaries were found for this query.";
         }
 
         return {
             type: 'web',
             title,
             summary,
-            source,
+            source: 'SearXNG (searx.be)',
             related: related.slice(0, 5) // Limit to 5 related links
         };
 
