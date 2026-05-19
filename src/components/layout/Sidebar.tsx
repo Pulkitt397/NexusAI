@@ -51,29 +51,41 @@ export function Sidebar({ isMobile, isOpen, onClose, isWebDevMode, setWebDevMode
                     <div className="w-10 h-10 relative">
                         <svg viewBox="0 0 48 48" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                             <defs>
-                                <linearGradient id="nexusGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="#818cf8" />
-                                    <stop offset="50%" stopColor="#a78bfa" />
-                                    <stop offset="100%" stopColor="#c084fc" />
+                                <linearGradient id="nexusGlowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor="#3b82f6" />
+                                    <stop offset="50%" stopColor="#8b5cf6" />
+                                    <stop offset="100%" stopColor="#ec4899" />
                                 </linearGradient>
-                                <linearGradient id="nexusGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
-                                    <stop offset="0%" stopColor="#6366f1" />
-                                    <stop offset="100%" stopColor="#8b5cf6" />
+                                <linearGradient id="nexusBodyGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                                    <stop offset="0%" stopColor="#1e1b4b" />
+                                    <stop offset="100%" stopColor="#311042" />
                                 </linearGradient>
+                                <filter id="premiumGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feGaussianBlur stdDeviation="3" result="blur" />
+                                    <feMerge>
+                                        <feMergeNode in="blur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
                             </defs>
-                            <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#nexusGrad2)" opacity="0.15" />
-                            <rect x="2" y="2" width="44" height="44" rx="12" stroke="url(#nexusGrad1)" strokeWidth="1.5" fill="none" opacity="0.5" />
-                            <path d="M16 32V16L24 26L32 16V32" stroke="url(#nexusGrad1)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                            <circle cx="16" cy="32" r="2" fill="#818cf8" />
-                            <circle cx="32" cy="32" r="2" fill="#c084fc" />
-                            <circle cx="24" cy="26" r="1.5" fill="#a78bfa" />
-                            <circle cx="16" cy="16" r="2" fill="#6366f1" />
-                            <circle cx="32" cy="16" r="2" fill="#8b5cf6" />
+                            <rect x="2" y="2" width="44" height="44" rx="14" fill="url(#nexusBodyGrad)" opacity="0.4" />
+                            <rect x="2" y="2" width="44" height="44" rx="14" stroke="url(#nexusGlowGrad)" strokeWidth="1.5" fill="none" opacity="0.3" />
+                            
+                            <path d="M14 34V14" stroke="url(#nexusGlowGrad)" strokeWidth="4.5" strokeLinecap="round" filter="url(#premiumGlow)" />
+                            <path d="M14 14L34 34" stroke="url(#nexusGlowGrad)" strokeWidth="4.5" strokeLinecap="round" filter="url(#premiumGlow)" />
+                            <path d="M34 34V14" stroke="url(#nexusGlowGrad)" strokeWidth="4.5" strokeLinecap="round" filter="url(#premiumGlow)" />
+
+                            <circle cx="14" cy="14" r="2.5" fill="#3b82f6" />
+                            <circle cx="34" cy="34" r="2.5" fill="#ec4899" />
+                            <circle cx="24" cy="24" r="1.5" fill="#ffffff" />
                         </svg>
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-base font-bold tracking-tight bg-gradient-to-r from-indigo-300 via-violet-300 to-purple-300 bg-clip-text text-transparent">Nexus</span>
-                        <span className="text-[10px] text-white/30 -mt-0.5 font-medium">Intelligent Workspace</span>
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-base font-black tracking-widest bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent uppercase font-sans">Nexus</span>
+                            <span className="text-[8px] font-extrabold px-1.5 py-0.5 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border border-blue-500/30 tracking-wider uppercase scale-90">AI</span>
+                        </div>
+                        <span className="text-[8px] text-white/40 tracking-[0.15em] font-bold uppercase mt-0.5">Cognitive Core</span>
                     </div>
                 </div>
             </div>

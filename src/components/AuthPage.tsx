@@ -239,35 +239,36 @@ export function AuthPage() {
                         />
                         <svg viewBox="0 0 96 96" className="w-14 h-14 relative z-10" xmlns="http://www.w3.org/2000/svg">
                             <defs>
-                                <linearGradient id="nexusAuthGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="#818cf8" />
-                                    <stop offset="50%" stopColor="#a78bfa" />
-                                    <stop offset="100%" stopColor="#c084fc" />
+                                <linearGradient id="nexusAuthGlowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor="#3b82f6" />
+                                    <stop offset="50%" stopColor="#8b5cf6" />
+                                    <stop offset="100%" stopColor="#ec4899" />
                                 </linearGradient>
-                                <linearGradient id="nexusAuthGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
-                                    <stop offset="0%" stopColor="#6366f1" />
-                                    <stop offset="100%" stopColor="#8b5cf6" />
-                                </linearGradient>
-                                <filter id="glow">
-                                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                                    <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                                <filter id="authGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feGaussianBlur stdDeviation="4" result="blur" />
+                                    <feMerge>
+                                        <feMergeNode in="blur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
                                 </filter>
                             </defs>
-                            <path d="M28 68V28L48 52L68 28V68" stroke="url(#nexusAuthGrad1)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" filter="url(#glow)" />
-                            <circle cx="28" cy="68" r="3" fill="#818cf8" />
-                            <circle cx="68" cy="68" r="3" fill="#c084fc" />
-                            <circle cx="48" cy="52" r="2.5" fill="#a78bfa" />
-                            <circle cx="28" cy="28" r="3" fill="#6366f1" />
-                            <circle cx="68" cy="28" r="3" fill="#8b5cf6" />
-                            <line x1="28" y1="68" x2="48" y2="52" stroke="url(#nexusAuthGrad2)" strokeWidth="1.5" opacity="0.4" />
-                            <line x1="68" y1="68" x2="48" y2="52" stroke="url(#nexusAuthGrad2)" strokeWidth="1.5" opacity="0.4" />
-                            <line x1="28" y1="28" x2="48" y2="52" stroke="url(#nexusAuthGrad2)" strokeWidth="1.5" opacity="0.4" />
-                            <line x1="68" y1="28" x2="48" y2="52" stroke="url(#nexusAuthGrad2)" strokeWidth="1.5" opacity="0.4" />
+                            <path d="M28 68V28" stroke="url(#nexusAuthGlowGrad)" strokeWidth="8" strokeLinecap="round" filter="url(#authGlow)" />
+                            <path d="M28 28L68 68" stroke="url(#nexusAuthGlowGrad)" strokeWidth="8" strokeLinecap="round" filter="url(#authGlow)" />
+                            <path d="M68 68V28" stroke="url(#nexusAuthGlowGrad)" strokeWidth="8" strokeLinecap="round" filter="url(#authGlow)" />
+                            
+                            <circle cx="28" cy="28" r="4.5" fill="#3b82f6" />
+                            <circle cx="68" cy="68" r="4.5" fill="#ec4899" />
+                            <circle cx="48" cy="48" r="3" fill="#ffffff" />
                         </svg>
                     </motion.div>
-                    <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">
-                        Nexus
-                    </h1>
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                        <h1 className="text-4xl font-black tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 uppercase font-sans">
+                            Nexus
+                        </h1>
+                        <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border border-blue-500/30 tracking-wider uppercase">
+                            AI
+                        </span>
+                    </div>
                     <p className="text-white/40 mt-2 text-sm">
                         {mode === 'login' ? 'Welcome back! Sign in to continue' : 'Create your account to get started'}
                     </p>
