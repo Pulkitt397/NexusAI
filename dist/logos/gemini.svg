@@ -1,9 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="url(#grad1)">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <path d="M12 2a1 1 0 00-1 1c0 4.4-3.6 8-8 8a1 1 0 000 2c4.4 0 8 3.6 8 8a1 1 0 002 0c0-4.4 3.6-8 8-8a1 1 0 000-2c-4.4 0-8-3.6-8-8a1 1 0 00-1-1z" fill="url(#gemini-grad)"/>
+  <path d="M19 1a.5.5 0 00-.5.5c0 2.2-1.8 4-4 4a.5.5 0 000 1c2.2 0 4 1.8 4 4a.5.5 0 001 0c0-2.2 1.8-4 4-4a.5.5 0 000-1c-2.2 0-4-1.8-4-4a.5.5 0 00-.5-.5z" fill="url(#gemini-grad2)"/>
   <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4285f4;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#9b72cb;stop-opacity:1" />
+    <linearGradient id="gemini-grad" x1="2" y1="12" x2="22" y2="12" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4285f4"/>
+      <stop offset="40%" stop-color="#9b72cb"/>
+      <stop offset="70%" stop-color="#d96570"/>
+      <stop offset="100%" stop-color="#f39c12"/>
+    </linearGradient>
+    <linearGradient id="gemini-grad2" x1="14.5" y1="5.5" x2="23.5" y2="5.5" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#9b72cb"/>
+      <stop offset="50%" stop-color="#d96570"/>
+      <stop offset="100%" stop-color="#f39c12"/>
     </linearGradient>
   </defs>
-  <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5Z" />
 </svg>
