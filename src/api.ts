@@ -12,7 +12,7 @@ export async function fetchGeminiModels(apiKey: string): Promise<Model[]> {
     const data = await res.json();
 
     return (data.models || [])
-        .filter((m: any) => m.supportedGenerationMethods?.includes('generateContent'))
+        .filter((m: any) => m.supportedGenerationMethods?.includes('generateContent') && m.name.toLowerCase().includes('gemini'))
         .map((m: any) => ({
             id: m.name.replace('models/', ''),
             name: formatModelName(m.name.replace('models/', '')),
@@ -26,10 +26,29 @@ export async function fetchGeminiModels(apiKey: string): Promise<Model[]> {
 }
 
 export async function* streamGemini(apiKey: string, model: string, messages: { role: string, content: string }[], systemPrompt?: string): AsyncGenerator<StreamChunk> {
-    const contents = messages.map(m => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.content }]
-    }));
+    const contents: any[] = [];
+    for (const m of messages) {
+        const role = m.role === 'assistant' ? 'model' : 'user';
+        if (!m.content || !m.content.trim()) continue;
+
+        if (contents.length > 0 && contents[contents.length - 1].role === role) {
+            contents[contents.length - 1].parts[0].text += '\n\n' + m.content;
+        } else {
+            contents.push({
+                role,
+                parts: [{ text: m.content }]
+            });
+        }
+    }
+
+    // Ensure conversation starts with user message as required by Gemini API
+    if (contents.length > 0 && contents[0].role === 'model') {
+        contents.shift();
+    }
+
+    if (contents.length === 0) {
+        throw new Error('Conversation cannot be empty');
+    }
 
     const body: any = { contents, generationConfig: { temperature: 0.7, maxOutputTokens: 8192 } };
     if (systemPrompt) body.systemInstruction = { parts: [{ text: systemPrompt }] };
