@@ -24,6 +24,8 @@ export default async function handler(req) {
         targetBase = 'https://integrate.api.nvidia.com/v1';
     } else if (provider === 'ollama') {
         targetBase = 'https://ollama.com';
+    } else if (provider === 'search') {
+        targetBase = 'https://searx.be';
     }
 
     if (!targetBase) {

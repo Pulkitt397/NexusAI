@@ -60,6 +60,12 @@ export default defineConfig({
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api\/zai/, ''),
                 secure: false
+            },
+            '/api/search': {
+                target: 'https://searx.be',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api\/search/, ''),
+                secure: false
             }
         }
     },

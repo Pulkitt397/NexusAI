@@ -1,6 +1,6 @@
 import { WebSearchResult } from '@/types';
 
-const SEARX_API_URL = 'https://searx.be/search';
+const SEARX_API_URL = '/api/search/search';
 
 /**
  * Searches the SearXNG metasearch engine (searx.be) and normalizes organic results.
@@ -8,7 +8,7 @@ const SEARX_API_URL = 'https://searx.be/search';
  */
 export async function searchWeb(query: string): Promise<WebSearchResult> {
     try {
-        const url = new URL(SEARX_API_URL);
+        const url = new URL(SEARX_API_URL, window.location.origin);
         url.searchParams.append('q', query);
         url.searchParams.append('format', 'json');
 

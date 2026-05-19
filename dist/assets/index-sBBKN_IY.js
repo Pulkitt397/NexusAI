@@ -3404,7 +3404,7 @@ STRICT PERSONA:
 
 TEMPORAL GROUNDING:
 - Current Date: ${ce}
-- Current Time: ${le} (User's Local Time)`,we=null;const je=R8(L);if(e.searchMode==="web"&&!je){n(Ee=>({...Ee,isSearching:!0}));try{const{searchWeb:Ee,formatResultsForPrompt:Oe}=await vL(async()=>{const{searchWeb:He,formatResultsForPrompt:Ke}=await import("./webSearchService-CNPBuIVX.js");return{searchWeb:He,formatResultsForPrompt:Ke}},[]);we=await Ee(L);const Qe=Oe(L,we);X+=`
+- Current Time: ${le} (User's Local Time)`,we=null;const je=R8(L);if(e.searchMode==="web"&&!je){n(Ee=>({...Ee,isSearching:!0}));try{const{searchWeb:Ee,formatResultsForPrompt:Oe}=await vL(async()=>{const{searchWeb:He,formatResultsForPrompt:Ke}=await import("./webSearchService-CqrWo3TK.js");return{searchWeb:He,formatResultsForPrompt:Ke}},[]);we=await Ee(L);const Qe=Oe(L,we);X+=`
 
 `+Qe}catch(Ee){console.error("Web search grounding failed:",Ee)}finally{n(Ee=>({...Ee,isSearching:!1}))}}else e.searchMode==="web"&&je&&console.log("[Routing] Bypassing tools for conversational intent:",L);const _e=C8(L);if(e.memoryEnabled){const Ee=e.memories.filter(Oe=>Oe.enabled);Ee.length>0&&(X+=`
 

@@ -1,0 +1,16 @@
+const l="/api/search/search";async function f(o){try{const t=new URL(l,window.location.origin);t.searchParams.append("q",o),t.searchParams.append("format","json");const a=await fetch(t.toString());if(!a.ok)throw new Error(`SearXNG API error: ${a.statusText}`);const e=await a.json(),n=`Search Results for "${o}"`;let s="";const i=[];return e.results&&Array.isArray(e.results)&&e.results.length>0&&(s=e.results.slice(0,3).map((r,c)=>`[Source ${c+1}] "${r.title}": ${r.content||r.snippet||""}`).join(`
+
+`),e.results.forEach(r=>{r.title&&r.url&&i.push({text:r.title,url:r.url})})),s||(s="No real-time search results or organic summaries were found for this query."),{type:"web",title:n,summary:s,source:"SearXNG (searx.be)",related:i.slice(0,5)}}catch(t){return console.error("Web Search Error:",t),{type:"web",title:"Search unavailable",summary:"The web search tool encountered a technical limitation (network/CORS).",source:"System",related:[]}}}function h(o,t){const a=/\b(exam|timetable|result|schedule|notification|board|date|class-12|rbse|cbse|ssc|hsc)\b/i.test(o);let e=`CRITICAL GROUNDING CONTEXT for "${o}":
+`;return e+=`SEARCH SUMMARY: ${t.summary}
+
+`,t.related.length>0&&(e+=`SOURCE LIST:
+`,t.related.slice(0,5).forEach(n=>{const s=/\.(gov\.in|nic\.in|edu\.in)\b/i.test(n.url);e+=`- [${s?"AUTHORITATIVE":"THIRD-PARTY"}] ${n.text}: ${n.url}
+`})),e+=`
+STRICT INSTRUCTIONS FOR OFFICIAL DATA:`,a?e+=`
+1. This query asks for OFFICIAL DATA (dates, results, schedules).
+2. RULE: You may ONLY state dates if a source tagged [AUTHORITATIVE] or a known official board website confirms them.
+3. RULE: If no [AUTHORITATIVE] source confirms the 2026 dates, you MUST use the following template:
+   "The [Official Body] has not yet released the official [Item] for 2026. Based on previous years, it is usually published around [Month], but no dates are confirmed yet."
+4. FORBIDDEN: Do not mention "tentative" or "expected" dates from THIRD-PARTY sites.
+5. ZERO TOLERANCE for hallucinating timetables or days of the week.`:e+=`
+Use the above information as grounding context. If the results are insufficient, rely on your internal base knowledge but never state unverified facts as certainty.`,e}export{h as formatResultsForPrompt,f as searchWeb};
