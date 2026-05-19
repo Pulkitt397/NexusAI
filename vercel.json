@@ -1,36 +1,8 @@
 {
     "rewrites": [
         {
-            "source": "/api/nvidia/:path*",
-            "destination": "https://integrate.api.nvidia.com/v1/:path*"
-        },
-        {
-            "source": "/api/ollama/:path*",
-            "destination": "https://ollama.com/:path*"
-        },
-        {
-            "source": "/api/gemini/:path*",
-            "destination": "https://generativelanguage.googleapis.com/:path*"
-        },
-        {
-            "source": "/api/groq/:path*",
-            "destination": "https://api.groq.com/:path*"
-        },
-        {
-            "source": "/api/openrouter/:path*",
-            "destination": "https://openrouter.ai/:path*"
-        },
-        {
-            "source": "/api/huggingface/:path*",
-            "destination": "https://api-inference.huggingface.co/:path*"
-        },
-        {
-            "source": "/api/huggingface-api/:path*",
-            "destination": "https://huggingface.co/:path*"
-        },
-        {
-            "source": "/api/zai/:path*",
-            "destination": "https://api.z.ai/:path*"
+            "source": "/api/:provider/:path*",
+            "destination": "/api/proxy.js?provider=:provider&path=:path*"
         },
         {
             "source": "/(.*)",
