@@ -24,6 +24,42 @@ export default defineConfig({
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api\/ollama/, ''),
                 secure: false
+            },
+            '/api/gemini': {
+                target: 'https://generativelanguage.googleapis.com',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api\/gemini/, ''),
+                secure: false
+            },
+            '/api/groq': {
+                target: 'https://api.groq.com',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api\/groq/, ''),
+                secure: false
+            },
+            '/api/openrouter': {
+                target: 'https://openrouter.ai',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api\/openrouter/, ''),
+                secure: false
+            },
+            '/api/huggingface': {
+                target: 'https://api-inference.huggingface.co',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api\/huggingface/, ''),
+                secure: false
+            },
+            '/api/huggingface-api': {
+                target: 'https://huggingface.co',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api\/huggingface-api/, ''),
+                secure: false
+            },
+            '/api/zai': {
+                target: 'https://api.z.ai',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api\/zai/, ''),
+                secure: false
             }
         }
     },

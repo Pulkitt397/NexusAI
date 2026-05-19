@@ -4,8 +4,11 @@ import { store } from './store';
 
 // Gemini API
 export async function fetchGeminiModels(apiKey: string): Promise<Model[]> {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-    if (!res.ok) throw new Error('Failed to fetch Gemini models');
+    const res = await fetch(`/api/gemini/v1beta/models?key=${apiKey}`);
+    if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new Error(err?.error?.message || `Failed to fetch Gemini models (${res.status})`);
+    }
     const data = await res.json();
 
     return (data.models || [])
@@ -31,22 +34,28 @@ export async function* streamGemini(apiKey: string, model: string, messages: { r
     const body: any = { contents, generationConfig: { temperature: 0.7, maxOutputTokens: 8192 } };
     if (systemPrompt) body.systemInstruction = { parts: [{ text: systemPrompt }] };
 
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`, {
+    const res = await fetch(`/api/gemini/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
     });
 
-    if (!res.ok) throw new Error('Gemini API error');
+    if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new Error(err?.error?.message || `Gemini API error (${res.status})`);
+    }
     yield* parseSSE(res);
 }
 
 // Groq API
 export async function fetchGroqModels(apiKey: string): Promise<Model[]> {
-    const res = await fetch('https://api.groq.com/openai/v1/models', {
+    const res = await fetch('/api/groq/openai/v1/models', {
         headers: { 'Authorization': `Bearer ${apiKey}` }
     });
-    if (!res.ok) throw new Error('Failed to fetch Groq models');
+    if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new Error(err?.error?.message || err?.message || `Failed to fetch Groq models (${res.status})`);
+    }
     const data = await res.json();
 
     return (data.data || [])
@@ -61,22 +70,28 @@ export async function fetchGroqModels(apiKey: string): Promise<Model[]> {
 export async function* streamGroq(apiKey: string, model: string, messages: { role: string, content: string }[], systemPrompt?: string): AsyncGenerator<StreamChunk> {
     const msgs = systemPrompt ? [{ role: 'system', content: systemPrompt }, ...messages] : messages;
 
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const res = await fetch('/api/groq/openai/v1/chat/completions', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, messages: msgs, stream: true, max_tokens: 8192 })
+        body: JSON.stringify({ model, messages: msgs, stream: true, max_tokens: 4096 })
     });
 
-    if (!res.ok) throw new Error('Groq API error');
+    if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new Error(err?.error?.message || err?.message || `Groq API error (${res.status})`);
+    }
     yield* parseOpenAISSE(res);
 }
 
 // OpenRouter API
 export async function fetchOpenRouterModels(apiKey: string): Promise<Model[]> {
-    const res = await fetch('https://openrouter.ai/api/v1/models', {
+    const res = await fetch('/api/openrouter/api/v1/models', {
         headers: { 'Authorization': `Bearer ${apiKey}` }
     });
-    if (!res.ok) throw new Error('Failed to fetch OpenRouter models');
+    if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new Error(err?.error?.message || err?.message || `Failed to fetch OpenRouter models (${res.status})`);
+    }
     const data = await res.json();
 
     return (data.data || [])
@@ -92,7 +107,7 @@ export async function fetchOpenRouterModels(apiKey: string): Promise<Model[]> {
 export async function* streamOpenRouter(apiKey: string, model: string, messages: { role: string, content: string }[], systemPrompt?: string): AsyncGenerator<StreamChunk> {
     const msgs = systemPrompt ? [{ role: 'system', content: systemPrompt }, ...messages] : messages;
 
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const res = await fetch('/api/openrouter/api/v1/chat/completions', {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${apiKey}`,
@@ -100,33 +115,40 @@ export async function* streamOpenRouter(apiKey: string, model: string, messages:
             'HTTP-Referer': window.location.origin,
             'X-Title': 'NexusAI'
         },
-        body: JSON.stringify({ model, messages: msgs, stream: true, max_tokens: 8192 })
+        body: JSON.stringify({ model, messages: msgs, stream: true, max_tokens: 4096 })
     });
 
-    if (!res.ok) throw new Error('OpenRouter API error');
+    if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new Error(err?.error?.message || err?.message || `OpenRouter API error (${res.status})`);
+    }
     yield* parseOpenAISSE(res);
 }
 
 // Hugging Face API
 export async function fetchHuggingFaceModels(apiKey: string): Promise<Model[]> {
     // Verify the API key by making a simple request
-    const verifyRes = await fetch('https://huggingface.co/api/whoami-v2', {
+    const verifyRes = await fetch('/api/huggingface-api/api/whoami-v2', {
         headers: { 'Authorization': `Bearer ${apiKey}` }
     });
-    if (!verifyRes.ok) throw new Error('Invalid Hugging Face API key');
+    if (!verifyRes.ok) {
+        throw new Error('Invalid Hugging Face API key');
+    }
 
     // Fetch all text-generation models that are available for inference (free tier)
     const modelsRes = await fetch(
-        'https://huggingface.co/api/models?pipeline_tag=text-generation&inference=warm&sort=downloads&direction=-1&limit=150',
+        '/api/huggingface-api/api/models?pipeline_tag=text-generation&inference=warm&sort=downloads&direction=-1&limit=150',
         { headers: { 'Authorization': `Bearer ${apiKey}` } }
     );
 
-    if (!modelsRes.ok) throw new Error('Failed to fetch Hugging Face models');
+    if (!modelsRes.ok) {
+        throw new Error('Failed to fetch Hugging Face models');
+    }
     const modelsData = await modelsRes.json();
 
     // Also fetch conversational models
     const chatRes = await fetch(
-        'https://huggingface.co/api/models?pipeline_tag=conversational&inference=warm&sort=downloads&direction=-1&limit=100',
+        '/api/huggingface-api/api/models?pipeline_tag=conversational&inference=warm&sort=downloads&direction=-1&limit=100',
         { headers: { 'Authorization': `Bearer ${apiKey}` } }
     );
 
@@ -155,7 +177,7 @@ export async function fetchHuggingFaceModels(apiKey: string): Promise<Model[]> {
 export async function* streamHuggingFace(apiKey: string, model: string, messages: { role: string, content: string }[], systemPrompt?: string): AsyncGenerator<StreamChunk> {
     const msgs = systemPrompt ? [{ role: 'system', content: systemPrompt }, ...messages] : messages;
 
-    const res = await fetch(`https://api-inference.huggingface.co/models/${model}/v1/chat/completions`, {
+    const res = await fetch(`/api/huggingface/models/${model}/v1/chat/completions`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${apiKey}`,
@@ -171,8 +193,8 @@ export async function* streamHuggingFace(apiKey: string, model: string, messages
     });
 
     if (!res.ok) {
-        const error = await res.json().catch(() => ({ error: 'Unknown error' }));
-        throw new Error(error.error || 'Hugging Face API error');
+        const error = await res.json().catch(() => ({ error: 'Hugging Face API error' }));
+        throw new Error(error.error || error.message || 'Hugging Face API error');
     }
     yield* parseOpenAISSE(res);
 }
@@ -257,7 +279,7 @@ export async function* streamNvidia(apiKey: string, model: string, messages: { r
 export async function fetchZaiModels(apiKey: string): Promise<Model[]> {
     // Attempt to fetch models from the API
     try {
-        const res = await fetch('https://api.z.ai/api/paas/v4/models', {
+        const res = await fetch('/api/zai/api/paas/v4/models', {
             headers: { 'Authorization': `Bearer ${apiKey}` }
         });
 
@@ -290,7 +312,7 @@ export async function fetchZaiModels(apiKey: string): Promise<Model[]> {
 export async function* streamZai(apiKey: string, model: string, messages: { role: string, content: string }[], systemPrompt?: string): AsyncGenerator<StreamChunk> {
     const msgs = systemPrompt ? [{ role: 'system', content: systemPrompt }, ...messages] : messages;
 
-    const res = await fetch('https://api.z.ai/api/paas/v4/chat/completions', {
+    const res = await fetch('/api/zai/api/paas/v4/chat/completions', {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${apiKey}`,
@@ -305,8 +327,8 @@ export async function* streamZai(apiKey: string, model: string, messages: { role
     });
 
     if (!res.ok) {
-        const error = await res.json().catch(() => ({ error: 'Unknown error' }));
-        throw new Error(error.error?.message || 'Z.ai API error');
+        const error = await res.json().catch(() => ({ error: { message: 'Z.ai API error' } }));
+        throw new Error(error.error?.message || error.message || 'Z.ai API error');
     }
     yield* parseOpenAISSE(res);
 }
