@@ -402,24 +402,29 @@ export default function App() {
   const deviceWidth = deviceMode === 'mobile' ? 'max-w-[375px]' : deviceMode === 'tablet' ? 'max-w-[768px]' : 'max-w-full';
 
   return (
-    <div className="flex flex-col h-full bg-[#09090b] text-white overflow-hidden font-sans">
+    <div className="flex flex-col h-full bg-[#030303] text-white overflow-hidden font-sans relative">
       {/* Header */}
-      <header className="h-12 border-b border-white/5 bg-[#0c0c0e] flex items-center justify-between px-3 shrink-0">
+      <header className="h-14 border-b border-white/[0.05] bg-[#050507]/60 backdrop-blur-xl flex items-center justify-between px-4 shrink-0 z-30 shadow-sm">
         <div className="flex items-center gap-3">
-          <button onClick={onClose} className="p-1.5 hover:bg-white/5 rounded-lg transition-colors">
-            <X className="w-4 h-4 text-white/40 hover:text-white" />
-          </button>
+          <motion.button 
+            onClick={onClose} 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-2 -ml-2 text-white/50 hover:text-white hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </motion.button>
           <div className="h-5 w-px bg-white/10" />
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-              <Code2 className="w-3.5 h-3.5 text-white" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <Code2 className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h1 className="text-sm font-semibold text-white leading-none">Nexus Studio</h1>
-              <p className="text-[10px] text-white/30 mt-0.5">
+              <h1 className="text-xs md:text-sm font-black text-white leading-none tracking-wide uppercase font-sans">Nexus Studio</h1>
+              <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mt-1">
                 {isBuilding ? (
-                  <span className="flex items-center gap-1">
-                    <Loader2 className="w-2.5 h-2.5 animate-spin text-indigo-400" />
+                  <span className="flex items-center gap-1.5 text-indigo-400">
+                    <Loader2 className="w-2.5 h-2.5 animate-spin" />
                     {buildPhase === 'planning' ? 'Planning...' : 'Building...'}
                   </span>
                 ) : (
@@ -430,9 +435,9 @@ export default function App() {
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2.5">
           {/* View Toggle */}
-          <div className="flex items-center bg-white/5 rounded-lg p-0.5">
+          <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/5 h-9">
             {[
               { id: 'code' as EditorView, icon: Code2, label: 'Code' },
               { id: 'preview' as EditorView, icon: Eye, label: 'Preview' },
@@ -443,11 +448,11 @@ export default function App() {
                 key={id}
                 onClick={() => setEditorView(id)}
                 className={cn(
-                  "px-2.5 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-1.5",
-                  editorView === id ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"
+                  "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer h-full",
+                  editorView === id ? "bg-[#27272a]/80 text-white border border-white/[0.05] shadow-sm" : "text-white/40 hover:text-white/70"
                 )}
               >
-                <Icon className="w-3 h-3" />
+                <Icon className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">{label}</span>
               </button>
             ))}
@@ -457,7 +462,7 @@ export default function App() {
 
           {/* Device Toggle (preview mode) */}
           {(editorView === 'preview' || editorView === 'split') && (
-            <div className="flex items-center bg-white/5 rounded-lg p-0.5">
+            <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/5 h-9">
               {[
                 { id: 'desktop' as DeviceMode, icon: Monitor },
                 { id: 'tablet' as DeviceMode, icon: Tablet },
@@ -467,7 +472,7 @@ export default function App() {
                   key={id}
                   onClick={() => setDeviceMode(id)}
                   className={cn(
-                    "p-1.5 rounded-md transition-all",
+                    "p-1.5 rounded-lg transition-all cursor-pointer h-full flex items-center justify-center",
                     deviceMode === id ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60"
                   )}
                 >
@@ -479,25 +484,29 @@ export default function App() {
 
           <div className="h-5 w-px bg-white/10 mx-1" />
 
-          <button
+          <motion.button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className={cn("p-1.5 rounded-lg transition-colors", sidebarOpen ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60")}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={cn("p-2 rounded-xl transition-all cursor-pointer border h-9 w-9 flex items-center justify-center", sidebarOpen ? "bg-white/10 border-white/10 text-white" : "bg-white/5 border-transparent text-white/30 hover:text-white/60")}
           >
             <PanelLeft className="w-4 h-4" />
-          </button>
+          </motion.button>
 
-          <button
+          <motion.button
             onClick={handleExport}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white rounded-lg text-[11px] font-medium transition-all shadow-lg shadow-indigo-500/20"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 text-white rounded-xl text-xs font-semibold transition-all shadow-lg shadow-indigo-500/20 cursor-pointer h-9"
           >
-            <Download className="w-3 h-3" />
+            <Download className="w-3.5 h-3.5" />
             Export
-          </button>
+          </motion.button>
         </div>
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden z-10">
         {/* Sidebar */}
         <AnimatePresence>
           {sidebarOpen && (
@@ -505,22 +514,22 @@ export default function App() {
               initial={{ width: 0, opacity: 0 }}
               animate={{ width: 240, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className="border-r border-white/5 bg-[#0c0c0e] flex flex-col shrink-0"
+              transition={{ type: "spring", bounce: 0, duration: 0.25 }}
+              className="border-r border-white/[0.05] bg-[#050507]/80 backdrop-blur-xl flex flex-col shrink-0"
             >
-              <div className="flex-1 overflow-y-auto p-2">
+              <div className="flex-1 overflow-y-auto p-3 space-y-5 custom-scrollbar">
                 {/* File Tree */}
-                <div className="mb-4">
-                  <div className="flex items-center gap-1.5 px-2 py-1.5 mb-1">
-                    <FolderTree className="w-3 h-3 text-white/30" />
-                    <h3 className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Explorer</h3>
+                <div>
+                  <div className="flex items-center gap-2 px-2.5 py-1.5 mb-2">
+                    <FolderTree className="w-3.5 h-3.5 text-white/30" />
+                    <h3 className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Explorer</h3>
                   </div>
 
                   {files.length === 0 ? (
-                    <div className="text-center py-6 text-white/20">
-                      <Package className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                      <p className="text-[11px]">No files yet</p>
-                      <p className="text-[10px] mt-1">Describe what to build</p>
+                    <div className="text-center py-8 px-4 rounded-2xl bg-white/[0.02] border border-white/[0.03]">
+                      <Package className="w-8 h-8 mx-auto mb-2.5 text-white/10" />
+                      <p className="text-xs font-medium text-white/40">No files yet</p>
+                      <p className="text-[10px] text-white/20 mt-1">Describe what to build to get started.</p>
                     </div>
                   ) : (
                     <div className="space-y-0.5">
@@ -540,29 +549,29 @@ export default function App() {
 
                 {/* Sections */}
                 {state.sections.length > 0 && (
-                  <div className="mb-4">
-                    <div className="flex items-center gap-1.5 px-2 py-1.5 mb-1">
-                      <Layers className="w-3 h-3 text-white/30" />
-                      <h3 className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Sections</h3>
+                  <div>
+                    <div className="flex items-center gap-2 px-2.5 py-1.5 mb-2">
+                      <Layers className="w-3.5 h-3.5 text-white/30" />
+                      <h3 className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Sections</h3>
                     </div>
-                    <div className="space-y-0.5">
+                    <div className="space-y-1">
                       {state.sections.map((section) => (
                         <button
                           key={section.id}
                           onClick={() => selectSection(section.id)}
                           className={cn(
-                            "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-all text-xs",
+                            "w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-all text-xs font-medium border cursor-pointer",
                             state.selectedSectionId === section.id
-                              ? "bg-indigo-500/10 text-indigo-300 border border-indigo-500/20"
-                              : "text-white/40 hover:bg-white/5 hover:text-white/70"
+                              ? "bg-indigo-500/10 text-indigo-300 border-indigo-500/30"
+                              : "bg-white/[0.01] hover:bg-white/5 text-white/40 hover:text-white/70 border-transparent"
                           )}
                         >
                           {section.status === 'complete' ? (
-                            <CheckCircle2 className="w-3 h-3 text-green-400 shrink-0" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-green-400 shrink-0" />
                           ) : section.status === 'generating' ? (
-                            <Loader2 className="w-3 h-3 text-indigo-400 animate-spin shrink-0" />
+                            <Loader2 className="w-3.5 h-3.5 text-indigo-400 animate-spin shrink-0" />
                           ) : (
-                            <Box className="w-3 h-3 shrink-0" />
+                            <Box className="w-3.5 h-3.5 text-white/30 shrink-0" />
                           )}
                           <span className="truncate">{section.title}</span>
                         </button>
@@ -573,30 +582,30 @@ export default function App() {
 
                 {/* Build Steps */}
                 {buildSteps.length > 0 && (
-                  <div className="mb-4">
-                    <div className="flex items-center gap-1.5 px-2 py-1.5 mb-1">
-                      <GitBranch className="w-3 h-3 text-white/30" />
-                      <h3 className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Pipeline</h3>
+                  <div className="rounded-2xl bg-white/[0.02] border border-white/[0.03] p-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <GitBranch className="w-3.5 h-3.5 text-white/30" />
+                      <h3 className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Pipeline</h3>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       {buildSteps.map((step, idx) => (
-                        <div key={idx} className="flex items-center gap-2 px-2 py-1">
+                        <div key={idx} className="flex items-center gap-2 px-1 py-0.5">
                           <div className={cn(
-                            "w-4 h-4 rounded-full flex items-center justify-center shrink-0",
-                            step.status === 'done' ? "bg-green-500/20" :
-                              step.status === 'active' ? "bg-indigo-500/20" :
-                                step.status === 'error' ? "bg-red-500/20" : "bg-white/5"
+                            "w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 border",
+                            step.status === 'done' ? "bg-green-500/10 border-green-500/20" :
+                              step.status === 'active' ? "bg-indigo-500/10 border-indigo-500/20" :
+                                step.status === 'error' ? "bg-red-500/10 border-red-500/20" : "bg-white/5 border-transparent"
                           )}>
-                            {step.status === 'done' ? <Check className="w-2.5 h-2.5 text-green-400" /> :
-                              step.status === 'active' ? <Loader2 className="w-2.5 h-2.5 text-indigo-400 animate-spin" /> :
-                                step.status === 'error' ? <AlertCircle className="w-2.5 h-2.5 text-red-400" /> :
+                            {step.status === 'done' ? <Check className="w-3 h-3 text-green-400" /> :
+                              step.status === 'active' ? <Loader2 className="w-3 h-3 text-indigo-400 animate-spin" /> :
+                                step.status === 'error' ? <AlertCircle className="w-3 h-3 text-red-400" /> :
                                   <div className="w-1.5 h-1.5 rounded-full bg-white/20" />}
                           </div>
                           <span className={cn(
-                            "text-[10px]",
-                            step.status === 'done' ? "text-green-400/70" :
-                              step.status === 'active' ? "text-indigo-300" :
-                                step.status === 'error' ? "text-red-400/70" : "text-white/20"
+                            "text-[10px] font-medium truncate",
+                            step.status === 'done' ? "text-green-400/80" :
+                              step.status === 'active' ? "text-indigo-300 font-bold" :
+                                step.status === 'error' ? "text-red-400/85" : "text-white/25"
                           )}>
                             {step.label}
                           </span>
@@ -606,14 +615,14 @@ export default function App() {
 
                     {/* Progress bar */}
                     {isBuilding && (
-                      <div className="mt-2 px-2">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] text-white/30">Progress</span>
-                          <span className="text-[10px] text-white/40">{Math.round(buildProgress)}%</span>
+                      <div className="mt-4 border-t border-white/5 pt-3">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider">Progress</span>
+                          <span className="text-[10px] font-bold text-indigo-400">{Math.round(buildProgress)}%</span>
                         </div>
-                        <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                           <motion.div
-                            className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
+                            className="h-full bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 rounded-full"
                             initial={{ width: 0 }}
                             animate={{ width: `${buildProgress}%` }}
                             transition={{ duration: 0.3 }}
@@ -627,19 +636,19 @@ export default function App() {
 
               {/* Quick Actions */}
               {state.projectStage === 'refine' && !isBuilding && (
-                <div className="p-2 border-t border-white/5 space-y-1">
-                  <p className="text-[10px] text-white/30 px-2 mb-1 font-medium uppercase tracking-wider">Quick Actions</p>
+                <div className="p-3 border-t border-white/[0.05] bg-[#030305]/60 space-y-1.5">
+                  <p className="text-[9px] font-bold text-white/30 px-2.5 mb-1.5 uppercase tracking-widest">Quick Refinement</p>
                   {[
-                    { icon: Sparkles, label: 'Polish UI', action: () => handleSubmit('Make the UI more polished and premium looking') },
-                    { icon: Smartphone, label: 'Make Responsive', action: () => handleSubmit('Make all components fully responsive for mobile') },
-                    { icon: ZapIcon, label: 'Add Animations', action: () => handleSubmit('Add smooth framer-motion animations to all sections') },
+                    { icon: Sparkles, label: 'Polish UI Details', action: () => handleSubmit('Make the UI more polished and premium looking') },
+                    { icon: Smartphone, label: 'Make Fully Responsive', action: () => handleSubmit('Make all components fully responsive for mobile') },
+                    { icon: ZapIcon, label: 'Add Framer Animations', action: () => handleSubmit('Add smooth framer-motion animations to all sections') },
                   ].map(({ icon: Icon, label, action }) => (
                     <button
                       key={label}
                       onClick={action}
-                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-white/40 hover:text-white hover:bg-white/5 transition-all"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-white/50 hover:text-white hover:bg-white/5 transition-all cursor-pointer font-medium"
                     >
-                      <Icon className="w-3 h-3" />
+                      <Icon className="w-3.5 h-3.5 text-indigo-400/80" />
                       {label}
                     </button>
                   ))}
@@ -654,25 +663,27 @@ export default function App() {
           <div className="flex-1 flex overflow-hidden">
             {/* Code Editor */}
             {(editorView === 'code' || editorView === 'split') && (
-              <div className={cn("flex flex-col", editorView === 'split' ? 'w-1/2 border-r border-white/5' : 'w-full')}>
+              <div className={cn("flex flex-col", editorView === 'split' ? 'w-1/2 border-r border-white/[0.05]' : 'w-full')}>
                 {activeFile ? (
                   <>
-                    <div className="flex items-center justify-between px-3 py-1.5 bg-white/[0.02] border-b border-white/5">
-                      <div className="flex items-center gap-2 text-[11px] text-white/40">
-                        <FileCode className="w-3 h-3" />
-                        <span>{activeFile.path}</span>
+                    <div className="flex items-center justify-between px-4 py-2.5 bg-white/[0.01] border-b border-white/[0.05]">
+                      <div className="flex items-center gap-2 text-[10px] font-bold text-white/30 uppercase tracking-wider">
+                        <FileCode className="w-3.5 h-3.5 text-indigo-400" />
+                        <span className="truncate max-w-[300px]">{activeFile.path}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <button
+                      <div className="flex items-center gap-1.5">
+                        <motion.button
                           onClick={() => {
                             navigator.clipboard.writeText(activeFile.content);
                             showToast('Copied to clipboard', 'success');
                           }}
-                          className="p-1 hover:bg-white/5 rounded text-white/30 hover:text-white transition-colors"
-                          title="Copy"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="p-1.5 hover:bg-white/5 rounded-lg text-white/30 hover:text-white transition-colors cursor-pointer"
+                          title="Copy Code"
                         >
-                          <Copy className="w-3 h-3" />
-                        </button>
+                          <Copy className="w-3.5 h-3.5" />
+                        </motion.button>
                       </div>
                     </div>
                     <textarea
@@ -685,10 +696,10 @@ export default function App() {
                   </>
                 ) : (
                   <div className="flex-1 flex items-center justify-center">
-                    <div className="text-center">
-                      <Code2 className="w-12 h-12 mx-auto mb-3 text-white/10" />
-                      <p className="text-sm text-white/30">Select a file to edit</p>
-                      <p className="text-xs text-white/20 mt-1">Or describe what to build below</p>
+                    <div className="text-center max-w-sm px-6">
+                      <Code2 className="w-12 h-12 mx-auto mb-4 text-white/10" />
+                      <p className="text-sm font-semibold text-white/40">Select a file to view editor</p>
+                      <p className="text-xs text-white/25 mt-1.5 leading-relaxed">Choose a generated file from the Explorer or describe a new UI build task in the prompt bar below.</p>
                     </div>
                   </div>
                 )}
@@ -697,13 +708,13 @@ export default function App() {
 
             {/* Preview */}
             {(editorView === 'preview' || editorView === 'split') && (
-              <div className={cn("flex flex-col bg-[#0a0a0b]", editorView === 'split' ? 'w-1/2' : 'w-full')}>
-                <div className="flex items-center justify-between px-3 py-1.5 bg-white/[0.02] border-b border-white/5">
-                  <div className="flex items-center gap-2 text-[11px] text-white/40">
-                    <Eye className="w-3 h-3" />
+              <div className={cn("flex flex-col bg-[#050507]/40", editorView === 'split' ? 'w-1/2' : 'w-full')}>
+                <div className="flex items-center justify-between px-4 py-2.5 bg-white/[0.01] border-b border-white/[0.05]">
+                  <div className="flex items-center gap-2 text-[10px] font-bold text-white/30 uppercase tracking-wider">
+                    <Eye className="w-3.5 h-3.5 text-violet-400" />
                     <span>Live Preview</span>
                   </div>
-                  <button
+                  <motion.button
                     onClick={() => {
                       if (activeFile) {
                         const extracted = extractPreviewableCode(activeFile.content);
@@ -711,27 +722,29 @@ export default function App() {
                         setPreviewContent(doc);
                       }
                     }}
-                    className="p-1 hover:bg-white/5 rounded text-white/30 hover:text-white transition-colors"
-                    title="Refresh"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="p-1.5 hover:bg-white/5 rounded-lg text-white/30 hover:text-white transition-colors cursor-pointer"
+                    title="Refresh Preview"
                   >
-                    <RefreshCw className="w-3 h-3" />
-                  </button>
+                    <RefreshCw className="w-3.5 h-3.5" />
+                  </motion.button>
                 </div>
                 <div className="flex-1 p-4 overflow-auto flex items-start justify-center bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L3N2Zz4=')]">
-                  <div className={cn("w-full h-[calc(100%-1rem)] bg-white rounded-xl overflow-hidden shadow-2xl shadow-black/50 transition-all duration-300", deviceWidth)}>
+                  <div className={cn("w-full h-[calc(100%-1rem)] bg-[#030303]/90 rounded-2xl overflow-hidden shadow-2xl shadow-black/80 transition-all duration-300 border border-white/[0.05] relative", deviceWidth)}>
                     {previewContent ? (
                       <iframe
                         srcDoc={previewContent}
-                        className="w-full h-full"
+                        className="w-full h-full bg-[#050507]"
                         sandbox="allow-scripts allow-same-origin allow-modals"
                         title="Preview"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-white/30">
-                        <div className="text-center">
-                          <Monitor className="w-10 h-10 mx-auto mb-3 opacity-20" />
-                          <p className="text-xs">No preview available</p>
-                          <p className="text-[10px] mt-1 opacity-50">Generate code to see preview</p>
+                      <div className="w-full h-full flex items-center justify-center text-white/30 bg-[#050507]/40">
+                        <div className="text-center px-6">
+                          <Monitor className="w-10 h-10 mx-auto mb-3 opacity-25" />
+                          <p className="text-xs font-semibold text-white/40">No live preview loaded</p>
+                          <p className="text-[10px] text-white/20 mt-1">Generate or open a component with HTML/JS layout structure.</p>
                         </div>
                       </div>
                     )}
@@ -742,58 +755,58 @@ export default function App() {
 
             {/* Blueprint View */}
             {editorView === 'blueprint' && (
-              <div className="w-full flex flex-col overflow-auto bg-[#09090b]">
+              <div className="w-full flex flex-col overflow-auto bg-[#030303] custom-scrollbar">
                 <div className="p-6 max-w-4xl mx-auto w-full">
                   {!state.siteIntent ? (
-                    <div className="flex items-center justify-center h-64">
-                      <div className="text-center">
+                    <div className="flex items-center justify-center h-64 border border-dashed border-white/5 rounded-2xl bg-white/[0.01]">
+                      <div className="text-center px-6">
                         <Layers className="w-12 h-12 mx-auto mb-3 text-white/10" />
-                        <p className="text-sm text-white/30">No blueprint yet</p>
-                        <p className="text-xs text-white/20 mt-1">Start a build to generate the blueprint</p>
+                        <p className="text-sm font-semibold text-white/40">No blueprint generated yet</p>
+                        <p className="text-xs text-white/20 mt-1.5">Start a build pipeline to design the app blueprint.</p>
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-6">
                       {/* Intent */}
-                      <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Sparkles className="w-4 h-4 text-indigo-400" />
-                          <h3 className="text-sm font-semibold text-white">Project Intent</h3>
+                      <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05] shadow-lg">
+                        <div className="flex items-center gap-2.5 mb-4 border-b border-white/5 pb-3">
+                          <Sparkles className="w-4.5 h-4.5 text-indigo-400" />
+                          <h3 className="text-sm font-black text-white uppercase tracking-wider">Project Intent</h3>
                         </div>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Goal</p>
-                            <p className="text-xs text-white/70">{(state.siteIntent as any)?.goal || 'N/A'}</p>
+                            <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1.5">Primary Goal</p>
+                            <p className="text-xs text-white/80 font-medium">{(state.siteIntent as any)?.goal || 'N/A'}</p>
                           </div>
                           <div>
-                            <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Audience</p>
-                            <p className="text-xs text-white/70">{(state.siteIntent as any)?.audience || 'N/A'}</p>
+                            <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1.5">Target Audience</p>
+                            <p className="text-xs text-white/80 font-medium">{(state.siteIntent as any)?.audience || 'N/A'}</p>
                           </div>
                           <div>
-                            <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Site Type</p>
-                            <p className="text-xs text-white/70">{(state.siteIntent as any)?.site_type || 'N/A'}</p>
+                            <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1.5">Site Type & Genre</p>
+                            <p className="text-xs text-white/80 font-medium">{(state.siteIntent as any)?.site_type || 'N/A'}</p>
                           </div>
                           <div>
-                            <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Tone</p>
-                            <p className="text-xs text-white/70">{(state.siteIntent as any)?.tone || 'N/A'}</p>
+                            <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1.5">Visual Aesthetic & Tone</p>
+                            <p className="text-xs text-white/80 font-medium">{(state.siteIntent as any)?.tone || 'N/A'}</p>
                           </div>
                         </div>
                       </div>
 
                       {/* Architecture */}
                       {state.siteArchitecture && (
-                        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                          <div className="flex items-center gap-2 mb-3">
-                            <Box className="w-4 h-4 text-violet-400" />
-                            <h3 className="text-sm font-semibold text-white">Architecture</h3>
+                        <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05] shadow-lg">
+                          <div className="flex items-center gap-2.5 mb-4 border-b border-white/5 pb-3">
+                            <Box className="w-4.5 h-4.5 text-violet-400" />
+                            <h3 className="text-sm font-black text-white uppercase tracking-wider">Section Architecture</h3>
                           </div>
                           <div className="space-y-2">
                             {(state.siteArchitecture as any)?.sections?.map((s: any, i: number) => (
-                              <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/[0.02]">
-                                <div className="w-5 h-5 rounded-md bg-indigo-500/10 flex items-center justify-center text-[10px] text-indigo-400 font-medium">{i + 1}</div>
+                              <div key={i} className="flex items-center gap-3.5 px-4 py-3 rounded-xl bg-white/[0.01] hover:bg-white/[0.03] border border-white/[0.02] transition-all">
+                                <div className="w-6 h-6 rounded-lg bg-indigo-500/10 flex items-center justify-center text-[11px] text-indigo-300 font-black">{i + 1}</div>
                                 <div>
-                                  <p className="text-xs text-white/70 font-medium">{s.name}</p>
-                                  <p className="text-[10px] text-white/30">{s.purpose}</p>
+                                  <p className="text-xs text-white/80 font-semibold">{s.name}</p>
+                                  <p className="text-[10px] text-white/40 mt-0.5">{s.purpose}</p>
                                 </div>
                               </div>
                             ))}
@@ -803,16 +816,16 @@ export default function App() {
 
                       {/* Design System */}
                       {state.designSystem && (
-                        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                          <div className="flex items-center gap-2 mb-3">
-                            <Palette className="w-4 h-4 text-purple-400" />
-                            <h3 className="text-sm font-semibold text-white">Design System</h3>
+                        <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05] shadow-lg">
+                          <div className="flex items-center gap-2.5 mb-4 border-b border-white/5 pb-3">
+                            <Palette className="w-4.5 h-4.5 text-purple-400" />
+                            <h3 className="text-sm font-black text-white uppercase tracking-wider">UI Theme Palettes</h3>
                           </div>
-                          <div className="flex gap-2 flex-wrap">
+                          <div className="flex gap-2.5 flex-wrap">
                             {Object.entries((state.designSystem as any)?.color_palette || {}).map(([name, value]: [string, any]) => (
-                              <div key={name} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/[0.02]">
-                                <div className="w-4 h-4 rounded-full border border-white/10" style={{ backgroundColor: value }} />
-                                <span className="text-[10px] text-white/50 capitalize">{name}</span>
+                              <div key={name} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.02] border border-white/[0.03]">
+                                <div className="w-5 h-5 rounded-full border border-white/10 shadow-inner" style={{ backgroundColor: value }} />
+                                <span className="text-[10px] font-bold text-white/60 capitalize tracking-wide">{name}</span>
                               </div>
                             ))}
                           </div>
@@ -832,45 +845,50 @@ export default function App() {
                 initial={{ height: 0 }}
                 animate={{ height: 160 }}
                 exit={{ height: 0 }}
-                transition={{ duration: 0.15 }}
-                className="border-t border-white/5 bg-[#0c0c0e] flex flex-col shrink-0"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                className="border-t border-white/[0.05] bg-[#050507]/90 backdrop-blur-xl flex flex-col shrink-0"
               >
-                <div className="flex items-center justify-between px-3 py-1 border-b border-white/5">
-                  <div className="flex items-center gap-1.5">
-                    <Terminal className="w-3 h-3 text-white/30" />
-                    <span className="text-[10px] text-white/40 font-medium uppercase tracking-wider">Console</span>
-                    <span className="text-[10px] text-white/20">({consoleMessages.length})</span>
+                <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.05] bg-white/[0.01]">
+                  <div className="flex items-center gap-2">
+                    <Terminal className="w-3.5 h-3.5 text-indigo-400" />
+                    <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Console Stream</span>
+                    <span className="text-[9px] font-extrabold bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded-full">
+                      {consoleMessages.length} Logs
+                    </span>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => setConsoleMessages([])}
-                      className="p-1 hover:bg-white/5 rounded text-white/20 hover:text-white/50 transition-colors"
+                      className="p-1 hover:bg-white/5 rounded-lg text-white/30 hover:text-white transition-colors cursor-pointer"
+                      title="Clear Console"
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => setBottomPanel('none')}
-                      className="p-1 hover:bg-white/5 rounded text-white/20 hover:text-white/50 transition-colors"
+                      className="p-1 hover:bg-white/5 rounded-lg text-white/30 hover:text-white transition-colors cursor-pointer"
+                      title="Hide Console"
                     >
-                      <X className="w-3 h-3" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
-                <div className="flex-1 overflow-y-auto p-2 font-mono text-[11px] space-y-0.5 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-3 font-mono text-[11px] space-y-1 custom-scrollbar">
                   {consoleMessages.length === 0 ? (
-                    <p className="text-white/15">Console output will appear here...</p>
+                    <p className="text-white/20 italic">No output logs standard input streams yet...</p>
                   ) : (
                     consoleMessages.map((msg) => (
-                      <div key={msg.id} className="flex items-start gap-2">
-                        <span className="text-white/15 shrink-0">
-                          {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                      <div key={msg.id} className="flex items-start gap-2.5">
+                        <span className="text-white/20 shrink-0 select-none">
+                          [{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}]
                         </span>
                         <span className={cn(
+                          "leading-relaxed font-semibold",
                           msg.type === 'error' ? 'text-red-400' :
                             msg.type === 'success' ? 'text-green-400' :
                               msg.type === 'warn' ? 'text-yellow-400' :
                                 msg.type === 'system' ? 'text-indigo-400' :
-                                  'text-white/50'
+                                  'text-white/60'
                         )}>
                           {msg.message}
                         </span>
@@ -886,11 +904,13 @@ export default function App() {
       </div>
 
       {/* Command Bar */}
-      <div className="border-t border-white/5 bg-[#0c0c0e] p-3 shrink-0">
+      <div className="border-t border-white/[0.05] bg-[#050507]/80 backdrop-blur-2xl p-4 shrink-0 z-20">
         <div className="max-w-3xl mx-auto">
           <div className={cn(
-            "flex items-end gap-2 bg-white/[0.03] rounded-xl border p-2 transition-all",
-            isSubmitting || isBuilding ? "border-indigo-500/30" : "border-white/5 focus-within:border-white/10"
+            "flex items-end gap-3 bg-[#09090b]/40 rounded-2xl border p-3 transition-all duration-300",
+            isSubmitting || isBuilding 
+              ? "border-indigo-500/40 shadow-[0_0_20px_-3px_rgba(99,102,241,0.15)]" 
+              : "border-white/[0.05] focus-within:border-indigo-500/40 focus-within:bg-[#070709]/90 focus-within:shadow-[0_0_25px_-5px_rgba(99,102,241,0.2)]"
           )}>
             <textarea
               ref={textareaRef}
@@ -899,10 +919,10 @@ export default function App() {
               disabled={isSubmitting || isBuilding}
               placeholder={
                 isBuilding ? 'Building in progress...' :
-                  state.projectStage === 'intent' ? 'Describe what you want to build...' :
-                    'Ask for changes or refinements...'
+                  state.projectStage === 'intent' ? 'Describe the site context, layout, colors or features you want to build...' :
+                    'Ask for specific code modifications or styles refinements...'
               }
-              className="flex-1 bg-transparent border-none resize-none focus:outline-none text-sm text-white placeholder:text-white/20 min-h-[36px] max-h-24 disabled:opacity-50"
+              className="flex-1 bg-transparent border-none resize-none focus:outline-none text-[13.5px] text-white placeholder:text-white/20 min-h-[36px] max-h-24 disabled:opacity-50 font-medium leading-relaxed"
               rows={1}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey && !isSubmitting && !isBuilding) {
@@ -911,35 +931,37 @@ export default function App() {
                 }
               }}
             />
-            <button
+            <motion.button
               onClick={() => { if (inputValue.trim() && !isSubmitting && !isBuilding) handleSubmit(inputValue.trim()); }}
               disabled={isSubmitting || isBuilding || !inputValue.trim()}
+              whileHover={inputValue.trim() && !isSubmitting && !isBuilding ? { scale: 1.05 } : {}}
+              whileTap={inputValue.trim() && !isSubmitting && !isBuilding ? { scale: 0.95 } : {}}
               className={cn(
-                "flex items-center justify-center w-9 h-9 rounded-lg transition-all shrink-0",
-                isSubmitting || isBuilding ? "bg-indigo-500/20 text-indigo-400" :
-                  inputValue.trim() ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/20" :
-                    "bg-white/5 text-white/20"
+                "flex items-center justify-center w-10 h-10 rounded-xl transition-all shrink-0 cursor-pointer",
+                isSubmitting || isBuilding ? "bg-indigo-500/20 text-indigo-400 border border-indigo-500/20" :
+                  inputValue.trim() ? "bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/35 border-0" :
+                    "bg-white/5 text-white/20 border border-white/[0.02]"
               )}
             >
-              {isSubmitting || isBuilding ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
-            </button>
+              {isSubmitting || isBuilding ? <Loader2 className="w-4.5 h-4.5 animate-spin" /> : <ArrowRight className="w-4.5 h-4.5" />}
+            </motion.button>
           </div>
-          <div className="flex items-center justify-between mt-1.5 px-1">
+          <div className="flex items-center justify-between mt-2.5 px-1.5">
             <span className={cn(
-              "text-[10px] flex items-center gap-1",
+              "text-[9px] font-bold uppercase tracking-wider flex items-center gap-1.5",
               isBuilding ? "text-indigo-400" : "text-white/20"
             )}>
               {isBuilding ? (
-                <><Loader2 className="w-2.5 h-2.5 animate-spin" /> {buildPhase === 'planning' ? 'Planning' : 'Building'} — {Math.round(buildProgress)}%</>
+                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> {buildPhase === 'planning' ? 'Planning Pipeline' : 'Building Sections'} — {Math.round(buildProgress)}%</>
               ) : (
-                <><span className="w-1.5 h-1.5 rounded-full bg-green-500" /> Ready</>
+                <><span className="w-2 h-2 rounded-full bg-green-500 shadow-md shadow-green-500/50" /> System Ready</>
               )}
             </span>
             <button
               onClick={() => setBottomPanel(bottomPanel === 'none' ? 'terminal' : 'none')}
-              className="text-[10px] text-white/20 hover:text-white/40 transition-colors flex items-center gap-1"
+              className="text-[9px] font-bold uppercase tracking-wider text-white/20 hover:text-white/40 transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              <Terminal className="w-2.5 h-2.5" />
+              <Terminal className="w-3 h-3 text-indigo-400/70" />
               {bottomPanel === 'none' ? 'Show Console' : 'Hide Console'}
             </button>
           </div>

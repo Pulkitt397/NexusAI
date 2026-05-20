@@ -41,12 +41,12 @@ export function Sidebar({ isMobile, isOpen, onClose, isWebDevMode, setWebDevMode
             }}
             transition={{ type: "spring", bounce: 0, duration: 0.3 }}
             className={cn(
-                "h-full border-r border-white/5 flex flex-col bg-[#0c0c0e] shrink-0 overflow-hidden z-20",
-                isMobile ? "fixed inset-y-0 left-0 shadow-2xl" : "relative"
+                "h-full border-r border-white/[0.05] flex flex-col bg-[#050507]/80 backdrop-blur-xl shrink-0 overflow-hidden z-20 shadow-2xl",
+                isMobile ? "fixed inset-y-0 left-0" : "relative"
             )}
         >
             {/* Header / Logo */}
-            <div className="h-16 flex items-center px-4 border-b border-white/5 bg-[#09090b]">
+            <div className="h-16 flex items-center px-4 border-b border-white/[0.05] bg-[#030305]/40 backdrop-blur-md">
                 <div className="flex items-center gap-3 font-semibold text-white">
                     <div className="w-10 h-10 relative">
                         <svg viewBox="0 0 48 48" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -91,112 +91,134 @@ export function Sidebar({ isMobile, isOpen, onClose, isWebDevMode, setWebDevMode
             </div>
 
             {/* Main Actions */}
-            <div className="p-3 space-y-2">
-                <button
+            <div className="p-3 space-y-2 shrink-0">
+                <motion.button
                     onClick={() => { setWebDevMode(false); createChat(); }}
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white rounded-xl text-sm font-medium transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 border-0"
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/35 border-0 cursor-pointer"
                 >
                     <Plus className="w-4 h-4" />
                     New Chat
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                     onClick={() => setWebDevMode(!isWebDevMode)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     className={cn(
-                        "w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all border",
+                        "w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold transition-all border cursor-pointer",
                         isWebDevMode
-                            ? "bg-violet-500/10 text-violet-400 border-violet-500/20"
-                            : "bg-white/5 text-white/50 hover:text-white hover:bg-white/10 border-white/10"
+                            ? "bg-violet-500/10 text-violet-300 border-violet-500/30 shadow-inner shadow-violet-500/10"
+                            : "bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border-white/10"
                     )}
                 >
-                    <Code className="w-4 h-4" />
+                    <Code className="w-4 h-4 text-violet-400" />
                     {isWebDevMode ? 'Exit Studio' : 'Open Studio'}
-                </button>
+                </motion.button>
             </div>
 
-{/* Navigation / Context */}
-            <div className="flex-1 overflow-y-auto px-3 py-2 space-y-6">
-
+            {/* Navigation / Context */}
+            <div className="flex-1 overflow-y-auto px-3 py-2 space-y-6 custom-scrollbar">
                 {/* Recent Chats */}
                 <div>
-                    <h3 className="text-[10px] font-semibold text-white/30 px-2 mb-3 uppercase tracking-widest">Workspace</h3>
+                    <h3 className="text-[10px] font-bold text-white/30 px-2.5 mb-3 uppercase tracking-widest">Workspace</h3>
                     <div className="space-y-1">
                         {state.chats.length === 0 ? (
-                            <div className="text-xs text-white/20 px-2 italic py-2">No active sessions</div>
+                            <div className="text-xs text-white/25 px-3.5 italic py-2.5">No active sessions</div>
                         ) : (
-                            state.chats.map(chat => (
-                                <div
-                                    key={chat.id}
-                                    onClick={() => selectChat(chat.id)}
-                                    className={cn(
-                                        "group w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all cursor-pointer",
-                                        chat.id === state.currentChatId
-                                            ? "bg-white/10 text-white border border-white/10"
-                                            : "text-white/50 hover:bg-white/5 hover:text-white"
-                                    )}
-                                >
-                                    {chat.latestCode ? (
-                                        <Code className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                                    ) : (
-                                        <MessageSquare className="w-3.5 h-3.5 text-white/30 shrink-0" />
-                                    )}
-                                    <span className="truncate flex-1 text-sm">{chat.title}</span>
-                                    {chat.latestCode && (
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setWebDevMode(true);
-                                            selectChat(chat.id);
-                                        }}
-                                        className="text-[9px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded font-bold tracking-tighter shrink-0 border border-indigo-500/20 hover:bg-indigo-500/30 transition-colors cursor-pointer"
+                            state.chats.map(chat => {
+                                const isActive = chat.id === state.currentChatId;
+                                return (
+                                    <motion.div
+                                        key={chat.id}
+                                        onClick={() => selectChat(chat.id)}
+                                        whileHover={{ x: 3 }}
+                                        className={cn(
+                                            "group w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all cursor-pointer relative overflow-hidden",
+                                            isActive
+                                                ? "bg-white/[0.06] text-white border border-white/10 shadow-lg shadow-black/10"
+                                                : "text-white/40 hover:bg-white/5 hover:text-white border border-transparent"
+                                        )}
                                     >
-                                        Open
-                                    </button>
-                                )}
-                                    {chat.id === state.currentChatId && (
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                deleteChat(chat.id);
-                                            }}
-                                            className="opacity-0 group-hover:opacity-100 text-white/30 hover:text-red-400 p-1 rounded transition-all ml-1 hover:bg-white/5"
-                                        >
-                                            <Trash2 className="w-3 h-3" />
-                                        </button>
-                                    )}
-                                </div>
-                            ))
+                                        {/* Active background glowing indicator */}
+                                        {isActive && (
+                                            <motion.div
+                                                layoutId="activeIndicator"
+                                                className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full"
+                                                transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                                            />
+                                        )}
+                                        {chat.latestCode ? (
+                                            <Code className="w-4 h-4 text-indigo-400 shrink-0" />
+                                        ) : (
+                                            <MessageSquare className="w-4 h-4 text-white/30 group-hover:text-indigo-400/50 shrink-0 transition-colors" />
+                                        )}
+                                        <span className="truncate flex-1 text-xs font-medium">{chat.title}</span>
+                                        {chat.latestCode && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setWebDevMode(true);
+                                                    selectChat(chat.id);
+                                                }}
+                                                className="text-[9px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded font-extrabold tracking-wider shrink-0 border border-indigo-500/20 hover:bg-indigo-500/30 transition-all cursor-pointer"
+                                            >
+                                                Open
+                                            </button>
+                                        )}
+                                        {isActive && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    deleteChat(chat.id);
+                                                }}
+                                                className="opacity-0 group-hover:opacity-100 text-white/30 hover:text-red-400 p-1 rounded-lg transition-all ml-1 hover:bg-white/10"
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                        )}
+                                    </motion.div>
+                                );
+                            })
                         )}
                     </div>
                 </div>
             </div>
 
             {/* Footer / Settings */}
-            <div className="p-3 border-t border-white/5 space-y-1 bg-[#0c0c0e]">
-                <button
+            <div className="p-3 border-t border-white/[0.05] space-y-1 bg-[#030305]/60 backdrop-blur-md shrink-0">
+                <motion.button
                     onClick={() => openModal('memory')}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-white/50 hover:text-white hover:bg-white/5 rounded-lg text-sm transition-colors group"
+                    whileHover={{ scale: 1.01, x: 2 }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-white/50 hover:text-white hover:bg-white/5 rounded-xl text-xs font-semibold transition-all group cursor-pointer"
                 >
-                    <Brain className="w-4 h-4 text-indigo-400 group-hover:text-white" />
-                    <span>Memory</span>
-                    {enabledMemoryCount > 0 && <span className="ml-auto text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded-full">{enabledMemoryCount}</span>}
-                </button>
+                    <Brain className="w-4 h-4 text-indigo-400 group-hover:text-indigo-300 transition-colors" />
+                    <span>Memory Space</span>
+                    {enabledMemoryCount > 0 && (
+                        <span className="ml-auto text-[9px] bg-indigo-500/25 text-indigo-300 px-2 py-0.5 rounded-full font-bold border border-indigo-500/20">
+                            {enabledMemoryCount}
+                        </span>
+                    )}
+                </motion.button>
 
-                <button
+                <motion.button
                     onClick={() => openModal('apiKey')}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-white/50 hover:text-white hover:bg-white/5 rounded-lg text-sm transition-colors group"
+                    whileHover={{ scale: 1.01, x: 2 }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-white/50 hover:text-white hover:bg-white/5 rounded-xl text-xs font-semibold transition-all group cursor-pointer"
                 >
-                    <Settings className="w-4 h-4 text-violet-400 group-hover:text-white" />
-                    <span>Settings</span>
-                </button>
+                    <Settings className="w-4 h-4 text-violet-400 group-hover:text-violet-300 transition-colors" />
+                    <span>Settings & Keys</span>
+                </motion.button>
 
-                <button
+                <motion.button
                     onClick={logout}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-white/50 hover:text-red-400 hover:bg-red-500/10 rounded-lg text-sm transition-colors"
+                    whileHover={{ scale: 1.01 }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-white/40 hover:text-red-400 hover:bg-red-500/10 rounded-xl text-xs font-semibold transition-all cursor-pointer"
                 >
-                    <LogOut className="w-4 h-4" />
+                    <LogOut className="w-4 h-4 text-red-500/60 group-hover:text-red-400" />
                     <span>Sign Out</span>
-                </button>
+                </motion.button>
             </div>
         </motion.aside>
     );
-} 
+}

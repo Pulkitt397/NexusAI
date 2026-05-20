@@ -3,6 +3,7 @@ import { useApp } from '@/context';
 import { PROMPT_MODE_LABELS, type SystemPromptMode } from '@/systemPrompts';
 import { cn } from '@/lib/utils';
 import { ChevronRight, LayoutTemplate, SquareTerminal, AppWindow, Cpu, Sparkles, ChevronDown, Check, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export function WorkspaceHeader({
     isSidebarOpen,
@@ -34,62 +35,76 @@ export function WorkspaceHeader({
     }, []);
 
     return (
-        <header className="h-12 border-b border-white/5 bg-[#09090b] flex items-center justify-between px-4 sticky top-0 z-30">
+        <header className="h-14 border-b border-white/[0.05] bg-[#050507]/60 backdrop-blur-xl flex items-center justify-between px-4 sticky top-0 z-30 shadow-sm">
             {/* Left: Breadcrumbs / Context */}
             <div className="flex items-center gap-3">
-                <button
+                <motion.button
                     onClick={toggleSidebar}
-                    className="p-2 -ml-2 text-white/50 hover:text-white hover:bg-white/5 rounded-md transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="p-2 -ml-2 text-white/50 hover:text-white hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
                 >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="9" y1="3" x2="9" y2="21"></line>
                     </svg>
-                </button>
+                </motion.button>
 
                 <div className="h-4 w-[1px] bg-white/10" />
 
-                <div className="flex items-center gap-2 text-sm text-white/50">
-                    <span className="flex items-center gap-1.5 hover:text-white/80 transition-colors cursor-pointer">
-                        <AppWindow className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-2 text-xs md:text-sm text-white/50">
+                    <span className="flex items-center gap-1.5 hover:text-white/80 transition-colors cursor-pointer font-medium">
+                        <AppWindow className="w-3.5 h-3.5 text-white/40" />
                         Workspace
                     </span>
                     <ChevronRight className="w-3 h-3 opacity-30" />
                     <span className={cn(
-                        "flex items-center gap-1.5 font-medium px-2 py-1 rounded",
-                        isWebDevMode ? "bg-violet-500/10 text-violet-400" : "bg-indigo-500/10 text-indigo-400"
+                        "flex items-center gap-1.5 font-bold px-2 py-1 rounded-lg text-xs transition-all",
+                        isWebDevMode ? "bg-violet-500/10 text-violet-300 border border-violet-500/20" : "bg-indigo-500/10 text-indigo-300 border border-indigo-500/20"
                     )}>
                         {isWebDevMode ? <LayoutTemplate className="w-3.5 h-3.5" /> : <Sparkles className="w-3.5 h-3.5" />}
-                        {isWebDevMode ? "Nexus Studio" : "Chat"}
+                        {isWebDevMode ? "Nexus Studio" : "Chat Mode"}
                     </span>
                 </div>
             </div>
 
             {/* Right: Mode Switcher & Model Selector Dropdown */}
             <div className="flex items-center gap-3">
-                <div className="flex items-center bg-white/5 mx-2 p-0.5 rounded-lg border border-white/5">
+                <div className="flex items-center bg-white/5 mx-2 p-1 rounded-xl border border-white/5 relative h-9">
+                    {/* Sliding background indicator */}
+                    <div className="absolute inset-y-1 left-1 right-1 pointer-events-none">
+                        <motion.div
+                            className="bg-[#27272a]/80 shadow-md rounded-lg h-full border border-white/[0.05]"
+                            initial={false}
+                            animate={{
+                                x: isWebDevMode ? '100%' : '0%',
+                                width: '50%'
+                            }}
+                            style={{
+                                width: 'calc(50% - 4px)'
+                            }}
+                            transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                        />
+                    </div>
+
                     <button
                         onClick={() => setWebDevMode(false)}
                         className={cn(
-                            "px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-2 cursor-pointer",
-                            !isWebDevMode
-                                ? "bg-[#27272a] text-white shadow-sm ring-1 ring-black/20"
-                                : "text-white/40 hover:text-white/60"
+                            "px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 cursor-pointer z-10 transition-colors duration-250 relative h-full",
+                            !isWebDevMode ? "text-white" : "text-white/40 hover:text-white/60"
                         )}
                     >
-                        <Sparkles className="w-3.5 h-3.5" />
+                        <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
                         Chat
                     </button>
                     <button
                         onClick={() => setWebDevMode(true)}
                         className={cn(
-                            "px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-2 cursor-pointer",
-                            isWebDevMode
-                                ? "bg-[#27272a] text-white shadow-sm ring-1 ring-black/20"
-                                : "text-white/40 hover:text-white/60"
+                            "px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 cursor-pointer z-10 transition-colors duration-250 relative h-full",
+                            isWebDevMode ? "text-white" : "text-white/40 hover:text-white/60"
                         )}
                     >
-                        <LayoutTemplate className="w-3.5 h-3.5" />
+                        <LayoutTemplate className="w-3.5 h-3.5 text-violet-400" />
                         Studio
                     </button>
                 </div>
@@ -98,89 +113,99 @@ export function WorkspaceHeader({
 
                 {/* Model Selector Dropdown */}
                 <div className="relative" ref={dropdownRef}>
-                    <button
+                    <motion.button
                         onClick={() => setIsOpen(!isOpen)}
-                        className="flex items-center gap-2 text-xs text-white/50 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1.5 rounded-lg border border-white/5 transition-all cursor-pointer"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="flex items-center gap-2.5 text-xs text-white/50 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-2 rounded-xl border border-white/5 transition-all cursor-pointer h-9"
                     >
-                        <Cpu className="w-3.5 h-3.5 text-indigo-400" />
-                        <span className="font-semibold max-w-[120px] truncate text-white">
+                        <Cpu className="w-4 h-4 text-indigo-400" />
+                        <span className="font-bold max-w-[120px] truncate text-white">
                             {currentModel?.name || "Select Model"}
                         </span>
                         <ChevronDown className="w-3.5 h-3.5 opacity-60 text-white/50" />
-                    </button>
+                    </motion.button>
 
-                    {isOpen && (
-                        <div className="absolute right-0 mt-2 w-80 bg-[#0c0c0e]/95 backdrop-blur-xl border border-white/[0.08] rounded-xl shadow-2xl p-3 z-50 flex flex-col gap-2">
-                            {/* Provider Selection */}
-                            <div>
-                                <p className="text-[9px] font-bold text-white/30 uppercase tracking-wider mb-1.5 px-1">Provider</p>
-                                <div className="grid grid-cols-4 gap-1">
-                                    {state.providers.map(p => (
-                                        <button
-                                            key={p.id}
-                                            onClick={() => selectProvider(p.id)}
-                                            title={p.name}
-                                            className={cn(
-                                                "flex items-center justify-center p-2 rounded-lg border transition-all cursor-pointer gap-1.5",
-                                                state.currentProviderId === p.id
-                                                    ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-300"
-                                                    : "bg-white/5 border-transparent text-white/40 hover:text-white hover:bg-white/10"
-                                            )}
-                                        >
-                                            <img
-                                                src={`/logos/${p.id}.svg`}
-                                                alt={p.name}
-                                                className="w-4 h-4 object-contain"
-                                                onError={(e) => {
-                                                    e.currentTarget.style.display = 'none';
-                                                }}
-                                            />
-                                            <span className="text-[9px] font-bold truncate max-w-[45px] uppercase tracking-wider">{p.name}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Separator */}
-                            <div className="h-px bg-white/5 my-1" />
-
-                            {/* Models List */}
-                            <div>
-                                <p className="text-[9px] font-bold text-white/30 uppercase tracking-wider mb-1.5 px-1">Available Models</p>
-                                <div className="max-h-48 overflow-y-auto space-y-0.5 custom-scrollbar pr-1">
-                                    {state.isLoadingModels ? (
-                                        <div className="flex items-center justify-center py-4 gap-2 text-white/40 text-xs">
-                                            <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-400" />
-                                            <span>Loading models...</span>
-                                        </div>
-                                    ) : state.availableModels.length === 0 ? (
-                                        <div className="text-center py-4 text-white/30 text-xs">
-                                            No models found. Configure your API key in Settings.
-                                        </div>
-                                    ) : (
-                                        state.availableModels.map(m => (
+                    <AnimatePresence>
+                        {isOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                                transition={{ duration: 0.15, ease: "easeOut" }}
+                                className="absolute right-0 mt-2.5 w-80 bg-[#070709]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-2xl p-4 z-50 flex flex-col gap-3.5"
+                            >
+                                {/* Provider Selection */}
+                                <div>
+                                    <p className="text-[9px] font-extrabold text-white/30 uppercase tracking-widest mb-2 px-1">AI Provider</p>
+                                    <div className="grid grid-cols-4 gap-1.5">
+                                        {state.providers.map(p => (
                                             <button
-                                                key={m.id}
-                                                onClick={() => {
-                                                    selectModel(m.id);
-                                                    setIsOpen(false);
-                                                }}
+                                                key={p.id}
+                                                onClick={() => selectProvider(p.id)}
+                                                title={p.name}
                                                 className={cn(
-                                                    "w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left text-xs transition-all cursor-pointer",
-                                                    state.currentModelId === m.id
-                                                        ? "bg-indigo-500/10 text-indigo-300 font-medium"
-                                                        : "text-white/50 hover:bg-white/5 hover:text-white"
+                                                    "flex items-center justify-center p-2 rounded-xl border transition-all cursor-pointer gap-1.5 h-9",
+                                                    state.currentProviderId === p.id
+                                                        ? "bg-indigo-500/10 border-indigo-500/40 text-indigo-300 shadow-md shadow-indigo-500/5"
+                                                        : "bg-white/5 border-transparent text-white/40 hover:text-white hover:bg-white/10"
                                                 )}
                                             >
-                                                <span className="truncate pr-4">{m.name}</span>
-                                                {state.currentModelId === m.id && <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0" />}
+                                                <img
+                                                    src={`/logos/${p.id}.svg`}
+                                                    alt={p.name}
+                                                    className="w-4 h-4 object-contain"
+                                                    onError={(e) => {
+                                                        e.currentTarget.style.display = 'none';
+                                                    }}
+                                                />
+                                                <span className="text-[9px] font-extrabold truncate max-w-[45px] uppercase tracking-wider">{p.name}</span>
                                             </button>
-                                        ))
-                                    )}
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    )}
+
+                                {/* Separator */}
+                                <div className="h-px bg-white/5" />
+
+                                {/* Models List */}
+                                <div>
+                                    <p className="text-[9px] font-extrabold text-white/30 uppercase tracking-widest mb-2 px-1">Available Models</p>
+                                    <div className="max-h-48 overflow-y-auto space-y-1 custom-scrollbar pr-1">
+                                        {state.isLoadingModels ? (
+                                            <div className="flex items-center justify-center py-5 gap-2.5 text-white/40 text-xs">
+                                                <Loader2 className="w-4 h-4 animate-spin text-indigo-400" />
+                                                <span className="font-medium">Loading models...</span>
+                                            </div>
+                                        ) : state.availableModels.length === 0 ? (
+                                            <div className="text-center py-5 text-white/30 text-xs">
+                                                No models found. Configure your API key in Settings.
+                                            </div>
+                                        ) : (
+                                            state.availableModels.map(m => (
+                                                <button
+                                                    key={m.id}
+                                                    onClick={() => {
+                                                        selectModel(m.id);
+                                                        setIsOpen(false);
+                                                    }}
+                                                    className={cn(
+                                                        "w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs transition-all cursor-pointer",
+                                                        state.currentModelId === m.id
+                                                            ? "bg-indigo-500/10 text-indigo-300 font-semibold"
+                                                            : "text-white/50 hover:bg-white/5 hover:text-white"
+                                                    )}
+                                                >
+                                                    <span className="truncate pr-4">{m.name}</span>
+                                                    {state.currentModelId === m.id && <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0" />}
+                                                </button>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
         </header>

@@ -54,7 +54,7 @@ export default function App() {
     // Show auth page if not logged in
     if (authLoading) {
         return (
-            <div className="min-h-screen w-screen bg-[#09090b] flex items-center justify-center">
+            <div className="min-h-screen w-screen bg-[#030303] flex items-center justify-center">
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -85,7 +85,7 @@ export default function App() {
 
 
     return (
-        <div className="flex h-screen w-screen overflow-hidden bg-[#09090b] text-white font-sans antialiased selection:bg-indigo-500/30">
+        <div className="flex h-screen w-screen overflow-hidden bg-[#030303] text-white font-sans antialiased selection:bg-indigo-500/30">
             {/* 1. Sidebar */}
             <Sidebar
                 isMobile={isMobile}
@@ -120,7 +120,7 @@ export default function App() {
                 />
 
                 {/* 4. Canvas (Chat or WebDev) */}
-                <main className="flex-1 relative overflow-hidden bg-[#09090b]">
+                <main className="flex-1 relative overflow-hidden bg-[#030303]">
                     {isWebDevMode ? (
                     <WebDevEnvironment
                             onClose={() => setIsWebDevMode(false)}
